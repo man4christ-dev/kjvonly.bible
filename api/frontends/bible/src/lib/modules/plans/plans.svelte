@@ -10,14 +10,17 @@
 
 	function onGetAllSubs(data: any){
 		console.log(data)
+		for (let i = 0; i < data.length; i++){
+			
+		}
 	}
 
 	function onGetAllPlans(data: any){
 		console.log(data)
 	}
 
-	let subID = ''
-
+	let subID = "00000000-0000-0000-0000-000000000000"
+	
 	onMount(()=>{
 			plansService.subscribe('getAllPlans', onGetAllPlans);
 			plansService.getAllPlans();

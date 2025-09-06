@@ -1,6 +1,6 @@
 import {
-	SUBSCRIPTIONS,
-	UNSYNCED_SUBSCRIPTIONS,
+READINGS,
+UNSYNCED_READINGS
 } from '$lib/storer/bible.db';
 import { bibleStorer } from '$lib/storer/bible.storer';
 import { offlineApi } from './offline.api';
@@ -9,15 +9,14 @@ const PATH = 'readings'
 export class ReadignsApi {
 	
 	async put(data: any): Promise<any> {
-		let path = `${PATH}/${data.id}`;
-		return offlineApi.put(data, path, UNSYNCED_SUBSCRIPTIONS, SUBSCRIPTIONS);
+		return offlineApi.put(data, PATH, UNSYNCED_READINGS, READINGS);
 	}
 
 	async gets(): Promise<any> {
 		let data: any = undefined;
 		try {
-			let unsyncedSubscription = await bibleStorer.getAllValue(UNSYNCED_SUBSCRIPTIONS);
-			let syncedSubscriptions = await bibleStorer.getAllValue(SUBSCRIPTIONS);
+			let unsyncedSubscription = await bibleStorer.getAllValue(UNSYNCED_READINGS);
+			let syncedSubscriptions = await bibleStorer.getAllValue(READINGS);
 
 			let concatSubscription: any = new Map()
 			syncedSubscriptions.forEach((p: any) => {
@@ -37,7 +36,7 @@ export class ReadignsApi {
 	}
 
 	async delete(id: string): Promise<any> {
-		await offlineApi.delete(id, PATH, UNSYNCED_SUBSCRIPTIONS, SUBSCRIPTIONS);
+		await offlineApi.delete(id, PATH, UNSYNCED_READINGS, READINGS);
 	}
 }
 

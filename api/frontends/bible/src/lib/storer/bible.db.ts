@@ -1,6 +1,6 @@
 import IndexedDB from './idb.db';
 
-const DB_VERSION = 9
+const DB_VERSION = 10
 
 export const enum STORES {
 	CHAPTERS,
@@ -39,7 +39,7 @@ export const SUBSCRIPTIONS = 'subscriptions';
 export const UNSYNCED_SUBSCRIPTIONS = 'unsynced_subscriptions';
 
 export const READINGS = 'readings';
-export const UNSYNCED_READINGS = 'readings';
+export const UNSYNCED_READINGS = 'unsynced_readings';
 
 
 export class BibleDB extends IndexedDB {

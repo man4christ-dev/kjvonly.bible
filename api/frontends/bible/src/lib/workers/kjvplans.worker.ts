@@ -37,7 +37,7 @@ let subsDocument = new FlexSearch.Document({
 let readingsDocument = new FlexSearch.Document({
 	document: {
 		id: 'id',
-		index: ['id', 'subID']
+		index: ['subID']
 	}
 });
 
@@ -92,6 +92,24 @@ async function parsePlans() {
 
 	console.log(plans)
 }
+async function addReadingsToSubs() {
+
+	let subKeys = Object.keys(subs)
+	for (let i = 0; i < subKeys.length; i++) {
+		const results = await readingsDocument.searchAsync(subKeys[i], {
+			index: ['subID'],
+		});
+		let filteredReadings: any = []
+		results.forEach((r) => {
+			r.result.forEach((id) => {
+				filteredReadings.push(readings[id]);
+			});
+
+			filteredReadings.sort((a: any, b: any) => { a.index - b.index })
+			subs[subKeys[i]].readings = filteredReadings
+		});
+	}
+}
 
 async function init() {
 	booknames = await chapterApi.getBooknames()
@@ -107,18 +125,20 @@ async function init() {
 	// CORE NOTE: Reading ids are composite priamry keys subID & id
 	// id is just the index in of the reading plan. FlexSearch id 
 	// is <subid>/<id> for a reading
-	let cachedReadings = await subsApi.gets()
+	let cachedReadings = await readingsApi.gets()
 	for (let i = 0; i < cachedReadings.length; i++) {
 		let r = cachedReadings[i]
-		await readingsDocument.addAsync(`${r.subID}/${r.id}`, r);
+		await readingsDocument.addAsync(r.id, r);
 		readings[r.id] = r
 	}
+
+	await addReadingsToSubs()
 
 	getAllPlans();
 	getAllSubs()
 }
 
-function addPlan(planID: string, plan: any) {	
+function addPlan(planID: string, plan: any) {
 	plans[planID] = plan;
 	plansDocument.add(planID, plan);
 	getAllPlans();
@@ -131,9 +151,10 @@ function deletePlan(planID: string) {
 }
 
 
-function addSubs(subID: string, sub: any) {	
+async function addSubs(subID: string, sub: any) {
 	subs[subID] = sub;
 	subsDocument.add(subID, sub);
+	await addReadingsToSubs()
 	getAllSubs();
 }
 
@@ -143,16 +164,16 @@ function deleteSub(subID: string) {
 	getAllSubs();
 }
 
-function addReadings(readingID: string, reading: any) {	
+async function addReadings(readingID: string, reading: any) {
 	readings[readingID] = reading;
 	readingsDocument.add(readingID, reading);
-	getAllReadings();
+	await addReadingsToSubs()
 }
 
-function deleteReadings(readingID: string) {
+async function deleteReadings(readingID: string) {
 	delete subs[readingID];
 	readingsDocument.remove(readingID);
-	getAllReadings();
+	await addReadingsToSubs()
 }
 
 
@@ -203,10 +224,10 @@ onmessage = async (e) => {
 			break;
 		case 'searchSubs':
 			await search(e.data.id, e.data.text, e.data.indexes, subsDocument, subs);
-			break;			
+			break;
 		case 'searchReadings':
 			await search(e.data.id, e.data.text, e.data.indexes, readingsDocument, readings);
-			break;						
+			break;
 		case 'getAllPlans':
 			getAllPlans();
 	}

@@ -10,6 +10,7 @@
 	import { plansApi } from '$lib/api/plans.api';
 	import { plansService } from '$lib/services/plans.service';
 	import { subsApi } from '$lib/api/subs.api';
+	import { readingsApi } from '$lib/api/readings.api';
 
 	function register() {
 		// Listen for connection coming online
@@ -47,8 +48,8 @@
 			}, 5000);
 		}
 
-		// let sub = localStorage.getItem('tmp')
-		// await subsApi.put(JSON.parse(sub))
+		let reading = localStorage.getItem('tmp')
+		await readingsApi.put(JSON.parse(reading))
 
 	});
 
