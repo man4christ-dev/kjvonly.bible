@@ -1,3 +1,4 @@
+import { read } from '$app/server';
 import { chapterApi } from '$lib/api/chapters.api';
 import { notesApi } from '$lib/api/notes.api';
 import { plansApi } from '$lib/api/plans.api';
@@ -92,22 +93,39 @@ async function parsePlans() {
 
 	console.log(plans)
 }
-async function addReadingsToSubs() {
 
+function getNextReadingIndex(readingIndexes: number[]): number {
+		readingIndexes.sort((a: number,b: number)=>  a - b )
+
+		let nextReadingIndex = 0
+		for(let j = 0; j < readingIndexes.length; j++){
+			if (readingIndexes[j] != j){
+				return nextReadingIndex
+			} 
+			nextReadingIndex = j + 1
+		}
+
+		return nextReadingIndex
+}
+
+async function addReadingsToSubs() {
 	let subKeys = Object.keys(subs)
 	for (let i = 0; i < subKeys.length; i++) {
 		const results = await readingsDocument.searchAsync(subKeys[i], {
 			index: ['subID'],
 		});
-		let filteredReadings: any = []
+		let filteredReadings: any = {}
+		let readingIndexes: number[] = []
 		results.forEach((r) => {
 			r.result.forEach((id) => {
-				filteredReadings.push(readings[id]);
+				let index = readings[id].index
+				filteredReadings[index] =readings[id];
+				readingIndexes.push(index)
 			});
-
-			filteredReadings.sort((a: any, b: any) => { a.index - b.index })
 			subs[subKeys[i]].readings = filteredReadings
 		});
+		subs[subKeys[i]].nextReadingIndex = getNextReadingIndex(readingIndexes)
+		subs[subKeys[i]].readingsCompleted = readingIndexes.length
 	}
 }
 
@@ -230,6 +248,8 @@ onmessage = async (e) => {
 			break;
 		case 'getAllPlans':
 			getAllPlans();
+		case 'getAllSubs':
+			getAllSubs();			
 	}
 };
 

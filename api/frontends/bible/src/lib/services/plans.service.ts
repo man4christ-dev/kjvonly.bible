@@ -21,7 +21,7 @@ export class PlansService {
 	}
 
 	init() {
-		plansWorker.postMessage({ action: 'empty' });
+		plansWorker.postMessage({ action: 'init' });
 	}
 
 	getAllReadings() {

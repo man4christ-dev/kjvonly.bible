@@ -6,39 +6,91 @@
 
 	let { containerHeight, paneId } = $props();
 
-	let readingSearchID = uuid4()
+	let readingSearchID = uuid4();
 
-	function onGetAllSubs(data: any){
-		console.log(data)
-		for (let i = 0; i < data.length; i++){
-			
+	let plans: any = $state({});
+	let subs: any = $state({});
+	let todaysReadings: any = $state([]);
+
+	function onGetAllSubs(data: any) {
+		if (data) {
+			subs = data.subs;
 		}
+		console.log(data.subs);
+		updateTodays();
 	}
 
-	function onGetAllPlans(data: any){
-		console.log(data)
+	function onGetAllPlans(data: any) {
+		if (data) {
+			plans = data.plans;
+		}
+
+		console.log(data.plans);
 	}
 
-	let subID = "00000000-0000-0000-0000-000000000000"
-	
-	onMount(()=>{
-			plansService.subscribe('getAllPlans', onGetAllPlans);
-			plansService.getAllPlans();
+	function updateTodays() {
+		let tr = [];
+		let subKeys = Object.keys(subs);
+		for (let i = 0; i < subKeys.length; i++) {
+			let sub = subs[subKeys[i]];
+			let plan = plans[sub.planID];
 
-			plansService.subscribe('getAllSubs', onGetAllSubs);
-			plansService.getAllSubs();			
-	})
+			if (plan.readings.length - 1 > sub.nextReadingIndex) {
+				tr.push({
+					reading: plan.readings[sub.nextReadingIndex],
+					planDateCreated: plan.dateCreated ? plan.dateCreated : Date.now(),
+					name: plan.name,
+					percentComplete: Math.ceil(sub.readingsCompleted / plan.readings.length * 100)
+				});
+			}
+		}
+
+		todaysReadings.length = 0;
+		todaysReadings.push(...tr);
+	}
+
+	let subID = '00000000-0000-0000-0000-000000000000';
+
+	onMount(() => {
+		plansService.subscribe('getAllPlans', onGetAllPlans);
+		plansService.getAllPlans();
+
+		plansService.subscribe('getAllSubs', onGetAllSubs);
+		plansService.getAllSubs();
+	});
 
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 </script>
 
 {#snippet today()}
-	<div>
-        no reading for today.
+	<div class="w-full">
+		{#if todaysReadings.length > 0}
+			{#each todaysReadings as t}
+				<div
+					class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
+				>
+					<div class="flex">
+						<span class="pb-2 text-2xl">{t.name}</span>
+						<span class="flex-grow"></span>
+						<span class="text-support-a-500">{t.percentComplete}%</span>
+						
+					</div>
 
-        Discover
-    </div>
+					<table class="table-fixed">
+						<tbody>
+							{#each t.reading as r}
+								<tr>
+									<td class="w-0 pe-3">{r.bookName}</td>
+									<td>{r.chapter}:{r.verses}</td>
+								</tr>
+							{/each}
+						</tbody>
+					</table>
+				</div>
+			{/each}
+		{/if}
+	</div>
 {/snippet}
 
 <div bind:clientHeight style={containerHeight} class="overflow-hidden">
@@ -65,6 +117,13 @@
 			</div>
 		</header>
 
-		<div class="flex w-full max-w-lg justify-center px-2 pt-2">{@render today()}</div>
+		<div class="w-full max-w-lg">
+			<div
+				style="height: {clientHeight - headerHeight}px"
+				class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
+			>
+				{@render today()}
+			</div>
+		</div>
 	</div>
 </div>
