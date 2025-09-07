@@ -90,9 +90,8 @@ async function parsePlans() {
 		await plansDocument.addAsync(plan.id, plan);
 		plans[plan.id] = plan
 	}
-
-	console.log(plans)
 }
+
 
 function getNextReadingIndex(readingIndexes: number[]): number {
 		readingIndexes.sort((a: number,b: number)=>  a - b )
@@ -120,7 +119,7 @@ async function addReadingsToSubs() {
 		results.forEach((r) => {
 			r.result.forEach((id) => {
 				let index = readings[id].index
-				filteredReadings[index] =readings[id];
+				filteredReadings[index] = readings[id];
 				readingIndexes.push(index)
 			});
 			sub.readings = filteredReadings

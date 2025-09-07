@@ -2,7 +2,9 @@
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { plansService } from '$lib/services/plans.service';
 	import { PLANS } from '$lib/storer/bible.db';
+	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
+	import uuid4 from 'uuid4';
 
 	let { containerHeight, paneId } = $props();
 
@@ -13,6 +15,9 @@
 	let todaysReadings: any = $state([]);
 	let selectedSub: any = $state(undefined);
 	let showCompletedReadings: boolean = $state(false);
+
+	let subListReadingsToShow: number = $state(20);
+	let subListViewID = uuid4();
 
 	const PLANS_VIEWS = {
 		PLANS_LIST: 'PLANS_LIST',
@@ -46,6 +51,16 @@
 	function onSubClicked(sub: any) {
 		selectedSub = sub;
 		plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
+
+		setTimeout(() => {
+			let el = document.getElementById(`${subListViewID}-scroll-container`);
+			while (!el) {
+				el = document.getElementById(`${subListViewID}-scroll-container`);
+				sleep(1000);
+			}
+
+			el?.addEventListener('scroll', handleScroll);
+		}, 1000);
 	}
 
 	function onGetAllSubs(data: any) {
@@ -58,7 +73,6 @@
 					subsList.push(subsMap[k]);
 				});
 		}
-		console.log(data.subs);
 		updateTodays();
 	}
 
@@ -71,8 +85,6 @@
 					planList.push(plansMap[k]);
 				});
 		}
-
-		console.log(data.plans);
 	}
 
 	function updateTodays() {
@@ -93,6 +105,28 @@
 
 		todaysReadings.length = 0;
 		todaysReadings.push(...tr);
+	}
+
+	function loadMoreSubReadings() {
+		let toShow = subListReadingsToShow + 20;
+		if (toShow > selectedSub.plan.readings.length) {
+			toShow = selectedSub.plan.readings.length;
+		}
+		subListReadingsToShow = toShow;
+	}
+
+	function handleScroll() {
+		let el = document.getElementById(`${subListViewID}-scroll-container`);
+		if (el === null) {
+			return;
+		}
+
+		const threshold = 20; // Adjust this value as needed
+		const isReachBottom = el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+
+		if (isReachBottom) {
+			loadMoreSubReadings();
+		}
 	}
 
 	let subID = '00000000-0000-0000-0000-000000000000';
@@ -166,14 +200,15 @@
 				></span>
 			</label>
 		</div>
+
 		<div class="flex w-full flex-col text-base">
-			{#each sub.plan.readings as r, idx}
+			{#each Array(subListReadingsToShow) as _, idx}
 				{#if !sub.readings[idx] || (sub.readings[idx] && showCompletedReadings)}
 					<div
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							{@render reading(r)}
+							{@render reading(sub.plan.readings[idx])}
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">
@@ -184,7 +219,9 @@
 								</div>
 							</div>
 							<div class="flex w-full justify-end">
-								<div class="text-base text-nowrap">Verses: {r.totalVerses}</div>
+								<div class="text-base text-nowrap">
+									Verses: {sub.plan.readings[idx].totalVerses}
+								</div>
 							</div>
 						</div>
 					</div>
@@ -370,6 +407,7 @@
 		{@render plansHeaderComponent('My Plans', undefined, PLANS_VIEWS.SUBS_LIST)}
 		<div class="flex w-full max-w-lg">
 			<div
+				id="{subListViewID}-scroll-container"
 				style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
 					headerHeight}px"
 				class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
