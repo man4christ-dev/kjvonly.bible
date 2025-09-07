@@ -1,17 +1,16 @@
 <script lang="ts">
 	import { bibleNavigationService } from '$lib/services/bibleNavigation.service';
-	import { onMount, untrack } from 'svelte';
+	import { onMount } from 'svelte';
 	import Chapter from './chapter.svelte';
 	import { newSettings, type Settings } from '../../models/settings.model';
 	import { settingsService } from '$lib/services/settings.service';
 
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import ChapterActions from './chapterActions.svelte';
-	import type { Pane } from '$lib/models/pane.model';
+
 	import uuid4 from 'uuid4';
 	import EditOptions from './editOptions.svelte';
-	import { chapterApi } from '$lib/api/chapters.api';
-	import { syncService } from '$lib/services/sync.service';
+
 
 	type WordAnnots = {
 		class: string[];
@@ -67,6 +66,7 @@
 
 	async function _nextChapter(e: Event) {
 		e.stopPropagation();
+		// TODO PLANS check
 		if (chapterKey) {
 			chapterKey = bibleNavigationService.next(chapterKey);
 		}
@@ -74,6 +74,9 @@
 
 	async function _previousChapter(e: Event) {
 		e.stopPropagation();
+		// TODO PLANS check
+
+
 		if (chapterKey) {
 			chapterKey = bibleNavigationService.previous(chapterKey);
 		}
@@ -123,6 +126,13 @@
 			chapterSettings = newSettings();
 		}
 
+
+		if(pane?.buffer?.bag?.plan){
+			console.log('plan')
+			mode.plan = pane?.buffer?.bag?.plan
+		}
+
+
 		let ck = pane.buffer.bag.chapterKey;
 		if (ck) {
 			chapterKey = ck;
@@ -150,6 +160,7 @@
 				ticking = true;
 			}
 		});
+
 
 		if (pane?.buffer?.bag?.lastVerse) {
 			setTimeout(() => {

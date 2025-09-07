@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 
-	let { containerHeight, paneId } = $props();
+	let { containerHeight, paneId, pane } = $props();
 
 	let plansMap: any = $state({});
 	let planList: any = $state([]);
@@ -18,6 +18,13 @@
 
 	let subListReadingsToShow: number = $state(20);
 	let subListViewID = uuid4();
+	
+	function onSelectedSubReading(idx: number){
+		pane.buffer.bag.plan = {
+			readings: selectedSub.plan.readings[idx]
+		}
+		pane.updateBuffer('ChapterContainer')
+	}
 
 	const PLANS_VIEWS = {
 		PLANS_LIST: 'PLANS_LIST',
@@ -204,7 +211,10 @@
 		<div class="flex w-full flex-col text-base">
 			{#each Array(subListReadingsToShow) as _, idx}
 				{#if !sub.readings[idx] || (sub.readings[idx] && showCompletedReadings)}
+					<!-- svelte-ignore a11y_click_events_have_key_events -->
+					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
+						onclick={()=>onSelectedSubReading(idx)}
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">

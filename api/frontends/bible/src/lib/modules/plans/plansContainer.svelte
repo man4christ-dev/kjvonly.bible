@@ -17,6 +17,6 @@
 
 <div class="kjvonly-noselect overflow-hidden">
 	<div {id} style="{containerHeight} {containerWidth}">
-		<Plans containerHeight paneId></Plans>
+		<Plans containerHeight paneId pane></Plans>
 	</div>
 </div>

@@ -4,6 +4,7 @@
 	import SettingsPopup from './settingsPopup.svelte';
 	import NotesContainer from '../notes/notesContainer.svelte';
 	import CopyVersePopup from './copyVersePopup.svelte';
+	import PlanReadingsList from './planReadingsList.svelte';
 
 	let {
 		mode = $bindable(),
@@ -16,13 +17,18 @@
 	} = $props();
 
 	let showBookChapterPopup: Boolean = $state(false);
+	let showPlanReadingPopup: Boolean = $state(false);
 	let showSettingsPopup: Boolean = $state(false);
 	let showActionsPopup: Boolean = $state(false);
 	let showCopyVersePopup: boolean = $state(false);
 
 	function onBookChapterClick(event: Event) {
 		event.stopPropagation();
-		showBookChapterPopup = !showBookChapterPopup;
+		if (mode.plan) {
+			showPlanReadingPopup = !showPlanReadingPopup;
+		} else {
+			showBookChapterPopup = !showBookChapterPopup;
+		}
 	}
 
 	function onSettingsClick(event: Event) {
@@ -107,6 +113,12 @@
 {#if showBookChapterPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
 		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey></BookChapterPopup>
+	</div>
+{/if}
+{#if showPlanReadingPopup}
+	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
+		<PlanReadingsList bind:showPlanReadingPopup bind:readings={mode.plan.readings} bind:chapterKey
+		></PlanReadingsList>
 	</div>
 {/if}
 {#if showSettingsPopup}
