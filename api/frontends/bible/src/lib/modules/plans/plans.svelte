@@ -11,30 +11,40 @@
 	let subsMap: any = $state({});
 	let subsList: any = $state([]);
 	let todaysReadings: any = $state([]);
-
+	let selectedSub: any = $state(undefined);
 
 	const PLANS_VIEWS = {
 		PLANS_LIST: 'PLANS_LIST',
 		PLANS_ACTIONS: 'PLANS_ACTION',
 		PLANS_DETAILS: 'PLANS_DETAILS',
 
-		SUBS_LIST: "SUBS_LIST",
-		SUBS_ACTIONS: "SUBS_ACTIONS",
-		SUBS_DETAILS: "SUBS_DETAILS"
+		SUBS_LIST: 'SUBS_LIST',
+		SUBS_ACTIONS: 'SUBS_ACTIONS',
+		SUBS_DETAILS: 'SUBS_DETAILS'
 	};
 
-	let plansDisplay: string = $state(PLANS_VIEWS.PLANS_LIST);
+	let plansDisplay: string = $state(PLANS_VIEWS.SUBS_LIST);
 	let planActionItems: any = {
-		subscription: () => {},
+		'my plans': () => {
+			plansDisplay = PLANS_VIEWS.SUBS_LIST;
+		},
 		'next readings': () => {}
 	};
 
-	function onClosePanesList() {
+	function onClosePlansList() {
 		paneService.onDeletePane(paneService.rootPane, paneId);
 	}
 
-	function onClosePlansActionList() {
-		plansDisplay = PLANS_VIEWS.PLANS_LIST;
+	let subsActionItems: any = {
+		plans: () => {
+			plansDisplay = PLANS_VIEWS.PLANS_LIST;
+		},
+		'next readings': () => {}
+	};
+
+	function onSubClicked(sub: any) {
+		selectedSub = sub;
+		plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
 	}
 
 	function onGetAllSubs(data: any) {
@@ -134,20 +144,27 @@
 {/snippet}
 
 {#snippet subListView(sub: any)}
-	<div class="flex">
-		<span class="pb-2 text-2xl">{sub.name}</span>
-	</div>
+	<div class="flex w-full flex-col">
+		<span class="pb-2 text-2xl">{sub.plan.name}</span>
 
-	<div class="col-2 flex w-full flex-col p-2 text-base">
-		{#each sub.readings as r}
-			{@render reading(r)}
-		{/each}
+		<div class="flex w-full flex-col text-base">
+			{#each sub.plan.readings as r}
+				<div class="col-2 p-2 flex w-full flex-col text-base hover:cursor-pointer hover:bg-neutral-100">
+					{@render reading(r)}
+				</div>
+			{/each}
+		</div>
 	</div>
 {/snippet}
 
 {#snippet subsListView()}
 	{#each subsList as s}
-		<div class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100">
+		<!-- svelte-ignore a11y_click_events_have_key_events -->
+		<!-- svelte-ignore a11y_no_static_element_interactions -->
+		<div
+			onclick={() => onSubClicked(s)}
+			class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
+		>
 			<div class="flex w-full">
 				<span class="pb-2 text-2xl">{s.plan.name}</span>
 				<span class="flex-grow"></span>
@@ -183,24 +200,23 @@
 	{/each}
 {/snippet}
 
-{#snippet plansActionItemsList()}
-	<div
-		style="height: {containerHeight - headerHeight}px"
-		class="flex w-full flex-col overflow-y-scroll border"
-	>
-		{#each Object.keys(planActionItems) as a}
-			<div class="w-full">
-				<button
-					onclick={(event) => planActionItems[a]()}
-					class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize hover:cursor-pointer"
-					>{a}</button
-				>
-			</div>
+{#snippet actionItemsListView(actionItems: any)}
+	<div class="flex w-full flex-col">
+		{#each Object.keys(actionItems) as a}
+			<button
+				onclick={(event) => actionItems[a]()}
+				class="hover:bg-primary-50 flex w-full bg-neutral-50 p-4 text-start capitalize hover:cursor-pointer"
+				>{a}</button
+			>
 		{/each}
 	</div>
 {/snippet}
 
-{#snippet plansHeaderComponent(title: string, onClose: Function | undefined, menuActionView: string)}
+{#snippet plansHeaderComponent(
+	title: string,
+	onClose: Function | undefined,
+	menuActionView: string
+)}
 	<header
 		bind:clientHeight={headerHeight}
 		class="flex w-full max-w-lg flex-row items-center justify-between bg-neutral-100 text-neutral-700"
@@ -212,11 +228,11 @@
 			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<p
 				onclick={() => {
-					plansDisplay = menuActionView
+					plansDisplay = menuActionView;
 				}}
 				class="flex flex-row items-center space-x-2 hover:cursor-pointer"
 			>
-				<span class="inline-block font-bold">{title}</span>
+				<span class="inline-block font-bold text-nowrap">{title}</span>
 				<button aria-label="chevron down" class="h-4 w-4 hover:cursor-pointer">
 					<svg
 						width="100%"
@@ -257,14 +273,14 @@
 				</button>
 			</div>
 		{:else}
-			<span class="w-full flex justify-end h-12 w-12"></span>
+			<span class="flex h-12 w-12 w-full justify-end"></span>
 		{/if}
 	</header>
 {/snippet}
 
 {#snippet plansView()}
 	{#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
-		{@render plansHeaderComponent('Plans', onClosePanesList, PLANS_VIEWS.PLANS_ACTIONS)}
+		{@render plansHeaderComponent('Discover Plans', onClosePlansList, PLANS_VIEWS.PLANS_ACTIONS)}
 		<div class="w-full max-w-lg">
 			<div
 				style="height: {clientHeight - headerHeight}px"
@@ -275,7 +291,7 @@
 			</div>
 		</div>
 	{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}
-		{@render plansHeaderComponent('Actions', undefined, PLANS_VIEWS.PLANS_LIST)}
+		{@render plansHeaderComponent('Discover Plans', undefined, PLANS_VIEWS.PLANS_LIST)}
 		<div class="flex w-full max-w-lg">
 			<div
 				style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
@@ -283,7 +299,46 @@
 				class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 			>
 				<!-- {@render today()} -->
-				{@render plansActionItemsList()}
+				{@render actionItemsListView(planActionItems)}
+			</div>
+		</div>
+	{/if}
+{/snippet}
+
+{#snippet subsView()}
+	{#if plansDisplay === PLANS_VIEWS.SUBS_LIST}
+		{@render plansHeaderComponent('My Plans', onClosePlansList, PLANS_VIEWS.SUBS_ACTIONS)}
+		<div class="w-full max-w-lg">
+			<div
+				style="height: {clientHeight - headerHeight}px"
+				class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
+			>
+				<!-- {@render today()} -->
+				{@render subsListView()}
+			</div>
+		</div>
+	{:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
+		{@render plansHeaderComponent('My Plans', undefined, PLANS_VIEWS.SUBS_LIST)}
+		<div class="flex w-full max-w-lg">
+			<div
+				style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
+					headerHeight}px"
+				class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
+			>
+				<!-- {@render today()} -->
+				{@render actionItemsListView(subsActionItems)}
+			</div>
+		</div>
+	{:else if plansDisplay === PLANS_VIEWS.SUBS_DETAILS}
+		{@render plansHeaderComponent('My Plans', undefined, PLANS_VIEWS.SUBS_LIST)}
+		<div class="flex w-full max-w-lg">
+			<div
+				style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
+					headerHeight}px"
+				class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
+			>
+				<!-- {@render today()} -->
+				{@render subListView(selectedSub)}
 			</div>
 		</div>
 	{/if}
@@ -291,6 +346,10 @@
 
 <div bind:clientHeight style={containerHeight} class="overflow-hidden">
 	<div class="flex flex-col items-center">
-		{@render plansView()}
+		{#if plansDisplay.startsWith('PLANS')}
+			{@render plansView()}
+		{:else if plansDisplay.startsWith('SUBS')}
+			{@render subsView()}
+		{/if}
 	</div>
 </div>
