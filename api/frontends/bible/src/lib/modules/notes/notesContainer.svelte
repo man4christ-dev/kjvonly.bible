@@ -453,7 +453,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			<span class="inline-block font-bold"
 				>{note.title}{note.title?.length === 20 ? '...' : ''}</span
 			>
-			<button aria-label="chevron down" class="h-4 w-4">
+			<button aria-label="chevron down" class="h-4 w-4 hover:cursor-pointer">
 				<svg
 					width="100%"
 					height="100%"
