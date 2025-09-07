@@ -111,7 +111,8 @@ function getNextReadingIndex(readingIndexes: number[]): number {
 async function addReadingsToSubs() {
 	let subKeys = Object.keys(subs)
 	for (let i = 0; i < subKeys.length; i++) {
-		const results = await readingsDocument.searchAsync(subKeys[i], {
+		let sub = subs[subKeys[i]]
+		const results = await readingsDocument.searchAsync(sub.id, {
 			index: ['subID'],
 		});
 		let filteredReadings: any = {}
@@ -122,10 +123,12 @@ async function addReadingsToSubs() {
 				filteredReadings[index] =readings[id];
 				readingIndexes.push(index)
 			});
-			subs[subKeys[i]].readings = filteredReadings
+			sub.readings = filteredReadings
 		});
-		subs[subKeys[i]].nextReadingIndex = getNextReadingIndex(readingIndexes)
-		subs[subKeys[i]].readingsCompleted = readingIndexes.length
+		let plan  = plans[sub.planID]
+		sub.plan = plan
+		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
+		sub.percentCompleted = Math.ceil(readingIndexes.length / sub.plan.readings.length * 100)
 	}
 }
 

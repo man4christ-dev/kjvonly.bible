@@ -10,11 +10,18 @@
 
 	let plans: any = $state({});
 	let subs: any = $state({});
+	let subsList: any = $state([]);
 	let todaysReadings: any = $state([]);
 
 	function onGetAllSubs(data: any) {
 		if (data) {
 			subs = data.subs;
+			subsList.length = 0;
+			Object.keys(subs)
+				.sort((a: any, b: any) => a.dateCreated - b.dateCreated)
+				.forEach((k: any) => {
+					subsList.push(subs[k]);
+				});
 		}
 		console.log(data.subs);
 		updateTodays();
@@ -33,14 +40,13 @@
 		let subKeys = Object.keys(subs);
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub = subs[subKeys[i]];
-			let plan = plans[sub.planID];
 
-			if (plan.readings.length - 1 > sub.nextReadingIndex) {
+			if (sub.plan.readings.length - 1 > sub.nextReadingIndex) {
 				tr.push({
-					reading: plan.readings[sub.nextReadingIndex],
-					planDateCreated: plan.dateCreated ? plan.dateCreated : Date.now(),
-					name: plan.name,
-					percentComplete: Math.ceil(sub.readingsCompleted / plan.readings.length * 100)
+					reading: sub.plan.readings[sub.nextReadingIndex],
+					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
+					name: sub.plan.name,
+					percentCompleted: sub.percentCompleted
 				});
 			}
 		}
@@ -63,34 +69,71 @@
 	let headerHeight = $state(0);
 </script>
 
+{#snippet reading(rs: any)}
+	<table class="table-fixed">
+		<tbody>
+			{#each rs as r}
+				<tr>
+					<td class="w-0 pe-3">{r.bookName}</td>
+					<td>{r.chapter}:{r.verses}</td>
+				</tr>
+			{/each}
+		</tbody>
+	</table>
+{/snippet}
+
+{#snippet todayReading(t: any)}
+	<div class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100">
+		<div class="flex">
+			<span class="pb-2 text-2xl">{t.name}</span>
+			<span class="flex-grow"></span>
+			<span class="text-support-a-500">{t.percentCompleted}%</span>
+		</div>
+
+		{@render reading(t.reading)}
+	</div>
+{/snippet}
+
 {#snippet today()}
 	<div class="w-full">
 		{#if todaysReadings.length > 0}
 			{#each todaysReadings as t}
-				<div
-					class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
-				>
-					<div class="flex">
-						<span class="pb-2 text-2xl">{t.name}</span>
-						<span class="flex-grow"></span>
-						<span class="text-support-a-500">{t.percentComplete}%</span>
-						
-					</div>
-
-					<table class="table-fixed">
-						<tbody>
-							{#each t.reading as r}
-								<tr>
-									<td class="w-0 pe-3">{r.bookName}</td>
-									<td>{r.chapter}:{r.verses}</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
+				{@render todayReading(t)}
 			{/each}
 		{/if}
 	</div>
+{/snippet}
+
+{#snippet subscription(sub: any)}
+	<div class="flex">
+		<span class="pb-2 text-2xl">{sub.name}</span>
+	</div>
+
+	<div class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100">
+		{#each sub.readings as r}
+			{@render reading(r)}
+		{/each}
+	</div>
+{/snippet}
+
+{#snippet subscriptions()}
+	{#each subsList as s}
+		<div class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100">
+			<div class="flex w-full">
+				<span class="pb-2 text-2xl">{s.plan.name}</span>
+				<span class="flex-grow"></span>
+				<span class="text-support-a-500">{s.percentCompleted}%</span>
+			</div>
+
+			<div class="text-sm">
+				{#each s.plan.description as d}
+					<span>
+						{d}
+					</span>
+				{/each}
+			</div>
+		</div>
+	{/each}
 {/snippet}
 
 <div bind:clientHeight style={containerHeight} class="overflow-hidden">
@@ -122,7 +165,8 @@
 				style="height: {clientHeight - headerHeight}px"
 				class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 			>
-				{@render today()}
+				<!-- {@render today()} -->
+				{@render subscriptions()}
 			</div>
 		</div>
 	</div>
