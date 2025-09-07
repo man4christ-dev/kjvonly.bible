@@ -48,8 +48,8 @@
 			}, 5000);
 		}
 
-		// let reading = localStorage.getItem('tmp')
-		// await readingsApi.put(JSON.parse(reading))
+		// let plan = localStorage.getItem('tmp')
+		// await plansApi.put(JSON.parse(plan))
 
 	});
 

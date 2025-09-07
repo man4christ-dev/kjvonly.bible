@@ -129,6 +129,15 @@ async function addReadingsToSubs() {
 		sub.plan = plan
 		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
 		sub.percentCompleted = Math.ceil(readingIndexes.length / sub.plan.readings.length * 100)
+
+		for (let j=0;j < sub.plan.readings.length; j++){
+			let totalVerses = 0
+			for (let k=0; k< sub.plan.readings[j].length; k++){
+				let split = sub.plan.readings[j][k].verses.split('-')
+				totalVerses += parseInt(split[1]) -  parseInt(split[0]) + 2 
+			}
+			sub.plan.readings[j].totalVerses = totalVerses
+		}
 	}
 }
 

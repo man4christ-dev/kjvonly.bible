@@ -12,6 +12,7 @@
 	let subsList: any = $state([]);
 	let todaysReadings: any = $state([]);
 	let selectedSub: any = $state(undefined);
+	let showCompletedReadings: boolean = $state(false);
 
 	const PLANS_VIEWS = {
 		PLANS_LIST: 'PLANS_LIST',
@@ -113,8 +114,8 @@
 		<tbody>
 			{#each rs as r}
 				<tr>
-					<td class="w-0 pe-3">{r.bookName}</td>
-					<td>{r.chapter}:{r.verses}</td>
+					<td class="pe-3 text-right text-nowrap">{r.bookName}</td>
+					<td class="text-right">{r.chapter}:{r.verses}</td>
 				</tr>
 			{/each}
 		</tbody>
@@ -145,13 +146,49 @@
 
 {#snippet subListView(sub: any)}
 	<div class="flex w-full flex-col">
-		<span class="pb-2 text-2xl">{sub.plan.name}</span>
+		<div class="flex p-2">
+			<span class="pb-2 text-2xl">{sub.plan.name}</span>
+			<span class="flex-grow"></span>
 
+			<label
+				for="showCompleted"
+				class="has-checked:bg-support-a-500 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent]"
+			>
+				<input
+					bind:checked={showCompletedReadings}
+					type="checkbox"
+					id="showCompleted"
+					class="peer sr-only"
+				/>
+
+				<span
+					class="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-neutral-100 transition-[inset-inline-start] peer-checked:start-6"
+				></span>
+			</label>
+		</div>
 		<div class="flex w-full flex-col text-base">
-			{#each sub.plan.readings as r}
-				<div class="col-2 p-2 flex w-full flex-col text-base hover:cursor-pointer hover:bg-neutral-100">
-					{@render reading(r)}
-				</div>
+			{#each sub.plan.readings as r, idx}
+				{#if !sub.readings[idx] || (sub.readings[idx] && showCompletedReadings)}
+					<div
+						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
+					>
+						<div class="flex w-full min-w-50">
+							{@render reading(r)}
+						</div>
+
+						<div class="flex w-full min-w-50 flex-col">
+							<div class="flex w-full">
+								<span class="flex flex-grow"></span>
+								<div class="text-lg {sub.readings[idx]?.index === idx ? 'text-support-a-500' : ''}">
+									{idx + 1} of {sub.plan.readings.length}
+								</div>
+							</div>
+							<div class="flex w-full justify-end">
+								<div class="text-base text-nowrap">Verses: {r.totalVerses}</div>
+							</div>
+						</div>
+					</div>
+				{/if}
 			{/each}
 		</div>
 	</div>
