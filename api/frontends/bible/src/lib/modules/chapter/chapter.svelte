@@ -8,17 +8,20 @@
 	import { extractBookChapter } from '$lib/utils/chapter';
 	import uuid4 from 'uuid4';
 	import { notesService } from '$lib/services/notes.service';
+	import { numberToLetters } from '$lib/services/dynamicGrid.service';
 
 	let searchID = uuid4();
 
 	let showChapter: boolean = $state(true);
-	let fadeClass: string = $state('');
 
 	let loadedBookName = $state();
 	let loadedChapter = $state();
 	let footnotes: any = $state();
 
 	let notes: any = $state();
+
+	let planStartIndex = $state(0)
+	let planEndIndex = $state(0)
 
 	let {
 		chapterKey = $bindable(),
@@ -38,7 +41,22 @@
 
 		mode.value = '';
 
+
+
 		let bcv = chapterKey.split('_');
+
+		if (mode.plan){
+			if (bcv.length > 2){
+				let verses = bcv[2].split('-')
+				let start = parseInt(verses[0])
+				let end =  parseInt(verses[1])
+
+				if(!Number.isNaN(start) && !Number.isNaN(end)){
+					planStartIndex = start - 1
+					planEndIndex = end
+				}
+			}
+		}
 		if (bcv.length > 2) {
 			chapterKey = `${bcv[0]}_${bcv[1]}`;
 			setTimeout(() => {
@@ -80,7 +98,13 @@
 		loadedChapter = bookChapter;
 		verses = data['verses'];
 		footnotes = data['footnotes'];
-		keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
+
+		if (mode.plan) {
+ 			keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1)).slice(planStartIndex, planEndIndex);
+		} else {
+			keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
+		}
+		
 	}
 
 	function onSearchResults(data: any) {
@@ -101,7 +125,7 @@
 	});
 </script>
 
-<div class="{fadeClass} px-4 leading-loose">
+<div class="px-4 leading-loose">
 	{#if showChapter}
 		{#each keys as k, idx}
 			<!-- w-full required for safari. -->
