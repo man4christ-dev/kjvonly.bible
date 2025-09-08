@@ -39,8 +39,11 @@
 
 	$effect(() => {
 		if (!chapterKey) {
+			console.log('returning')
 			return;
 		}
+
+		console.log(chapterKey)
 
 		mode.value = '';
 

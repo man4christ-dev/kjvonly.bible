@@ -153,8 +153,6 @@
 
 		if (pane?.buffer?.bag?.plan) {
 			mode.plan = pane?.buffer?.bag?.plan;
-			console.log(JSON.stringify(mode.plan))
-			
 		}
 
 		let ck = pane.buffer.bag.chapterKey;

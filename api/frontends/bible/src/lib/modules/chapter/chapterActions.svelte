@@ -148,7 +148,7 @@
 
 {#if showBookChapterPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey={bookIDChapter}></BookChapterPopup>
+		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey></BookChapterPopup>
 	</div>
 {/if}
 {#if showPlanReadingPopup}
