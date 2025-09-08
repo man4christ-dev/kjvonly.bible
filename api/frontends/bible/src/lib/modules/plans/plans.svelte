@@ -18,19 +18,21 @@
 
 	let subListReadingsToShow: number = $state(20);
 	let subListViewID = uuid4();
-	
-	function onSelectedSubReading(idx: number){
-		let readings = selectedSub.plan.readings[idx]
-		let updReadings = readings.map((r : any ) => {
-			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`	
-			return r
+
+	function onSelectedSubReading(idx: number) {
+		let readings = selectedSub.plan.readings[idx];
+		let updReadings = readings.map((r: any) => {
+			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
+			return r;
 		});
-		
+
 		pane.buffer.bag.plan = {
 			readings: updReadings,
-		}
-		pane.buffer.bag.chapterKey = updReadings[0].chapterKey
-		pane.updateBuffer('ChapterContainer')
+			currentReadingsIndex: 0
+		};
+
+		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
+		pane.updateBuffer('ChapterContainer');
 	}
 
 	const PLANS_VIEWS = {
@@ -66,11 +68,18 @@
 		selectedSub = sub;
 		plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
 
-		setTimeout(() => {
+		setTimeout(async () => {
 			let el = document.getElementById(`${subListViewID}-scroll-container`);
-			while (!el) {
+			let retriesMax = 10;
+			let count = 0;
+			while (!el && count != retriesMax) {
 				el = document.getElementById(`${subListViewID}-scroll-container`);
-				sleep(1000);
+				await sleep(1000);
+				count++;
+			}
+
+			if (count === 10) {
+				return;
 			}
 
 			el?.addEventListener('scroll', handleScroll);
@@ -221,7 +230,7 @@
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
-						onclick={()=>onSelectedSubReading(idx)}
+						onclick={() => onSelectedSubReading(idx)}
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">

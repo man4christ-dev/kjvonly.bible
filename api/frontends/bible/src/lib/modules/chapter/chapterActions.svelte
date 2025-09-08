@@ -52,7 +52,7 @@
 				if (start + end > 0) {
 					console.log(start, end);
 
-					verses = `:${start + 1} - ${end}`;
+					verses = `:${start + 1}-${end}`;
 
 					console.log(start, end);
 				}else {

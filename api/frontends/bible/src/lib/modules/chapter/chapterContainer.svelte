@@ -64,9 +64,32 @@
 		}
 	});
 
+	async function _nextPlanChapter() {
+		let ci = mode.plan.currentReadingsIndex;
+		let nextIndex = ci + 1;
+		if (nextIndex > mode.plan.readings.length - 1) {
+			pane.updateBuffer('Plans');
+		} else {
+			mode.plan.currentReadingsIndex = nextIndex;
+			chapterKey = mode.plan.readings[nextIndex].chapterKey;
+		}
+	}
+
+	async function _previousPlanChapter() {
+		let ci = mode.plan.currentReadingsIndex;
+		let nextIndex = ci - 1;
+		if (nextIndex > 0) {
+			mode.plan.currentReadingsIndex = nextIndex;
+			chapterKey = mode.plan.readings[nextIndex].chapterKey;
+		}
+	}
+
 	async function _nextChapter(e: Event) {
 		e.stopPropagation();
-		// TODO PLANS check
+		if (mode.plan) {
+			_nextPlanChapter();
+			return;
+		}
 		if (chapterKey) {
 			chapterKey = bibleNavigationService.next(chapterKey);
 		}
@@ -74,7 +97,10 @@
 
 	async function _previousChapter(e: Event) {
 		e.stopPropagation();
-		// TODO PLANS check
+		if (mode.plan) {
+			_previousPlanChapter();
+			return;
+		}
 
 		if (chapterKey) {
 			chapterKey = bibleNavigationService.previous(chapterKey);
@@ -126,8 +152,9 @@
 		}
 
 		if (pane?.buffer?.bag?.plan) {
-			console.log('plan');
 			mode.plan = pane?.buffer?.bag?.plan;
+			console.log(JSON.stringify(mode.plan))
+			
 		}
 
 		let ck = pane.buffer.bag.chapterKey;
