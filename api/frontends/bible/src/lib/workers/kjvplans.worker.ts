@@ -64,7 +64,7 @@ function parseReadingEntries(reading: any): any[] {
 			bookID: bcv[0],
 			chapter: chapter,
 			verses: verses,
-			bcv: readingGroup[i]
+			chapterKey: readingGroup[i].replaceAll('/', '_')
 		}
 		entries.push(entry)
 	}

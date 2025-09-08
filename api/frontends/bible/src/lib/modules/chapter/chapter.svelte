@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import { chapterApi } from '$lib/api/chapters.api';
 	import Verse from './verse.svelte';
 	import { syncService } from '$lib/services/sync.service';
 	import { annotsApi } from '$lib/api/annots.api';
 
-	import { extractBookChapter } from '$lib/utils/chapter';
+	import { extractBookChapter, extractVerses } from '$lib/utils/chapter';
 	import uuid4 from 'uuid4';
 	import { notesService } from '$lib/services/notes.service';
 	import { numberToLetters } from '$lib/services/dynamicGrid.service';
@@ -17,11 +17,12 @@
 	let loadedBookName = $state();
 	let loadedChapter = $state();
 	let footnotes: any = $state();
+	let verseRange: boolean = $state(false);
 
 	let notes: any = $state();
 
-	let planStartIndex = $state(0)
-	let planEndIndex = $state(0)
+	let rangeStartIndex = 0;
+	let rangeEndIndex = 0;
 
 	let {
 		chapterKey = $bindable(),
@@ -34,6 +35,8 @@
 		lastKnownScrollPosition
 	} = $props();
 
+
+
 	$effect(() => {
 		if (!chapterKey) {
 			return;
@@ -41,32 +44,30 @@
 
 		mode.value = '';
 
-
+		bookIDChapter = extractBookChapter(chapterKey)
 
 		let bcv = chapterKey.split('_');
 
-		if (mode.plan){
-			if (bcv.length > 2){
-				let verses = bcv[2].split('-')
-				let start = parseInt(verses[0])
-				let end =  parseInt(verses[1])
-
-				if(!Number.isNaN(start) && !Number.isNaN(end)){
-					planStartIndex = start - 1
-					planEndIndex = end
-				}
-			}
-		}
 		if (bcv.length > 2) {
-			chapterKey = `${bcv[0]}_${bcv[1]}`;
-			setTimeout(() => {
-				let e = document.getElementById(`${id}-vno-${bcv[2]}`);
-				e?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
-				e?.classList.add('scrolled-to');
+			// untrack(() => {
+			// 	chapterKey = `${bcv[0]}_${bcv[1]}`;
+			// });
+			let [start, end] = extractVerses(chapterKey);
+				
+			if (start + end > 0){
+				verseRange = true;
+				rangeStartIndex = start;
+				rangeEndIndex = end;
+			} else {
 				setTimeout(() => {
-					e?.classList.remove('scrolled-to');
-				}, 4000);
-			}, 250);
+					let e = document.getElementById(`${id}-vno-${bcv[2]}`);
+					e?.scrollIntoView({ behavior: 'smooth', block: 'center', inline: 'nearest' });
+					e?.classList.add('scrolled-to');
+					setTimeout(() => {
+						e?.classList.remove('scrolled-to');
+					}, 4000);
+				}, 250);
+			}
 		}
 
 		if (chapterKey) {
@@ -79,32 +80,33 @@
 		}
 	});
 
+	let bookIDChapter = $state('')
 	let verses: any = $state();
 	let keys: string[] = $state([]);
 
 	async function loadAnnotations() {
-		annotations = await annotsApi.getAnnotations(chapterKey);
+		annotations = await annotsApi.getAnnotations(bookIDChapter);
 	}
 
 	async function loadNotes() {
-		notesService.searchNotes(searchID, extractBookChapter(chapterKey), ['bookChapter']);
+		notesService.searchNotes(searchID, extractBookChapter(bookIDChapter), ['bookChapter']);
 	}
 
 	async function loadChapter() {
-		let data = await chapterApi.getChapter(chapterKey);
+		let data = await chapterApi.getChapter(bookIDChapter);
 		bookName = data['bookName'];
 		bookChapter = data['number'];
 		loadedBookName = bookName;
 		loadedChapter = bookChapter;
 		verses = data['verses'];
 		footnotes = data['footnotes'];
+		keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
 
-		if (mode.plan) {
- 			keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1)).slice(planStartIndex, planEndIndex);
+		if (verseRange) {
+			keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1)).slice(rangeStartIndex, rangeEndIndex);
 		} else {
 			keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
 		}
-		
 	}
 
 	function onSearchResults(data: any) {
@@ -137,7 +139,7 @@
 					bind:mode
 					verse={verses[k]}
 					{footnotes}
-					{chapterKey}
+					chapterKey={bookIDChapter}
 					{lastKnownScrollPosition}
 				></Verse>
 			</span>

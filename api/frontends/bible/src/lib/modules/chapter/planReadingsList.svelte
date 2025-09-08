@@ -9,7 +9,7 @@
     function rowClicked(e:any, r:any){
         e.stopPropagation()
 
-        chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`
+        chapterKey = r.chapterKey
         showPlanReadingPopup = false
     }
 </script>

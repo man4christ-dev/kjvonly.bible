@@ -20,9 +20,16 @@
 	let subListViewID = uuid4();
 	
 	function onSelectedSubReading(idx: number){
+		let readings = selectedSub.plan.readings[idx]
+		let updReadings = readings.map((r : any ) => {
+			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`	
+			return r
+		});
+		
 		pane.buffer.bag.plan = {
-			readings: selectedSub.plan.readings[idx]
+			readings: updReadings,
 		}
+		pane.buffer.bag.chapterKey = updReadings[0].chapterKey
 		pane.updateBuffer('ChapterContainer')
 	}
 

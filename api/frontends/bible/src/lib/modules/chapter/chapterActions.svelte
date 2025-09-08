@@ -5,6 +5,8 @@
 	import NotesContainer from '../notes/notesContainer.svelte';
 	import CopyVersePopup from './copyVersePopup.svelte';
 	import PlanReadingsList from './planReadingsList.svelte';
+	import { onMount, untrack } from 'svelte';
+	import { extractBookChapter, extractVerses } from '$lib/utils/chapter';
 
 	let {
 		mode = $bindable(),
@@ -21,6 +23,8 @@
 	let showSettingsPopup: Boolean = $state(false);
 	let showActionsPopup: Boolean = $state(false);
 	let showCopyVersePopup: boolean = $state(false);
+	let verses: string = $state('');
+	let bookIDChapter = $state('');
 
 	function onBookChapterClick(event: Event) {
 		event.stopPropagation();
@@ -40,6 +44,34 @@
 		e.stopPropagation();
 		showActionsPopup = !showActionsPopup;
 	}
+
+	$effect(() => {
+		if (chapterKey) {
+			untrack(() => {
+				let [start, end] = extractVerses(chapterKey);
+				if (start + end > 0) {
+					console.log(start, end);
+
+					verses = `:${start + 1} - ${end}`;
+
+					console.log(start, end);
+				}else {
+					verses = ''
+				}
+			});
+		}
+	});
+
+	onMount(() => {
+		bookIDChapter = extractBookChapter(chapterKey);
+
+		// let [start, end] = extractVerses(chapterKey);
+		// console.log(start, end);
+		// if (start + end > 0) {
+		// 	verses = `${start + 1} - ${end}`;
+		// 	console.log(start, end);
+		// }
+	});
 
 	let clientWidth: number = $state(0);
 </script>
@@ -83,7 +115,11 @@
 			class="m-0 text-center font-bold text-neutral-700 md:text-base lg:text-lg"
 		>
 			<span class="bookChapter flex items-center text-center"
-				><span>{bookName} {bookChapter}</span><span> </span></span
+				><span>
+					{#if bookName && bookChapter}
+						{bookName} {bookChapter}{verses}
+					{/if}
+				</span><span> </span></span
 			>
 		</span>
 		<span class="mr-2 h-[100%] border-e-2 border-neutral-300">&nbsp;</span>
@@ -112,7 +148,7 @@
 
 {#if showBookChapterPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey></BookChapterPopup>
+		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey={bookIDChapter}></BookChapterPopup>
 	</div>
 {/if}
 {#if showPlanReadingPopup}
@@ -142,7 +178,7 @@
 
 {#if showCopyVersePopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<CopyVersePopup bind:showCopyVersePopup {chapterKey}></CopyVersePopup>
+		<CopyVersePopup bind:showCopyVersePopup chapterKey={bookIDChapter}></CopyVersePopup>
 	</div>
 {/if}
 

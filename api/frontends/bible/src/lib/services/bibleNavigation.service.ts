@@ -1,5 +1,6 @@
 import { bibleDB } from '../storer/bible.db';
 import { chapterApi } from '../api/chapters.api';
+import { extractBookChapter } from '$lib/utils/chapter';
 
 var chapters: string[] = [
 	'1_1',
@@ -1207,6 +1208,7 @@ export class BibleNavigationService {
 	}
 
 	next(currentKey: string): string {
+		currentKey = extractBookChapter(currentKey)
 		let ci = this.chapterList.indexOf(currentKey);
 		if (ci + 1 >= this.chapterList.length) {
 			return this.chapterList[0];
@@ -1216,6 +1218,7 @@ export class BibleNavigationService {
 	}
 
 	previous(currentKey: string): string {
+		currentKey = extractBookChapter(currentKey)
 		let ci = this.chapterList.indexOf(currentKey);
 		if (ci - 1 < 0) {
 			return this.chapterList[this.chapterList.length - 1];
