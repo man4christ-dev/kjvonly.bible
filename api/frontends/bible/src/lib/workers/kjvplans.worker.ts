@@ -42,7 +42,6 @@ let readingsDocument = new FlexSearch.Document({
 	}
 });
 
-let notes: any = {};
 let plans: any = {}
 let subs: any = {}
 let readings: any = {}
@@ -195,7 +194,8 @@ function deleteSub(subID: string) {
 
 async function putReading(data: any, subID: any) {
 	await readingsDocument.addAsync(data.id, data)
-	subs[subID].readigns[data.index] = data
+	readings[data.id] = data
+	subs[subID].readings[data.index] = data
 }
 
 async function addReadings(readingID: string, reading: any) {

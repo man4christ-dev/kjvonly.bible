@@ -41,7 +41,7 @@ export class PlansService {
 	}
 
 	putReading(data: any, subID: string) {
-		plansWorker.postMessage({ action: 'putReading', id: 'putReading', data: data, subID: String });
+		plansWorker.postMessage({ action: 'putReading', id: 'putReading', data: data, subID: subID });
 	}
 
 	getAllSubs() {

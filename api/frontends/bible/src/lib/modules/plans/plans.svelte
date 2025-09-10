@@ -103,6 +103,7 @@
 					version: 0
 				};
 				await readingsApi.put(readingsData);
+				plansService.putReading(readingsData, selectedSub.id)
 				selectedSub.readings[pane.buffer.bag.plan.readingIndex] = {
 					index: pane.buffer.bag.plan.readingIndex
 				};
