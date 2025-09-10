@@ -16,9 +16,21 @@ export class PlansService {
 		};
 	}
 
-	subscribe(id: any, fn: any) {
-		this.subscribers.push({ id: id, fn: fn });
+	subscribe(id: any, fn: any, subID: any) {
+		this.subscribers.push({ id: id, fn: fn, subID: subID });
 	}
+
+	unsubscribe(subID: any) {
+		let tmpSubscribers: any = []
+		this.subscribers.forEach((s) => {
+			if (s.subID !== subID){
+				tmpSubscribers.push()
+			}
+		});
+		this.subscribers = tmpSubscribers
+	}
+
+
 
 	init() {
 		plansWorker.postMessage({ action: 'init' });
@@ -26,6 +38,10 @@ export class PlansService {
 
 	getAllReadings() {
 		plansWorker.postMessage({ action: 'getAllPlans', id: 'getAllReadings' });
+	}
+
+	putReading(data: any, subID: string) {
+		plansWorker.postMessage({ action: 'putReading', id: 'putReading', data: data, subID: String });
 	}
 
 	getAllSubs() {

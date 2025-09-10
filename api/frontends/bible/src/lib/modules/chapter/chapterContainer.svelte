@@ -11,6 +11,7 @@
 	import uuid4 from 'uuid4';
 	import EditOptions from './editOptions.svelte';
 	import { extractBookChapter } from '$lib/utils/chapter';
+	import { Buffer } from '$lib/models/buffer.model';
 
 	type WordAnnots = {
 		class: string[];
@@ -68,6 +69,10 @@
 		let ci = mode.plan.currentReadingsIndex;
 		let nextIndex = ci + 1;
 		if (nextIndex > mode.plan.readings.length - 1) {
+			pane.buffer.bag.plan.route = {
+				view: 'SUBS_DETAILS',
+				subID: pane.buffer.bag.plan.subID
+			}
 			pane.updateBuffer('Plans');
 		} else {
 			mode.plan.currentReadingsIndex = nextIndex;
@@ -78,7 +83,7 @@
 	async function _previousPlanChapter() {
 		let ci = mode.plan.currentReadingsIndex;
 		let nextIndex = ci - 1;
-		if (nextIndex > 0) {
+		if (nextIndex >= 0) {
 			mode.plan.currentReadingsIndex = nextIndex;
 			chapterKey = mode.plan.readings[nextIndex].chapterKey;
 		}
@@ -195,7 +200,6 @@
 
 		let cc = document.getElementById(`chapter-container-${id}`);
 		cc?.addEventListener('contextmenu', (e) => e.preventDefault());
-		console.log(chapterKey);
 	});
 </script>
 

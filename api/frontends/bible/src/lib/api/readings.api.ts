@@ -5,11 +5,11 @@ UNSYNCED_READINGS
 import { bibleStorer } from '$lib/storer/bible.storer';
 import { offlineApi } from './offline.api';
 
-const PATH = 'readings'
+const PATH = '/readings'
 export class ReadignsApi {
 	
 	async put(data: any): Promise<any> {
-		return offlineApi.put(data, PATH, UNSYNCED_READINGS, READINGS);
+		return await offlineApi.put(data, PATH, UNSYNCED_READINGS, READINGS);
 	}
 
 	async gets(): Promise<any> {

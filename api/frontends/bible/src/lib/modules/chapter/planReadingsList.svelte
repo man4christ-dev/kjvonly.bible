@@ -1,14 +1,14 @@
 <script lang="ts">
-	let { readings = $bindable(), showPlanReadingPopup = $bindable(), chapterKey =$bindable() } = $props();
+	let { plan = $bindable(), showPlanReadingPopup = $bindable(), chapterKey =$bindable() } = $props();
 
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 	let clientWidth = $state(0);
 
 
-    function rowClicked(e:any, r:any){
+    function rowClicked(e:any, r:any, idx: number){
         e.stopPropagation()
-
+        plan.currentReadingsIndex = idx
         chapterKey = r.chapterKey
         showPlanReadingPopup = false
     }
@@ -47,8 +47,8 @@
 		>
 			<table class="table-fixed">
 				<tbody>
-					{#each readings as r}
-						<tr class="h-16 hover:cursor-pointer hover:bg-neutral-100" onclick={(event) => rowClicked(event, r)}>
+					{#each plan.readings as r, idx}
+						<tr class="h-16 hover:cursor-pointer hover:bg-neutral-100" onclick={(event) => rowClicked(event, r, idx)}>
 							<td class="w-0 ps-3 pe-3 text-right text-nowrap">{r.bookName}</td>
 							<td class="">{r.chapter}:{r.verses}</td>
 						</tr>

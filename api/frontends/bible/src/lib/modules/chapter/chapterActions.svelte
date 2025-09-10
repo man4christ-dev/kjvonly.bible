@@ -50,11 +50,7 @@
 			untrack(() => {
 				let [start, end] = extractVerses(chapterKey);
 				if (start + end > 0) {
-					console.log(start, end);
-
 					verses = `:${start + 1}-${end}`;
-
-					console.log(start, end);
 				}else {
 					verses = ''
 				}
@@ -64,13 +60,6 @@
 
 	onMount(() => {
 		bookIDChapter = extractBookChapter(chapterKey);
-
-		// let [start, end] = extractVerses(chapterKey);
-		// console.log(start, end);
-		// if (start + end > 0) {
-		// 	verses = `${start + 1} - ${end}`;
-		// 	console.log(start, end);
-		// }
 	});
 
 	let clientWidth: number = $state(0);
@@ -153,7 +142,7 @@
 {/if}
 {#if showPlanReadingPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<PlanReadingsList bind:showPlanReadingPopup bind:readings={mode.plan.readings} bind:chapterKey
+		<PlanReadingsList bind:showPlanReadingPopup bind:plan={mode.plan} bind:chapterKey
 		></PlanReadingsList>
 	</div>
 {/if}

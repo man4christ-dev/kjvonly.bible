@@ -193,6 +193,11 @@ function deleteSub(subID: string) {
 	getAllSubs();
 }
 
+async function putReading(data: any, subID: any) {
+	await readingsDocument.addAsync(data.id, data)
+	subs[subID].readigns[data.index] = data
+}
+
 async function addReadings(readingID: string, reading: any) {
 	readings[readingID] = reading;
 	readingsDocument.add(readingID, reading);
@@ -259,8 +264,13 @@ onmessage = async (e) => {
 			break;
 		case 'getAllPlans':
 			getAllPlans();
+			break;
 		case 'getAllSubs':
-			getAllSubs();			
+			getAllSubs();
+			break;
+		case 'putReading':
+			putReading(e.data.data, e.data.subID);							
+			break;
 	}
 };
 

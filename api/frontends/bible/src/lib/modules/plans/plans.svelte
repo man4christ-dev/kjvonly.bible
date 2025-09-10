@@ -1,12 +1,16 @@
 <script lang="ts">
+	import { plansApi } from '$lib/api/plans.api';
+	import { readingsApi } from '$lib/api/readings.api';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { plansService } from '$lib/services/plans.service';
 	import { PLANS } from '$lib/storer/bible.db';
 	import { sleep } from '$lib/utils/sleep';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 
 	let { containerHeight, paneId, pane } = $props();
+
+	let PLAN_SUBSCRIBER_ID = uuid4();
 
 	let plansMap: any = $state({});
 	let planList: any = $state([]);
@@ -28,7 +32,9 @@
 
 		pane.buffer.bag.plan = {
 			readings: updReadings,
-			currentReadingsIndex: 0
+			currentReadingsIndex: 0,
+			subID: selectedSub.id,
+			readingIndex: idx
 		};
 
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
@@ -45,7 +51,7 @@
 		SUBS_DETAILS: 'SUBS_DETAILS'
 	};
 
-	let plansDisplay: string = $state(PLANS_VIEWS.SUBS_LIST);
+	let plansDisplay: string = $state('');
 	let planActionItems: any = {
 		'my plans': () => {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -86,6 +92,26 @@
 		}, 1000);
 	}
 
+	async function onReturnPlan() {
+		if (pane.buffer.bag?.plan?.route) {
+			let route = pane.buffer.bag.plan.route;
+			if (route.view === PLANS_VIEWS.SUBS_DETAILS) {
+				selectedSub = subsMap[route.subID];
+				let readingsData = {
+					id: `${route.subID}/${pane.buffer.bag.plan.readingIndex}`,
+					index: pane.buffer.bag.plan.readingIndex,
+					version: 0
+				};
+				await readingsApi.put(readingsData);
+				selectedSub.readings[pane.buffer.bag.plan.readingIndex] = {
+					index: pane.buffer.bag.plan.readingIndex
+				};
+				plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
+			}
+			pane.buffer.bag = {};
+		}
+	}
+
 	function onGetAllSubs(data: any) {
 		if (data) {
 			subsMap = data.subs;
@@ -96,6 +122,7 @@
 					subsList.push(subsMap[k]);
 				});
 		}
+		onReturnPlan();
 		updateTodays();
 	}
 
@@ -154,12 +181,21 @@
 
 	let subID = '00000000-0000-0000-0000-000000000000';
 
+	onDestroy(() => {
+		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
+	});
+
 	onMount(() => {
-		plansService.subscribe('getAllPlans', onGetAllPlans);
+		console.log('called onMount');
+		plansService.subscribe('getAllPlans', onGetAllPlans, PLAN_SUBSCRIBER_ID);
 		plansService.getAllPlans();
 
-		plansService.subscribe('getAllSubs', onGetAllSubs);
+		plansService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
 		plansService.getAllSubs();
+
+		if (!pane.buffer.bag?.plan?.route) {
+			plansDisplay = PLANS_VIEWS.SUBS_LIST;
+		}
 	});
 
 	let clientHeight = $state(0);

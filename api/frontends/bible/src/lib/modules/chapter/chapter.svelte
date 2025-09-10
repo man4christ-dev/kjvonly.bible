@@ -42,9 +42,6 @@
 			console.log('returning')
 			return;
 		}
-
-		console.log(chapterKey)
-
 		mode.value = '';
 
 		bookIDChapter = extractBookChapter(chapterKey)
