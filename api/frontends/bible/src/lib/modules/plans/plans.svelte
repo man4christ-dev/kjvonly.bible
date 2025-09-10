@@ -100,6 +100,7 @@
 				let readingsData = {
 					id: `${route.subID}/${pane.buffer.bag.plan.readingIndex}`,
 					index: pane.buffer.bag.plan.readingIndex,
+					subID: selectedSub.id,
 					version: 0
 				};
 				await readingsApi.put(readingsData);
