@@ -23,7 +23,7 @@
 	let subListReadingsToShow: number = $state(20);
 	let subListViewID = uuid4();
 
-	function onSelectedSubReading(idx: number) {
+	function onSelectedSubReading(idx: number, returnView: string) {
 		let readings = selectedSub.plan.readings[idx];
 		let updReadings = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
@@ -34,12 +34,36 @@
 			readings: updReadings,
 			currentReadingsIndex: 0,
 			subID: selectedSub.id,
-			readingIndex: idx
+			readingIndex: idx,
+			returnView: returnView
 		};
 
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
 	}
+
+
+	function onSelectedNextReading(idx: number, returnView: string) {
+		let nextReading = todaysReadings[idx];
+		let readings = nextReading.reading
+		let updReadings = readings.map((r: any) => {
+			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
+			return r;
+		});
+
+		pane.buffer.bag.plan = {
+			readings: updReadings,
+			currentReadingsIndex: 0,
+			subID: nextReading.subID,
+			readingIndex: idx,
+			returnView: returnView
+		};
+
+		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
+		pane.updateBuffer('ChapterContainer');
+	}
+
+	
 
 	const PLANS_VIEWS = {
 		PLANS_LIST: 'PLANS_LIST',
@@ -48,7 +72,9 @@
 
 		SUBS_LIST: 'SUBS_LIST',
 		SUBS_ACTIONS: 'SUBS_ACTIONS',
-		SUBS_DETAILS: 'SUBS_DETAILS'
+		SUBS_DETAILS: 'SUBS_DETAILS',
+
+		NEXT_LIST: 'NEXT_LIST'
 	};
 
 	let plansDisplay: string = $state('');
@@ -56,18 +82,26 @@
 		'my plans': () => {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
 		},
-		'next readings': () => {}
+		'next readings': () => {
+			plansDisplay = PLANS_VIEWS.NEXT_LIST;
+		}
 	};
 
 	function onClosePlansList() {
 		paneService.onDeletePane(paneService.rootPane, paneId);
 	}
 
+	function onCloseSubDetails() {
+		plansDisplay = PLANS_VIEWS.SUBS_LIST;
+	}
+
 	let subsActionItems: any = {
 		plans: () => {
 			plansDisplay = PLANS_VIEWS.PLANS_LIST;
 		},
-		'next readings': () => {}
+		'next readings': () => {
+			plansDisplay = PLANS_VIEWS.NEXT_LIST;
+		}
 	};
 
 	function onSubClicked(sub: any) {
@@ -95,7 +129,7 @@
 	async function onReturnPlan() {
 		if (pane.buffer.bag?.plan?.route) {
 			let route = pane.buffer.bag.plan.route;
-			if (route.view === PLANS_VIEWS.SUBS_DETAILS) {
+			if (route.view === PLANS_VIEWS.SUBS_DETAILS || route.view === PLANS_VIEWS.NEXT_LIST) {
 				selectedSub = subsMap[route.subID];
 				let readingsData = {
 					id: `${route.subID}/${pane.buffer.bag.plan.readingIndex}`,
@@ -104,13 +138,12 @@
 					version: 0
 				};
 				await readingsApi.put(readingsData);
-				plansService.putReading(readingsData, selectedSub.id)
+				plansService.putReading(readingsData, selectedSub.id);
 				selectedSub.readings[pane.buffer.bag.plan.readingIndex] = {
 					index: pane.buffer.bag.plan.readingIndex
 				};
 				plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
 			}
-			pane.buffer.bag = {};
 		}
 	}
 
@@ -144,13 +177,16 @@
 		let subKeys = Object.keys(subsMap);
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub = subsMap[subKeys[i]];
-
 			if (sub.plan.readings.length - 1 > sub.nextReadingIndex) {
 				tr.push({
 					reading: sub.plan.readings[sub.nextReadingIndex],
+					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses,
 					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
 					name: sub.plan.name,
-					percentCompleted: sub.percentCompleted
+					percentCompleted: sub.percentCompleted,
+					readingIndex: sub.nextReadingIndex + 1,
+					totalReadings: sub.plan.readings.length,
+					subID: sub.id
 				});
 			}
 		}
@@ -217,25 +253,55 @@
 	</table>
 {/snippet}
 
-{#snippet todayReading(t: any)}
-	<div class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100">
+{#snippet todayReading(t: any, idx: any)}
+	<!-- svelte-ignore a11y_click_events_have_key_events -->
+	<!-- svelte-ignore a11y_no_static_element_interactions -->
+	<div
+		onclick={() => onSelectedNextReading(idx, PLANS_VIEWS.NEXT_LIST)}
+		class=" flex w-full flex-col px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
+	>
 		<div class="flex">
 			<span class="pb-2 text-2xl">{t.name}</span>
 			<span class="flex-grow"></span>
 			<span class="text-support-a-500">{t.percentCompleted}%</span>
 		</div>
+		<div class="flex flex-row">
+			<div class="min-w-50">
+				{@render reading(t.reading)}
+			</div>
 
-		{@render reading(t.reading)}
+			<div class="flex w-full min-w-50 flex-col">
+				<div class="flex w-full">
+					<span class="flex flex-grow"></span>
+					<div class="text-lg">
+						{t.readingIndex + 1} of {t.totalReadings}
+					</div>
+				</div>
+				<div class="flex w-full justify-end">
+					<div class="text-base text-nowrap">
+						Verses: {t.totalVerses}
+					</div>
+				</div>
+			</div>
+		</div>
 	</div>
 {/snippet}
 
 {#snippet nextReadingListView()}
-	<div class="w-full">
-		{#if todaysReadings.length > 0}
-			{#each todaysReadings as t}
-				{@render todayReading(t)}
-			{/each}
-		{/if}
+	{@render plansHeaderComponent('My Plans', onCloseSubDetails, undefined)}
+	<div class="flex w-full max-w-lg">
+		<div
+			id="{subListViewID}-scroll-container"
+			style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
+				headerHeight}px"
+			class="flex w-full max-w-lg flex-col overflow-x-hidden overflow-y-scroll bg-neutral-50"
+		>
+			{#if todaysReadings.length > 0}
+				{#each todaysReadings as t, idx}
+					{@render todayReading(t, idx)}
+				{/each}
+			{/if}
+		</div>
 	</div>
 {/snippet}
 
@@ -268,7 +334,7 @@
 					<!-- svelte-ignore a11y_click_events_have_key_events -->
 					<!-- svelte-ignore a11y_no_static_element_interactions -->
 					<div
-						onclick={() => onSelectedSubReading(idx)}
+						onclick={() => onSelectedSubReading(idx, PLANS_VIEWS.SUBS_DETAILS)}
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
@@ -353,7 +419,7 @@
 {#snippet plansHeaderComponent(
 	title: string,
 	onClose: Function | undefined,
-	menuActionView: string
+	menuDropdownToggleViews: string[] | undefined
 )}
 	<header
 		bind:clientHeight={headerHeight}
@@ -361,12 +427,16 @@
 	>
 		<span class="flex w-full"></span>
 
-		{#if menuActionView}
+		{#if menuDropdownToggleViews}
 			<!-- svelte-ignore a11y_click_events_have_key_events -->
 			<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
 			<p
 				onclick={() => {
-					plansDisplay = menuActionView;
+					if (plansDisplay === menuDropdownToggleViews[0]) {
+						plansDisplay = menuDropdownToggleViews[1];
+					} else {
+						plansDisplay = menuDropdownToggleViews[0];
+					}
 				}}
 				class="flex flex-row items-center space-x-2 hover:cursor-pointer"
 			>
@@ -418,7 +488,10 @@
 
 {#snippet plansView()}
 	{#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
-		{@render plansHeaderComponent('Discover Plans', onClosePlansList, PLANS_VIEWS.PLANS_ACTIONS)}
+		{@render plansHeaderComponent('Discover Plans', onClosePlansList, [
+			PLANS_VIEWS.PLANS_ACTIONS,
+			PLANS_VIEWS.PLANS_LIST
+		])}
 		<div class="w-full max-w-lg">
 			<div
 				style="height: {clientHeight - headerHeight}px"
@@ -429,7 +502,10 @@
 			</div>
 		</div>
 	{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}
-		{@render plansHeaderComponent('Discover Plans', undefined, PLANS_VIEWS.PLANS_LIST)}
+		{@render plansHeaderComponent('Discover Plans', undefined, [
+			PLANS_VIEWS.PLANS_LIST,
+			PLANS_VIEWS.PLANS_ACTIONS
+		])}
 		<div class="flex w-full max-w-lg">
 			<div
 				style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
@@ -445,7 +521,10 @@
 
 {#snippet subsView()}
 	{#if plansDisplay === PLANS_VIEWS.SUBS_LIST}
-		{@render plansHeaderComponent('My Plans', onClosePlansList, PLANS_VIEWS.SUBS_ACTIONS)}
+		{@render plansHeaderComponent('My Plans', onClosePlansList, [
+			PLANS_VIEWS.SUBS_ACTIONS,
+			PLANS_VIEWS.SUBS_LIST
+		])}
 		<div class="w-full max-w-lg">
 			<div
 				style="height: {clientHeight - headerHeight}px"
@@ -456,7 +535,10 @@
 			</div>
 		</div>
 	{:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
-		{@render plansHeaderComponent('My Plans', undefined, PLANS_VIEWS.SUBS_LIST)}
+		{@render plansHeaderComponent('My Plans', undefined, [
+			PLANS_VIEWS.SUBS_LIST,
+			PLANS_VIEWS.SUBS_ACTIONS
+		])}
 		<div class="flex w-full max-w-lg">
 			<div
 				style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
@@ -468,7 +550,7 @@
 			</div>
 		</div>
 	{:else if plansDisplay === PLANS_VIEWS.SUBS_DETAILS}
-		{@render plansHeaderComponent('My Plans', undefined, PLANS_VIEWS.SUBS_LIST)}
+		{@render plansHeaderComponent('My Plans', onCloseSubDetails, undefined)}
 		<div class="flex w-full max-w-lg">
 			<div
 				id="{subListViewID}-scroll-container"
@@ -489,6 +571,8 @@
 			{@render plansView()}
 		{:else if plansDisplay.startsWith('SUBS')}
 			{@render subsView()}
+		{:else if plansDisplay.startsWith('NEXT')}
+			{@render nextReadingListView()}
 		{/if}
 	</div>
 </div>

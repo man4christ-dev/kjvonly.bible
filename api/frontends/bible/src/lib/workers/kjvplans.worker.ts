@@ -196,6 +196,7 @@ async function putReading(data: any, subID: any) {
 	await readingsDocument.addAsync(data.id, data)
 	readings[data.id] = data
 	subs[subID].readings[data.index] = data
+	addReadingsToSubs()
 }
 
 async function addReadings(readingID: string, reading: any) {

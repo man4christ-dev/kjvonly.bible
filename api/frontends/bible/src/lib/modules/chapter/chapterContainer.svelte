@@ -70,7 +70,7 @@
 		let nextIndex = ci + 1;
 		if (nextIndex > mode.plan.readings.length - 1) {
 			pane.buffer.bag.plan.route = {
-				view: 'SUBS_DETAILS',
+				view: pane.buffer.bag.plan.returnView,
 				subID: pane.buffer.bag.plan.subID
 			}
 			pane.updateBuffer('Plans');
