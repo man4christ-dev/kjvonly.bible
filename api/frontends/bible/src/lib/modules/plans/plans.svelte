@@ -4,6 +4,7 @@
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { plansService } from '$lib/services/plans.service';
 	import { PLANS } from '$lib/storer/bible.db';
+	import { getNextReadingIndex } from '$lib/utils/plan';
 	import { sleep } from '$lib/utils/sleep';
 	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
@@ -55,7 +56,7 @@
 			readings: updReadings,
 			currentReadingsIndex: 0,
 			subID: nextReading.subID,
-			readingIndex: idx,
+			readingIndex: nextReading.readingIndex,
 			returnView: returnView
 		};
 
@@ -77,7 +78,7 @@
 		NEXT_LIST: 'NEXT_LIST'
 	};
 
-	let plansDisplay: string = $state('');
+	let plansDisplay: string = $state(PLANS_VIEWS.SUBS_LIST);
 	let planActionItems: any = {
 		'my plans': () => {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -129,7 +130,7 @@
 	async function onReturnPlan() {
 		if (pane.buffer.bag?.plan?.route) {
 			let route = pane.buffer.bag.plan.route;
-			if (route.view === PLANS_VIEWS.SUBS_DETAILS || route.view === PLANS_VIEWS.NEXT_LIST) {
+			if (route.returnView === PLANS_VIEWS.SUBS_DETAILS || route.returnView === PLANS_VIEWS.NEXT_LIST) {
 				selectedSub = subsMap[route.subID];
 				let readingsData = {
 					id: `${route.subID}/${pane.buffer.bag.plan.readingIndex}`,
@@ -142,7 +143,11 @@
 				selectedSub.readings[pane.buffer.bag.plan.readingIndex] = {
 					index: pane.buffer.bag.plan.readingIndex
 				};
-				plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
+
+
+				selectedSub.nextReadingIndex = getNextReadingIndex(Object.keys(selectedSub.readings))
+				console.log(selectedSub.nextReadingIndex + " next reading index")
+				plansDisplay = route.returnView;
 			}
 		}
 	}
@@ -184,7 +189,7 @@
 					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
 					name: sub.plan.name,
 					percentCompleted: sub.percentCompleted,
-					readingIndex: sub.nextReadingIndex + 1,
+					readingIndex: sub.nextReadingIndex,
 					totalReadings: sub.plan.readings.length,
 					subID: sub.id
 				});
@@ -567,11 +572,11 @@
 
 <div bind:clientHeight style={containerHeight} class="overflow-hidden">
 	<div class="flex flex-col items-center">
-		{#if plansDisplay.startsWith('PLANS')}
+		{#if plansDisplay?.startsWith('PLANS')}
 			{@render plansView()}
-		{:else if plansDisplay.startsWith('SUBS')}
+		{:else if plansDisplay?.startsWith('SUBS')}
 			{@render subsView()}
-		{:else if plansDisplay.startsWith('NEXT')}
+		{:else if plansDisplay?.startsWith('NEXT')}
 			{@render nextReadingListView()}
 		{/if}
 	</div>

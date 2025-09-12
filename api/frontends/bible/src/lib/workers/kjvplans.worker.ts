@@ -121,6 +121,7 @@ async function addReadingsToSubs() {
 				filteredReadings[index] = readings[id];
 				readingIndexes.push(index)
 			});
+			// TODO sub readings is tracked readings.
 			sub.readings = filteredReadings
 		});
 		let plan  = plans[sub.planID]
