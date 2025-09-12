@@ -3,7 +3,6 @@
 	import { readingsApi } from '$lib/api/readings.api';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { plansService } from '$lib/services/plans.service';
-	import { PLANS } from '$lib/storer/bible.db';
 	import { getNextReadingIndex } from '$lib/utils/plan';
 	import { sleep } from '$lib/utils/sleep';
 	import { onDestroy, onMount } from 'svelte';
@@ -13,8 +12,42 @@
 
 	let PLAN_SUBSCRIBER_ID = uuid4();
 
+	
+	
+	const PLANS_VIEWS = {
+		PLANS_LIST: 'PLANS_LIST',
+		PLANS_ACTIONS: 'PLANS_ACTION',
+		PLANS_DETAILS: 'PLANS_DETAILS',
+
+		SUBS_LIST: 'SUBS_LIST',
+		SUBS_ACTIONS: 'SUBS_ACTIONS',
+		SUBS_DETAILS: 'SUBS_DETAILS',
+
+		NEXT_LIST: 'NEXT_LIST'
+	};
+
+	//////////////////////////// PLANS ////////////////////////////////////////
 	let plansMap: any = $state({});
 	let planList: any = $state([]);
+
+	let plansDisplay: string = $state(PLANS_VIEWS.SUBS_LIST);
+	let planActionItems: any = {
+		'my plans': () => {
+			plansDisplay = PLANS_VIEWS.SUBS_LIST;
+		},
+		'next readings': () => {
+			plansDisplay = PLANS_VIEWS.NEXT_LIST;
+		}
+	};
+
+	function onClosePlansList() {
+		paneService.onDeletePane(paneService.rootPane, paneId);
+	}
+
+	
+
+	//////////////////////////// SUB UPDATES //////////////////////////////////
+
 	let subsMap: any = $state({});
 	let subsList: any = $state([]);
 	let todaysReadings: any = $state([]);
@@ -43,52 +76,6 @@
 		pane.updateBuffer('ChapterContainer');
 	}
 
-	function onSelectedNextReading(idx: number, returnView: string) {
-		let nextReading = todaysReadings[idx];
-		let readings = nextReading.reading;
-		let updReadings = readings.map((r: any) => {
-			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
-			return r;
-		});
-
-		console.log(nextReading.readingIndex, 'next reading reading index');
-		pane.buffer.bag.plan = {
-			readings: updReadings,
-			currentReadingsIndex: 0,
-			subID: nextReading.subID,
-			readingIndex: nextReading.readingIndex,
-			returnView: returnView
-		};
-
-		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
-		pane.updateBuffer('ChapterContainer');
-	}
-
-	const PLANS_VIEWS = {
-		PLANS_LIST: 'PLANS_LIST',
-		PLANS_ACTIONS: 'PLANS_ACTION',
-		PLANS_DETAILS: 'PLANS_DETAILS',
-
-		SUBS_LIST: 'SUBS_LIST',
-		SUBS_ACTIONS: 'SUBS_ACTIONS',
-		SUBS_DETAILS: 'SUBS_DETAILS',
-
-		NEXT_LIST: 'NEXT_LIST'
-	};
-
-	let plansDisplay: string = $state(PLANS_VIEWS.SUBS_LIST);
-	let planActionItems: any = {
-		'my plans': () => {
-			plansDisplay = PLANS_VIEWS.SUBS_LIST;
-		},
-		'next readings': () => {
-			plansDisplay = PLANS_VIEWS.NEXT_LIST;
-		}
-	};
-
-	function onClosePlansList() {
-		paneService.onDeletePane(paneService.rootPane, paneId);
-	}
 
 	function onCloseSubDetails() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -146,14 +133,9 @@
 					index: pane.buffer.bag.plan.readingIndex
 				};
 
-				console.log(
-					pane.buffer.bag.plan.readingIndex,
-					'next reading reading index onREtrunPlan staret'
-				);
 
-				selectedSub.nextReadingIndex = getNextReadingIndex(Object.keys(selectedSub.readings));
+				selectedSub.nextReadingIndex = getNextReadingIndex(Object.keys(selectedSub.readings).map(v => parseInt(v)));
 				subsMap[selectedSub.id].nextReadingIndex = selectedSub.nextReadingIndex;
-				console.log(selectedSub.nextReadingIndex, 'next reading reading index on return plan end');
 				plansDisplay = route.returnView;
 			}
 			loadMoreSubReadings();
@@ -186,6 +168,30 @@
 		}
 	}
 
+	
+	//////////////////////////// NEXT READINGS ////////////////////////////////
+
+	function onSelectedNextReading(idx: number, returnView: string) {
+		let nextReading = todaysReadings[idx];
+		let readings = nextReading.reading;
+		let updReadings = readings.map((r: any) => {
+			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
+			return r;
+		});
+
+		pane.buffer.bag.plan = {
+			readings: updReadings,
+			currentReadingsIndex: 0,
+			subID: nextReading.subID,
+			readingIndex: nextReading.readingIndex,
+			returnView: returnView
+		};
+
+		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
+		pane.updateBuffer('ChapterContainer');
+	}
+
+
 	function updateTodays() {
 		let tr = [];
 		let subKeys = Object.keys(subsMap);
@@ -208,6 +214,8 @@
 		todaysReadings.length = 0;
 		todaysReadings.push(...tr);
 	}
+
+	//////////////////////////// SCROLL MGNT //////////////////////////////////
 
 	function loadMoreSubReadings() {
 		let toShow = 0;
@@ -239,14 +247,13 @@
 		}
 	}
 
-	let subID = '00000000-0000-0000-0000-000000000000';
+	///////////////////////////// LIFECYCLES //////////////////////////////////
 
 	onDestroy(() => {
 		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
 	});
 
 	onMount(() => {
-		console.log('called onMount');
 		plansService.subscribe('getAllPlans', onGetAllPlans, PLAN_SUBSCRIBER_ID);
 		plansService.getAllPlans();
 
