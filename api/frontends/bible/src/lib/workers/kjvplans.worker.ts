@@ -84,8 +84,7 @@ async function parsePlans() {
 	for (let i = 0; i < chachedPlans.length; i++) {
 		let plan = chachedPlans[i]
 		let planReadings = plan.readings
-		readings = parsePlanReadings(planReadings)
-		plan.readings = readings
+		plan.readings = parsePlanReadings(planReadings)
 		await plansDocument.addAsync(plan.id, plan);
 		plans[plan.id] = plan
 	}
@@ -93,17 +92,17 @@ async function parsePlans() {
 
 
 function getNextReadingIndex(readingIndexes: number[]): number {
-		readingIndexes.sort((a: number,b: number)=>  a - b )
+	readingIndexes.sort((a: number, b: number) => a - b)
 
-		let nextReadingIndex = 0
-		for(let j = 0; j < readingIndexes.length; j++){
-			if (readingIndexes[j] != j){
-				return nextReadingIndex
-			} 
-			nextReadingIndex = j + 1
+	let nextReadingIndex = 0
+	for (let j = 0; j < readingIndexes.length; j++) {
+		if (readingIndexes[j] != j) {
+			return nextReadingIndex
 		}
+		nextReadingIndex = j + 1
+	}
 
-		return nextReadingIndex
+	return nextReadingIndex
 }
 
 async function addReadingsToSubs() {
@@ -124,16 +123,17 @@ async function addReadingsToSubs() {
 			// TODO sub readings is tracked readings.
 			sub.readings = filteredReadings
 		});
-		let plan  = plans[sub.planID]
+		
+		let plan = plans[sub.planID]
 		sub.plan = plan
 		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
 		sub.percentCompleted = Math.ceil(readingIndexes.length / sub.plan.readings.length * 100)
 
-		for (let j=0;j < sub.plan.readings.length; j++){
+		for (let j = 0; j < sub.plan.readings.length; j++) {
 			let totalVerses = 0
-			for (let k=0; k< sub.plan.readings[j].length; k++){
+			for (let k = 0; k < sub.plan.readings[j].length; k++) {
 				let split = sub.plan.readings[j][k].verses.split('-')
-				totalVerses += parseInt(split[1]) -  parseInt(split[0]) + 2 
+				totalVerses += parseInt(split[1]) - parseInt(split[0]) + 2
 			}
 			sub.plan.readings[j].totalVerses = totalVerses
 		}
@@ -163,6 +163,7 @@ async function init() {
 
 	await addReadingsToSubs()
 
+	hasInitialized = true
 	getAllPlans();
 	getAllSubs()
 }
@@ -231,17 +232,23 @@ async function search(id: string, searchTerm: string, indexes: string[], flexDoc
 }
 
 function getAllPlans() {
-	postMessage({ id: 'getAllPlans', plans: plans });
+	if (hasInitialized) {
+		postMessage({ id: 'getAllPlans', plans: plans });
+	}
 }
 
 
 function getAllSubs() {
-	postMessage({ id: 'getAllSubs', subs: subs });
+	if (hasInitialized) {
+		postMessage({ id: 'getAllSubs', subs: subs });
+	}
 }
 
 
 function getAllReadings() {
-	postMessage({ id: 'getAllReadings', readings: readings });
+	if (hasInitialized) {
+		postMessage({ id: 'getAllReadings', readings: readings });
+	}
 }
 
 onmessage = async (e) => {
@@ -271,9 +278,10 @@ onmessage = async (e) => {
 			getAllSubs();
 			break;
 		case 'putReading':
-			putReading(e.data.data, e.data.subID);							
+			putReading(e.data.data, e.data.subID);
 			break;
 	}
 };
 
+let hasInitialized = false
 init();

@@ -21,7 +21,7 @@
 	let selectedSub: any = $state(undefined);
 	let showCompletedReadings: boolean = $state(false);
 
-	let subListReadingsToShow: number = $state(20);
+	let subListReadingsToShow: number = $state(0);
 	let subListViewID = uuid4();
 
 	function onSelectedSubReading(idx: number, returnView: string) {
@@ -33,7 +33,7 @@
 
 		pane.buffer.bag.plan = {
 			readings: updReadings,
-			currentReadingsIndex: 0,
+			currentReadingsIndex: 0, // What to start at
 			subID: selectedSub.id,
 			readingIndex: idx,
 			returnView: returnView
@@ -43,15 +43,15 @@
 		pane.updateBuffer('ChapterContainer');
 	}
 
-
 	function onSelectedNextReading(idx: number, returnView: string) {
 		let nextReading = todaysReadings[idx];
-		let readings = nextReading.reading
+		let readings = nextReading.reading;
 		let updReadings = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r;
 		});
 
+		console.log(nextReading.readingIndex, 'next reading reading index');
 		pane.buffer.bag.plan = {
 			readings: updReadings,
 			currentReadingsIndex: 0,
@@ -63,8 +63,6 @@
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
 	}
-
-	
 
 	const PLANS_VIEWS = {
 		PLANS_LIST: 'PLANS_LIST',
@@ -108,6 +106,7 @@
 	function onSubClicked(sub: any) {
 		selectedSub = sub;
 		plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
+		loadMoreSubReadings();
 
 		setTimeout(async () => {
 			let el = document.getElementById(`${subListViewID}-scroll-container`);
@@ -130,7 +129,10 @@
 	async function onReturnPlan() {
 		if (pane.buffer.bag?.plan?.route) {
 			let route = pane.buffer.bag.plan.route;
-			if (route.returnView === PLANS_VIEWS.SUBS_DETAILS || route.returnView === PLANS_VIEWS.NEXT_LIST) {
+			if (
+				route.returnView === PLANS_VIEWS.SUBS_DETAILS ||
+				route.returnView === PLANS_VIEWS.NEXT_LIST
+			) {
 				selectedSub = subsMap[route.subID];
 				let readingsData = {
 					id: `${route.subID}/${pane.buffer.bag.plan.readingIndex}`,
@@ -144,16 +146,23 @@
 					index: pane.buffer.bag.plan.readingIndex
 				};
 
+				console.log(
+					pane.buffer.bag.plan.readingIndex,
+					'next reading reading index onREtrunPlan staret'
+				);
 
-				selectedSub.nextReadingIndex = getNextReadingIndex(Object.keys(selectedSub.readings))
-				console.log(selectedSub.nextReadingIndex + " next reading index")
+				selectedSub.nextReadingIndex = getNextReadingIndex(Object.keys(selectedSub.readings));
+				subsMap[selectedSub.id].nextReadingIndex = selectedSub.nextReadingIndex;
+				console.log(selectedSub.nextReadingIndex, 'next reading reading index on return plan end');
 				plansDisplay = route.returnView;
 			}
+			loadMoreSubReadings();
 		}
 	}
 
-	function onGetAllSubs(data: any) {
+	async function onGetAllSubs(data: any) {
 		if (data) {
+			console.log(data);
 			subsMap = data.subs;
 			subsList.length = 0;
 			Object.keys(subsMap)
@@ -161,9 +170,9 @@
 				.forEach((k: any) => {
 					subsList.push(subsMap[k]);
 				});
+			await onReturnPlan();
+			await updateTodays();
 		}
-		onReturnPlan();
-		updateTodays();
 	}
 
 	function onGetAllPlans(data: any) {
@@ -201,11 +210,19 @@
 	}
 
 	function loadMoreSubReadings() {
-		let toShow = subListReadingsToShow + 20;
-		if (toShow > selectedSub.plan.readings.length) {
-			toShow = selectedSub.plan.readings.length;
+		let toShow = 0;
+		let count = 0;
+
+		while (toShow !== 30 && count + subListReadingsToShow < selectedSub.plan.readings.length) {
+			let hasCompletedReading = selectedSub.readings[subListReadingsToShow + count];
+			count++;
+			if (hasCompletedReading && !showCompletedReadings) {
+				continue;
+			}
+			toShow = toShow + 1;
 		}
-		subListReadingsToShow = toShow;
+
+		subListReadingsToShow += count;
 	}
 
 	function handleScroll() {
