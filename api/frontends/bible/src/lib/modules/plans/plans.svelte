@@ -63,6 +63,7 @@
 		name: string;
 		description: string[];
 		readings: PlanReading[][];
+		dateCreated: number;
 		version: number;
 	}
 
@@ -79,7 +80,7 @@
 		version: number;
 	}
 
-	let subsMap: Map<string, Sub> = $state(new Map());
+	let subsMap: Map<string, Sub> = new Map<string, Sub>();
 	let subsList: Sub[] = $state([]);
 	let todaysReadings: NextReading[] = $state([]);
 	let selectedSub: Sub = $state(NullSub());
@@ -97,7 +98,8 @@
 				name: '',
 				description: [],
 				readings: [],
-				version: 0
+				version: 0,
+				dateCreated: 0
 			},
 			nextReadingIndex: 0,
 			percentCompleted: 0,
@@ -111,7 +113,7 @@
 
 	function onSelectedSubReading(idx: number, returnView: string) {
 		let readings: PlanReading[] = selectedSub.plan.readings[idx];
-		let updReadings: PlanReading[] = readings.map((r: any) =>   {
+		let updReadings: PlanReading[] = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r as PlanReading;
 		});
@@ -167,27 +169,36 @@
 	async function onReturnPlan() {
 		if (pane.buffer.bag?.plan?.route) {
 			let route = pane.buffer.bag.plan.route;
+
 			if (
 				route.returnView === PLANS_VIEWS.SUBS_DETAILS ||
 				route.returnView === PLANS_VIEWS.NEXT_LIST
 			) {
-				selectedSub = subsMap.get(route.subID);
-				let readingsData = {
-					id: `${route.subID}/${pane.buffer.bag.plan.readingIndex}`,
-					index: pane.buffer.bag.plan.readingIndex,
+				let sub = subsMap.get(route.subID);
+				if (!sub) {
+					return;
+				}
+
+				selectedSub = sub;
+				let readingIndex: number = pane.buffer.bag.plan.readingIndex;
+				let readingsData: CompletedReading = {
+					id: `${route.subID}/${readingIndex}`,
+					index: readingIndex,
 					subID: selectedSub.id,
 					version: 0
 				};
 				await readingsApi.put(readingsData);
 				plansService.putReading(readingsData, selectedSub.id);
-				selectedSub.readings[pane.buffer.bag.plan.readingIndex] = {
-					index: pane.buffer.bag.plan.readingIndex
-				};
+				selectedSub.readings[readingIndex] = readingsData;
 
 				selectedSub.nextReadingIndex = getNextReadingIndex(
 					Object.keys(selectedSub.readings).map((v) => parseInt(v))
 				);
-				subsMap[selectedSub.id].nextReadingIndex = selectedSub.nextReadingIndex;
+				let updSub: Sub | undefined = subsMap.get(selectedSub.id);
+				if (updSub) {
+					updSub.nextReadingIndex = selectedSub.nextReadingIndex;
+				}
+
 				plansDisplay = route.returnView;
 			}
 			loadMoreSubReadings();
@@ -197,13 +208,15 @@
 	async function onGetAllSubs(data: any) {
 		if (data) {
 			console.log(data);
-			subsMap = data.subs;
+			subsMap = new Map<string, Sub>(Object.entries(data.subs));
 			subsList.length = 0;
-			Object.keys(subsMap)
+			subsMap
+				.entries()
+				.map((s, _): Sub => s[1])
+				.toArray()
 				.sort((a: any, b: any) => a.dateCreated - b.dateCreated)
-				.forEach((k: any) => {
-					subsList.push(subsMap[k]);
-				});
+				.forEach((s: any) => subsList.push(s));
+
 			await onReturnPlan();
 			await updateTodays();
 		}
@@ -260,7 +273,7 @@
 	interface NextReading {
 		reading: PlanReading[];
 		totalVerses: number;
-		planDateCreated: Date;
+		planDateCreated: number;
 		name: string;
 		percentCompleted: number;
 		readingIndex: number;
@@ -270,10 +283,10 @@
 
 	function updateTodays() {
 		let tr: NextReading[] = [];
-		let subKeys = Object.keys(subsMap);
+		let subKeys = subsMap.keys().toArray();
 		for (let i = 0; i < subKeys.length; i++) {
-			let sub = subsMap[subKeys[i]];
-			if (sub.plan.readings.length - 1 > sub.nextReadingIndex) {
+			let sub = subsMap.get(subKeys[i]);
+			if (sub && sub.plan.readings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
 					reading: sub.plan.readings[sub.nextReadingIndex],
 					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses,
