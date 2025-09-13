@@ -10,10 +10,8 @@
 
 	let { containerHeight, paneId, pane } = $props();
 
-	let PLAN_SUBSCRIBER_ID = uuid4();
+	let PLAN_SUBSCRIBER_ID: string = uuid4();
 
-	
-	
 	const PLANS_VIEWS = {
 		PLANS_LIST: 'PLANS_LIST',
 		PLANS_ACTIONS: 'PLANS_ACTION',
@@ -44,24 +42,78 @@
 		paneService.onDeletePane(paneService.rootPane, paneId);
 	}
 
-	
-
 	//////////////////////////// SUB UPDATES //////////////////////////////////
 
-	let subsMap: any = $state({});
-	let subsList: any = $state([]);
-	let todaysReadings: any = $state([]);
-	let selectedSub: any = $state(undefined);
+	/**
+	 * id: "00000000-0000-0000-0000-000000000000/0"
+	 * subID: "00000000-0000-0000-0000-000000000000"
+	 * index: 0
+	 * version: 0
+	 */
+	interface CompletedReading {
+		id: string;
+		subID: string;
+		index: number;
+		version: number;
+	}
+
+	interface Plan {
+		id: string;
+		userID: string;
+		name: string;
+		description: string[];
+		readings: PlanReading[][];
+		version: number;
+	}
+
+	interface Sub {
+		id: string;
+		planID: string;
+		userID: string;
+		readings: CompletedReading[];
+		plan: Plan;
+		nextReadingIndex: number;
+		percentCompleted: number;
+
+		dateSubscribed: Date;
+		version: number;
+	}
+
+	let subsMap: Map<string, Sub> = $state(new Map());
+	let subsList: Sub[] = $state([]);
+	let todaysReadings: NextReading[] = $state([]);
+	let selectedSub: Sub = $state(NullSub());
 	let showCompletedReadings: boolean = $state(false);
+
+	function NullSub(): Sub {
+		return {
+			id: '',
+			planID: '',
+			userID: '',
+			readings: [],
+			plan: {
+				id: '',
+				userID: '',
+				name: '',
+				description: [],
+				readings: [],
+				version: 0
+			},
+			nextReadingIndex: 0,
+			percentCompleted: 0,
+			dateSubscribed: new Date(),
+			version: 0
+		};
+	}
 
 	let subListReadingsToShow: number = $state(0);
 	let subListViewID = uuid4();
 
 	function onSelectedSubReading(idx: number, returnView: string) {
-		let readings = selectedSub.plan.readings[idx];
-		let updReadings = readings.map((r: any) => {
+		let readings: PlanReading[] = selectedSub.plan.readings[idx];
+		let updReadings: PlanReading[] = readings.map((r: any) =>   {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
-			return r;
+			return r as PlanReading;
 		});
 
 		pane.buffer.bag.plan = {
@@ -75,7 +127,6 @@
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
 	}
-
 
 	function onCloseSubDetails() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -120,7 +171,7 @@
 				route.returnView === PLANS_VIEWS.SUBS_DETAILS ||
 				route.returnView === PLANS_VIEWS.NEXT_LIST
 			) {
-				selectedSub = subsMap[route.subID];
+				selectedSub = subsMap.get(route.subID);
 				let readingsData = {
 					id: `${route.subID}/${pane.buffer.bag.plan.readingIndex}`,
 					index: pane.buffer.bag.plan.readingIndex,
@@ -133,8 +184,9 @@
 					index: pane.buffer.bag.plan.readingIndex
 				};
 
-
-				selectedSub.nextReadingIndex = getNextReadingIndex(Object.keys(selectedSub.readings).map(v => parseInt(v)));
+				selectedSub.nextReadingIndex = getNextReadingIndex(
+					Object.keys(selectedSub.readings).map((v) => parseInt(v))
+				);
 				subsMap[selectedSub.id].nextReadingIndex = selectedSub.nextReadingIndex;
 				plansDisplay = route.returnView;
 			}
@@ -168,7 +220,6 @@
 		}
 	}
 
-	
 	//////////////////////////// NEXT READINGS ////////////////////////////////
 
 	function onSelectedNextReading(idx: number, returnView: string) {
@@ -191,14 +242,39 @@
 		pane.updateBuffer('ChapterContainer');
 	}
 
+	/**
+	 * bookName: "Genesis",
+	 * bookID: 1,
+	 * chapter: 1,
+	 * verses: "1-31",
+	 * chapterKey: "1_1_1-31"
+	 */
+	interface PlanReading {
+		bookName: string;
+		bookID: number;
+		chapter: number;
+		verses: string;
+		chapterKey: string;
+	}
+
+	interface NextReading {
+		reading: PlanReading[];
+		totalVerses: number;
+		planDateCreated: Date;
+		name: string;
+		percentCompleted: number;
+		readingIndex: number;
+		totalReadings: number;
+		subID: string;
+	}
 
 	function updateTodays() {
-		let tr = [];
+		let tr: NextReading[] = [];
 		let subKeys = Object.keys(subsMap);
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub = subsMap[subKeys[i]];
 			if (sub.plan.readings.length - 1 > sub.nextReadingIndex) {
-				tr.push({
+				let nr: NextReading = {
 					reading: sub.plan.readings[sub.nextReadingIndex],
 					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses,
 					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
@@ -207,7 +283,8 @@
 					readingIndex: sub.nextReadingIndex,
 					totalReadings: sub.plan.readings.length,
 					subID: sub.id
-				});
+				};
+				tr.push(nr);
 			}
 		}
 
