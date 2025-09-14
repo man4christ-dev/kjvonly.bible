@@ -273,7 +273,7 @@
 {:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
 	<Header
 		title="My Plans"
-		onClose={() => {}}
+		onClose={undefined}
 		bind:plansDisplay
 		menuDropdownToggleViews={[PLANS_VIEWS.SUBS_LIST, PLANS_VIEWS.SUBS_ACTIONS]}
 	></Header>

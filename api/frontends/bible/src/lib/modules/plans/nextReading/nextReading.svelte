@@ -21,8 +21,6 @@
     let subsMap: Map<string, Sub> = new Map<string, Sub>();
 	
 	function onCloseNextReadings() {
-        console.log(plansDisplay)
-        console.log(JSON.stringify(pane.buffer.bag.plan))
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
 	}
 
