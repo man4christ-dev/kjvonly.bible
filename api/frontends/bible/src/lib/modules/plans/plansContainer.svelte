@@ -1,10 +1,10 @@
 <script lang="ts">
-	import type { Pane } from '$lib/models/pane.model';
-	import { paneService } from '$lib/services/pane.service.svelte';
+	import SubsView from './subscription/subsView.svelte';
+	import NextReading from './nextReading/nextReading.svelte';
+	import { PLANS_VIEWS } from './models';
+	import Discover from './discover/discover.svelte';
+	import { onMount } from 'svelte';
 	import uuid4 from 'uuid4';
-
-	import { onMount, untrack } from 'svelte';
-	import Plans from './plans.svelte';
 
 	let id = uuid4();
 	let {
@@ -13,10 +13,32 @@
 		containerHeight = $bindable(),
 		containerWidth = $bindable()
 	} = $props();
+
+	let plansDisplay: string = $state('');
+	let clientHeight = $state(0);
+
+	onMount(() => {
+		let route = pane?.buffer?.bag?.plan?.route;
+		if (route) {
+			plansDisplay = route.returnView;
+		} else {
+			plansDisplay = PLANS_VIEWS.SUBS_LIST;
+		}
+	});
 </script>
 
 <div class="kjvonly-noselect overflow-hidden">
 	<div {id} style="{containerHeight} {containerWidth}">
-		<Plans containerHeight paneId pane></Plans>
+		<div bind:clientHeight style={containerHeight} class="overflow-hidden">
+			<div class="flex flex-col items-center">
+				{#if plansDisplay?.startsWith('PLANS')}
+					<Discover bind:plansDisplay bind:pane paneId bind:clientHeight></Discover>
+				{:else if plansDisplay?.startsWith('SUBS')}
+					<SubsView bind:plansDisplay bind:pane paneId bind:clientHeight></SubsView>
+				{:else if plansDisplay?.startsWith('NEXT')}
+					<NextReading bind:plansDisplay bind:pane bind:clientHeight></NextReading>
+				{/if}
+			</div>
+		</div>
 	</div>
 </div>

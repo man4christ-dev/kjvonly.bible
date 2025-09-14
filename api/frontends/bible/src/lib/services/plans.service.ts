@@ -1,3 +1,5 @@
+import uuid4 from "uuid4";
+
 const plansWorker = new Worker(new URL('../workers/kjvplans.worker?worker', import.meta.url), {
 	type: 'module'
 });
@@ -13,6 +15,7 @@ export class PlansService {
 					s.fn(e.data);
 				}
 			});
+
 		};
 	}
 
@@ -23,7 +26,7 @@ export class PlansService {
 	unsubscribe(subID: any) {
 		let tmpSubscribers: any = []
 		this.subscribers.forEach((s) => {
-			if (s.subID !== subID){
+			if (s.subID !== subID) {
 				tmpSubscribers.push()
 			}
 		});

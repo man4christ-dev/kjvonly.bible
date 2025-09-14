@@ -7,21 +7,17 @@
 	import { sleep } from '$lib/utils/sleep';
 	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
-	import SubsView from './subscription/subsView.svelte';
-	import Header from './components/header.svelte';
-	import NextReading from './nextReading/nextReading.svelte';
-	import ActionItemsList from './components/actionItemsList.svelte';
-	import { PLANS_VIEWS } from './models';
+	import Header from '../components/header.svelte';
+	import ActionItemsList from '../components/actionItemsList.svelte';
+	import { PLANS_VIEWS } from '../models';
 
-	let { containerHeight, paneId, pane } = $props();
+	let {plansDisplay=$bindable(), clientHeight=$bindable(), paneId, pane=$bindable() } = $props();
 
 	let PLAN_SUBSCRIBER_ID: string = uuid4();
 
-	//////////////////////////// PLANS ////////////////////////////////////////
 	let plansMap: any = $state({});
 	let planList: any = $state([]);
 
-	let plansDisplay: string = $state(PLANS_VIEWS.SUBS_LIST);
 	let planActionItems: any = {
 		'my plans': () => {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -35,8 +31,6 @@
 		paneService.onDeletePane(paneService.rootPane, paneId);
 	}
 
-	//////////////////////////// SUB UPDATES //////////////////////////////////
-
 	function onGetAllPlans(data: any) {
 		if (data) {
 			plansMap = data.plans;
@@ -47,10 +41,6 @@
 				});
 		}
 	}
-
-	//////////////////////////// NEXT READINGS ////////////////////////////////
-
-	///////////////////////////// LIFECYCLES //////////////////////////////////
 
 	onDestroy(() => {
 		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
@@ -65,7 +55,6 @@
 		}
 	});
 
-	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 </script>
 
@@ -87,7 +76,7 @@
 	{/each}
 {/snippet}
 
-{#snippet plansView()}
+
 	{#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
 		<Header
 			title="Discover Plans"
@@ -124,16 +113,5 @@
 			</div>
 		</div>
 	{/if}
-{/snippet}
 
-<div bind:clientHeight style={containerHeight} class="overflow-hidden">
-	<div class="flex flex-col items-center">
-		{#if plansDisplay?.startsWith('PLANS')}
-			{@render plansView()}
-		{:else if plansDisplay?.startsWith('SUBS')}
-			<SubsView bind:plansDisplay bind:pane paneId bind:clientHeight></SubsView>
-		{:else if plansDisplay?.startsWith('NEXT')}
-			<NextReading bind:plansDisplay bind:pane  bind:clientHeight></NextReading>
-		{/if}
-	</div>
-</div>
+

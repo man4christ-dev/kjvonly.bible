@@ -171,7 +171,6 @@ export class OfflineApi {
             }
         }
         toastService.showToast(toastMessage);
-        console.log('hitting onFailurePut')
         await storer.putValue(unsyncedDB, data);
         return data;
     }
