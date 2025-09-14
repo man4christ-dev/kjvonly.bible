@@ -48,7 +48,7 @@
 			</button>
 		</p>
 	{:else}
-		<span class="w-full"></span>
+		<span class="w-full text-center">{title}</span>
 	{/if}
 	{#if onClose}
 		<div class="flex w-full justify-end">

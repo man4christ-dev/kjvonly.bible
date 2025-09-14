@@ -13,14 +13,16 @@
 	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight = $bindable() } = $props();
 
 	let NEXT_READING_ID: string = uuid4();
-
-	let headerHeight = $state(0);
-
-	let subsMap: Map<string, Sub> = new Map<string, Sub>();
 	let nextReadingViewID = uuid4();
-	let nextReadings: NextReading[] = $state([]);
-
+	
+    let headerHeight = $state(0);
+    let nextReadings: NextReading[] = $state([]);
+	
+    let subsMap: Map<string, Sub> = new Map<string, Sub>();
+	
 	function onCloseNextReadings() {
+        console.log(plansDisplay)
+        console.log(JSON.stringify(pane.buffer.bag.plan))
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
 	}
 
@@ -46,11 +48,11 @@
 		pane.updateBuffer('ChapterContainer');
 	}
 
-	function updateTodays() {
+	function updateNextReadings() {
 		let nrs: NextReading[] = [];
 		let subKeys = subsMap.keys().toArray();
 		for (let i = 0; i < subKeys.length; i++) {
-			let sub = subsMap.get(subKeys[i]);
+			let sub: Sub | undefined = subsMap.get(subKeys[i]);
 			if (sub && sub.plan.readings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
 					reading: sub.plan.readings[sub.nextReadingIndex],
@@ -71,30 +73,24 @@
 	}
 
 	async function onReturnPlan() {
-		if (pane.buffer.bag?.plan?.route) {
-			let route = pane.buffer.bag.plan.route;
-			if (route.returnView === PLANS_VIEWS.NEXT_LIST) {
-				let sub = subsMap.get(route.subID);
-				if (!sub) {
-					return;
-				}
+		let plan: NavPlan = pane.buffer.bag?.plan;
+		if (plan) {
+			let readingsData: CompletedReading = {
+				id: `${plan.subID}/${plan.readingIndex}`,
+				index: plan.readingIndex,
+				subID: plan.subID,
+				version: 0
+			};
+			await readingsApi.put(readingsData);
+			plansService.putReading(readingsData, plan.subID);
 
-				let readingIndex: number = pane.buffer.bag.plan.readingIndex;
-				let readingsData: CompletedReading = {
-					id: `${route.subID}/${readingIndex}`,
-					index: readingIndex,
-					subID: route.subID,
-					version: 0
-				};
-				await readingsApi.put(readingsData);
-				plansService.putReading(readingsData, sub.id);
-
-				sub.readings[readingIndex] = readingsData;
-				sub.nextReadingIndex = getNextReadingIndex(
-					Object.keys(sub.readings).map((v) => parseInt(v))
-				);
-				plansDisplay = route.returnView;
+			let sub = subsMap.get(plan.subID);
+            // SHOULD ALWAYS EXIST. MAKE COMPILER HAPPY
+			if (!sub) {
+				return;
 			}
+			sub.readings[plan.readingIndex] = readingsData;
+			sub.nextReadingIndex = getNextReadingIndex(Object.keys(sub.readings).map((v) => parseInt(v)));
 		}
 	}
 
@@ -103,7 +99,7 @@
 			subsMap = new Map<string, Sub>(Object.entries(data.subs));
 
 			await onReturnPlan();
-			await updateTodays();
+			await updateNextReadings();
 		}
 	}
 
@@ -152,7 +148,7 @@
 {/snippet}
 
 <Header
-	title="My Plans"
+	title="Next Readings"
 	onClose={onCloseNextReadings}
 	bind:plansDisplay
 	menuDropdownToggleViews={undefined}

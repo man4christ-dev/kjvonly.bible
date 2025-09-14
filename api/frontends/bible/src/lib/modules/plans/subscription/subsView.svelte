@@ -108,14 +108,11 @@
 			if (!sub) {
 				return;
 			}
-			
+
 			sub.readings[plan.readingIndex] = readingsData;
-			sub.nextReadingIndex = getNextReadingIndex(
-				Object.keys(sub.readings).map((v) => parseInt(v))
-			);
+			sub.nextReadingIndex = getNextReadingIndex(Object.keys(sub.readings).map((v) => parseInt(v)));
 
 			selectedSub = sub;
-			plansDisplay = plan.returnView;
 		}
 		loadMoreSubReadings();
 	}
@@ -172,10 +169,6 @@
 	onMount(() => {
 		plansService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
 		plansService.getAllSubs();
-
-		if (!pane.buffer.bag?.plan) {
-			plansDisplay = PLANS_VIEWS.SUBS_LIST;
-		}
 	});
 
 	let headerHeight = $state(0);
