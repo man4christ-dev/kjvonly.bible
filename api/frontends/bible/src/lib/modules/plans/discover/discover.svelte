@@ -1,17 +1,18 @@
 <script lang="ts">
-	import { plansApi } from '$lib/api/plans.api';
-	import { readingsApi } from '$lib/api/readings.api';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { plansService } from '$lib/services/plans.service';
-	import { getNextReadingIndex } from '$lib/utils/plan';
-	import { sleep } from '$lib/utils/sleep';
 	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
 	import ActionItemsList from '../components/actionItemsList.svelte';
 	import { PLANS_VIEWS } from '../models';
 
-	let {plansDisplay=$bindable(), clientHeight=$bindable(), paneId, pane=$bindable() } = $props();
+	let {
+		plansDisplay = $bindable(),
+		clientHeight = $bindable(),
+		paneId,
+		pane = $bindable()
+	} = $props();
 
 	let PLAN_SUBSCRIBER_ID: string = uuid4();
 
@@ -49,10 +50,6 @@
 	onMount(() => {
 		plansService.subscribe('getAllPlans', onGetAllPlans, PLAN_SUBSCRIBER_ID);
 		plansService.getAllPlans();
-
-		if (!pane.buffer.bag?.plan?.route) {
-			plansDisplay = PLANS_VIEWS.SUBS_LIST;
-		}
 	});
 
 	let headerHeight = $state(0);
@@ -76,42 +73,39 @@
 	{/each}
 {/snippet}
 
+{#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
+	<Header
+		title="Discover Plans"
+		onClose={onClosePlansList}
+		bind:plansDisplay
+		menuDropdownToggleViews={[PLANS_VIEWS.PLANS_ACTIONS, PLANS_VIEWS.PLANS_LIST]}
+	></Header>
 
-	{#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
-		<Header
-			title="Discover Plans"
-			onClose={onClosePlansList}
-			bind:plansDisplay
-			menuDropdownToggleViews={[PLANS_VIEWS.PLANS_ACTIONS, PLANS_VIEWS.PLANS_LIST]}
-		></Header>
-
-		<div class="w-full max-w-lg">
-			<div
-				style="height: {clientHeight - headerHeight}px"
-				class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-			>
-				<!-- {@render today()} -->
-				{@render plansListView()}
-			</div>
+	<div class="w-full max-w-lg">
+		<div
+			style="height: {clientHeight - headerHeight}px"
+			class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
+		>
+			<!-- {@render today()} -->
+			{@render plansListView()}
 		</div>
-	{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}
-		<Header
-			title="Discover Plans"
-			onClose={() => {}}
-			bind:plansDisplay
-			menuDropdownToggleViews={[PLANS_VIEWS.PLANS_LIST, PLANS_VIEWS.PLANS_ACTIONS]}
-		></Header>
-		<div class="flex w-full max-w-lg">
-			<div
-				style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
-					headerHeight}px"
-				class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-			>
-				<!-- {@render today()} -->
+	</div>
+{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}
+	<Header
+		title="Discover Plans"
+		onClose={() => {}}
+		bind:plansDisplay
+		menuDropdownToggleViews={[PLANS_VIEWS.PLANS_LIST, PLANS_VIEWS.PLANS_ACTIONS]}
+	></Header>
+	<div class="flex w-full max-w-lg">
+		<div
+			style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
+				headerHeight}px"
+			class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
+		>
+			<!-- {@render today()} -->
 
-				<ActionItemsList actionItems={planActionItems}></ActionItemsList>
-			</div>
+			<ActionItemsList actionItems={planActionItems}></ActionItemsList>
 		</div>
-	{/if}
-
-
+	</div>
+{/if}

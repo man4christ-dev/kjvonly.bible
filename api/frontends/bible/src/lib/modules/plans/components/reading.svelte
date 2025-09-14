@@ -1,12 +1,12 @@
 <script lang="ts">
 	import type { PlanReading } from "../models";
 
-    let {rs=$bindable<PlanReading[]>()} = $props()
+    let {planReading=$bindable<PlanReading[]>()} = $props()
 </script>
 
 	<table class="table-fixed">
 		<tbody>
-			{#each rs as r}
+			{#each planReading as r}
 				<tr>
 					<td class="pe-3 text-right text-nowrap">{r.bookName}</td>
 					<td class="text-right">{r.chapter}:{r.verses}</td>

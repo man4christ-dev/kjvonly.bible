@@ -12,18 +12,20 @@
 
 	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight = $bindable() } = $props();
 
-	let PLAN_SUBSCRIBER_ID: string = uuid4();
-	let subsMap: Map<string, Sub> = new Map<string, Sub>();
-	let subsList: Sub[] = $state([]);
-	let subListViewID = uuid4();
-	let todaysReadings: NextReading[] = $state([]);
+	let NEXT_READING_ID: string = uuid4();
 
-	function onCloseSubDetails() {
+	let headerHeight = $state(0);
+
+	let subsMap: Map<string, Sub> = new Map<string, Sub>();
+	let nextReadingViewID = uuid4();
+	let nextReadings: NextReading[] = $state([]);
+
+	function onCloseNextReadings() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
 	}
 
 	function onSelectedNextReading(idx: number, returnView: string) {
-		let nextReading: NextReading = todaysReadings[idx];
+		let nextReading: NextReading = nextReadings[idx];
 		let readings: PlanReading[] = nextReading.reading;
 		let updReadings: PlanReading[] = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
@@ -45,7 +47,7 @@
 	}
 
 	function updateTodays() {
-		let tr: NextReading[] = [];
+		let nrs: NextReading[] = [];
 		let subKeys = subsMap.keys().toArray();
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub = subsMap.get(subKeys[i]);
@@ -60,12 +62,12 @@
 					totalReadings: sub.plan.readings.length,
 					subID: sub.id
 				};
-				tr.push(nr);
+				nrs.push(nr);
 			}
 		}
 
-		todaysReadings.length = 0;
-		todaysReadings.push(...tr);
+		nextReadings.length = 0;
+		nextReadings.push(...nrs);
 	}
 
 	async function onReturnPlan() {
@@ -99,13 +101,6 @@
 	async function onGetAllSubs(data: any) {
 		if (data) {
 			subsMap = new Map<string, Sub>(Object.entries(data.subs));
-			subsList.length = 0;
-			subsMap
-				.entries()
-				.map((s, _): Sub => s[1])
-				.toArray()
-				.sort((a: any, b: any) => a.dateCreated - b.dateCreated)
-				.forEach((s: any) => subsList.push(s));
 
 			await onReturnPlan();
 			await updateTodays();
@@ -113,18 +108,16 @@
 	}
 
 	onDestroy(() => {
-		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
+		plansService.unsubscribe(NEXT_READING_ID);
 	});
 
 	onMount(() => {
-		plansService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
+		plansService.subscribe('getAllSubs', onGetAllSubs, NEXT_READING_ID);
 		plansService.getAllSubs();
 	});
-
-	let headerHeight = $state(0);
 </script>
 
-{#snippet todayReading(t: any, idx: any)}
+{#snippet nextReading(n: any, idx: any)}
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<div
@@ -132,25 +125,25 @@
 		class=" flex w-full flex-col px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 	>
 		<div class="flex">
-			<span class="pb-2 text-2xl">{t.name}</span>
+			<span class="pb-2 text-2xl">{n.name}</span>
 			<span class="flex-grow"></span>
-			<span class="text-support-a-500">{t.percentCompleted}%</span>
+			<span class="text-support-a-500">{n.percentCompleted}%</span>
 		</div>
 		<div class="flex flex-row">
 			<div class="min-w-50">
-				<Reading bind:rs={t.reading}></Reading>
+				<Reading bind:planReading={n.reading}></Reading>
 			</div>
 
 			<div class="flex w-full min-w-50 flex-col">
 				<div class="flex w-full">
 					<span class="flex flex-grow"></span>
 					<div class="text-lg">
-						{t.readingIndex + 1} of {t.totalReadings}
+						{n.readingIndex + 1} of {n.totalReadings}
 					</div>
 				</div>
 				<div class="flex w-full justify-end">
 					<div class="text-base text-nowrap">
-						Verses: {t.totalVerses}
+						Verses: {n.totalVerses}
 					</div>
 				</div>
 			</div>
@@ -160,19 +153,19 @@
 
 <Header
 	title="My Plans"
-	onClose={onCloseSubDetails}
+	onClose={onCloseNextReadings}
 	bind:plansDisplay
 	menuDropdownToggleViews={undefined}
 ></Header>
 <div class="flex w-full max-w-lg">
 	<div
-		id="{subListViewID}-scroll-container"
+		id="{nextReadingViewID}-scroll-container"
 		style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight - headerHeight}px"
 		class="flex w-full max-w-lg flex-col overflow-x-hidden overflow-y-scroll bg-neutral-50"
 	>
-		{#if todaysReadings.length > 0}
-			{#each todaysReadings as t, idx}
-				{@render todayReading(t, idx)}
+		{#if nextReadings.length > 0}
+			{#each nextReadings as n, idx}
+				{@render nextReading(n, idx)}
 			{/each}
 		{/if}
 	</div>

@@ -27,8 +27,6 @@
 	let selectedSub: Sub = $state(NullSub());
 	let showCompletedReadings: boolean = $state(false);
 
-
-
 	let subListReadingsToShow: number = $state(0);
 	let subListViewID = uuid4();
 
@@ -142,8 +140,6 @@
 		}
 	}
 
-	//////////////////////////// SCROLL MGNT //////////////////////////////////
-
 	function loadMoreSubReadings() {
 		let toShow = 0;
 		let count = 0;
@@ -223,7 +219,7 @@
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							<Reading bind:rs={sub.plan.readings[idx]}></Reading>
+							<Reading bind:planReading={sub.plan.readings[idx]}></Reading>
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">
@@ -283,7 +279,6 @@
 			style="height: {clientHeight - headerHeight}px"
 			class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 		>
-			<!-- {@render today()} -->
 			{@render subsListView()}
 		</div>
 	</div>
@@ -300,7 +295,6 @@
 				headerHeight}px"
 			class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 		>
-			<!-- {@render today()} -->
 			 <ActionItemsList actionItems={subsActionItems}></ActionItemsList>
 		</div>
 	</div>
@@ -319,7 +313,6 @@
 				headerHeight}px"
 			class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 		>
-			<!-- {@render today()} -->
 			{@render subListView(selectedSub)}
 		</div>
 	</div>
