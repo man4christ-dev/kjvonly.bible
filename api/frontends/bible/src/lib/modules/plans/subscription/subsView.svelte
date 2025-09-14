@@ -3,7 +3,7 @@
 	import { plansService } from '$lib/services/plans.service';
 	import { getNextReadingIndex } from '$lib/utils/plan';
 	import { sleep } from '$lib/utils/sleep';
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 	import Reading from '../components/reading.svelte';
 	import Header from '../components/header.svelte';
@@ -129,7 +129,6 @@
 
 	async function onGetAllSubs(data: any) {
 		if (data) {
-			console.log('subview', data);
 			subsMap = new Map<string, Sub>(Object.entries(data.subs));
 			subsList.length = 0;
 			subsMap
@@ -174,6 +173,10 @@
 			loadMoreSubReadings();
 		}
 	}
+
+	onDestroy(() => {
+		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
+	});
 
 	onMount(() => {
 		plansService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);

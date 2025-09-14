@@ -60,7 +60,6 @@
 		plansService.subscribe('getAllPlans', onGetAllPlans, PLAN_SUBSCRIBER_ID);
 		plansService.getAllPlans();
 
-
 		if (!pane.buffer.bag?.plan?.route) {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
 		}

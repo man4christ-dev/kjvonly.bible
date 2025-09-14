@@ -1,16 +1,16 @@
 <script lang="ts">
 	import { plansService } from '$lib/services/plans.service';
-	import { onMount } from 'svelte';
-	import  Reading from '../components/reading.svelte';
+	import { onDestroy, onMount } from 'svelte';
+	import Reading from '../components/reading.svelte';
 
 	import { getNextReadingIndex } from '$lib/utils/plan';
 	import { readingsApi } from '$lib/api/readings.api';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
-	import type {  Sub, NextReading, PlanReading, NavPlan, CompletedReading } from '../models';
-    import {PLANS_VIEWS} from '../models'
+	import type { Sub, NextReading, PlanReading, NavPlan, CompletedReading } from '../models';
+	import { PLANS_VIEWS } from '../models';
 
-	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight=$bindable() } = $props();
+	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight = $bindable() } = $props();
 
 	let PLAN_SUBSCRIBER_ID: string = uuid4();
 	let subsMap: Map<string, Sub> = new Map<string, Sub>();
@@ -98,7 +98,6 @@
 
 	async function onGetAllSubs(data: any) {
 		if (data) {
-			console.log(data);
 			subsMap = new Map<string, Sub>(Object.entries(data.subs));
 			subsList.length = 0;
 			subsMap
@@ -113,13 +112,13 @@
 		}
 	}
 
+	onDestroy(() => {
+		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
+	});
+
 	onMount(() => {
 		plansService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
 		plansService.getAllSubs();
-
-		if (!pane.buffer.bag?.plan?.route) {
-			plansDisplay = PLANS_VIEWS.SUBS_LIST;
-		}
 	});
 
 	let headerHeight = $state(0);
@@ -159,25 +158,22 @@
 	</div>
 {/snippet}
 
-{#snippet nextReadingListView()}
-	<Header
-		title="My Plans"
-		onClose={onCloseSubDetails}
-		bind:plansDisplay
-		menuDropdownToggleViews={undefined}
-	></Header>
-	<div class="flex w-full max-w-lg">
-		<div
-			id="{subListViewID}-scroll-container"
-			style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
-				headerHeight}px"
-			class="flex w-full max-w-lg flex-col overflow-x-hidden overflow-y-scroll bg-neutral-50"
-		>
-			{#if todaysReadings.length > 0}
-				{#each todaysReadings as t, idx}
-					{@render todayReading(t, idx)}
-				{/each}
-			{/if}
-		</div>
+<Header
+	title="My Plans"
+	onClose={onCloseSubDetails}
+	bind:plansDisplay
+	menuDropdownToggleViews={undefined}
+></Header>
+<div class="flex w-full max-w-lg">
+	<div
+		id="{subListViewID}-scroll-container"
+		style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight - headerHeight}px"
+		class="flex w-full max-w-lg flex-col overflow-x-hidden overflow-y-scroll bg-neutral-50"
+	>
+		{#if todaysReadings.length > 0}
+			{#each todaysReadings as t, idx}
+				{@render todayReading(t, idx)}
+			{/each}
+		{/if}
 	</div>
-{/snippet}
+</div>
