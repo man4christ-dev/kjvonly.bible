@@ -69,10 +69,6 @@
 		let ci = mode.plan.currentReadingsIndex;
 		let nextIndex = ci + 1;
 		if (nextIndex > mode.plan.readings.length - 1) {
-			pane.buffer.bag.plan.route = {
-				returnView: pane.buffer.bag.plan.returnView,
-				subID: pane.buffer.bag.plan.subID
-			}
 			pane.updateBuffer('Plans');
 		} else {
 			mode.plan.currentReadingsIndex = nextIndex;

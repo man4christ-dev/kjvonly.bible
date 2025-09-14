@@ -18,9 +18,9 @@
 	let clientHeight = $state(0);
 
 	onMount(() => {
-		let route = pane?.buffer?.bag?.plan?.route;
-		if (route) {
-			plansDisplay = route.returnView;
+		let plan = pane?.buffer?.bag?.plan;
+		if (plan) {
+			plansDisplay = plan.returnView;
 		} else {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
 		}

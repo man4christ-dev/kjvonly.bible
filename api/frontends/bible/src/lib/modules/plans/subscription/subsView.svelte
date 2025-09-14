@@ -9,12 +9,16 @@
 	import Header from '../components/header.svelte';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import ActionItemsList from '../components/actionItemsList.svelte';
-	
-	import type {  Sub, PlanReading, NavPlan, CompletedReading } from '../models';
-    import {NullSub, PLANS_VIEWS} from '../models'
 
+	import type { Sub, PlanReading, NavPlan, CompletedReading } from '../models';
+	import { NullSub, PLANS_VIEWS } from '../models';
 
-	let { plansDisplay = $bindable(), pane = $bindable(), paneId, clientHeight=$bindable() } = $props();
+	let {
+		plansDisplay = $bindable(),
+		pane = $bindable(),
+		paneId,
+		clientHeight = $bindable()
+	} = $props();
 
 	function onClosePlansList() {
 		paneService.onDeletePane(paneService.rootPane, paneId);
@@ -88,41 +92,32 @@
 	}
 
 	async function onReturnPlan() {
-		if (pane.buffer.bag?.plan?.route) {
-			let route = pane.buffer.bag.plan.route;
+		let plan: NavPlan = pane.buffer.bag?.plan;
+		if (plan) {
+			let readingsData: CompletedReading = {
+				id: `${plan.subID}/${plan.readingIndex}`,
+				index: plan.readingIndex,
+				subID: plan.subID,
+				version: 0
+			};
+			await readingsApi.put(readingsData);
+			plansService.putReading(readingsData, plan.subID);
 
-			if (
-				route.returnView === PLANS_VIEWS.SUBS_DETAILS ||
-				route.returnView === PLANS_VIEWS.NEXT_LIST
-			) {
-				let sub = subsMap.get(route.subID);
-				if (!sub) {
-					return;
-				}
-				selectedSub = sub;
-				let readingIndex: number = pane.buffer.bag.plan.readingIndex;
-				let readingsData: CompletedReading = {
-					id: `${route.subID}/${readingIndex}`,
-					index: readingIndex,
-					subID: selectedSub.id,
-					version: 0
-				};
-				await readingsApi.put(readingsData);
-				plansService.putReading(readingsData, selectedSub.id);
-				selectedSub.readings[readingIndex] = readingsData;
-
-				selectedSub.nextReadingIndex = getNextReadingIndex(
-					Object.keys(selectedSub.readings).map((v) => parseInt(v))
-				);
-				let updSub: Sub | undefined = subsMap.get(selectedSub.id);
-				if (updSub) {
-					updSub.nextReadingIndex = selectedSub.nextReadingIndex;
-				}
-
-				plansDisplay = route.returnView;
+			let sub = subsMap.get(plan.subID);
+			// SHOULD ALWAYS EXIST. MAKE COMPILER HAPPY
+			if (!sub) {
+				return;
 			}
-			loadMoreSubReadings();
+			
+			sub.readings[plan.readingIndex] = readingsData;
+			sub.nextReadingIndex = getNextReadingIndex(
+				Object.keys(sub.readings).map((v) => parseInt(v))
+			);
+
+			selectedSub = sub;
+			plansDisplay = plan.returnView;
 		}
+		loadMoreSubReadings();
 	}
 
 	async function onGetAllSubs(data: any) {
@@ -178,7 +173,7 @@
 		plansService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
 		plansService.getAllSubs();
 
-		if (!pane.buffer.bag?.plan?.route) {
+		if (!pane.buffer.bag?.plan) {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
 		}
 	});
@@ -272,7 +267,7 @@
 		title="My Plans"
 		onClose={onClosePlansList}
 		bind:plansDisplay
-		menuDropdownToggleViews={[	PLANS_VIEWS.SUBS_ACTIONS,PLANS_VIEWS.SUBS_LIST]}
+		menuDropdownToggleViews={[PLANS_VIEWS.SUBS_ACTIONS, PLANS_VIEWS.SUBS_LIST]}
 	></Header>
 	<div class="w-full max-w-lg">
 		<div
@@ -285,9 +280,9 @@
 {:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
 	<Header
 		title="My Plans"
-		onClose={()=>{}}
+		onClose={() => {}}
 		bind:plansDisplay
-		menuDropdownToggleViews={[	PLANS_VIEWS.SUBS_LIST,PLANS_VIEWS.SUBS_ACTIONS]}
+		menuDropdownToggleViews={[PLANS_VIEWS.SUBS_LIST, PLANS_VIEWS.SUBS_ACTIONS]}
 	></Header>
 	<div class="flex w-full max-w-lg">
 		<div
@@ -295,7 +290,7 @@
 				headerHeight}px"
 			class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 		>
-			 <ActionItemsList actionItems={subsActionItems}></ActionItemsList>
+			<ActionItemsList actionItems={subsActionItems}></ActionItemsList>
 		</div>
 	</div>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_DETAILS}
