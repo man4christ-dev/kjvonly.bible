@@ -118,13 +118,15 @@
 			return r as PlanReading;
 		});
 
-		pane.buffer.bag.plan = {
+		let np: NavPlan = {
 			readings: updReadings,
 			currentReadingsIndex: 0, // What to start at
 			subID: selectedSub.id,
 			readingIndex: idx,
-			returnView: returnView
-		};
+			returnView: returnView,
+		} 
+		
+		pane.buffer.bag.plan = np
 
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
@@ -235,21 +237,31 @@
 
 	//////////////////////////// NEXT READINGS ////////////////////////////////
 
+	interface NavPlan {
+		readings: PlanReading[];
+		currentReadingsIndex: number;
+		subID: string;
+		readingIndex: number
+		returnView: string
+	}
+
 	function onSelectedNextReading(idx: number, returnView: string) {
-		let nextReading = todaysReadings[idx];
-		let readings = nextReading.reading;
-		let updReadings = readings.map((r: any) => {
+		let nextReading: NextReading = todaysReadings[idx];
+		let readings: PlanReading[] = nextReading.reading;
+		let updReadings: PlanReading[] = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r;
 		});
 
-		pane.buffer.bag.plan = {
+		let np: NavPlan = {
 			readings: updReadings,
 			currentReadingsIndex: 0,
 			subID: nextReading.subID,
 			readingIndex: nextReading.readingIndex,
 			returnView: returnView
 		};
+
+		pane.buffer.bag.plan = np
 
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
@@ -289,7 +301,7 @@
 			if (sub && sub.plan.readings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
 					reading: sub.plan.readings[sub.nextReadingIndex],
-					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses,
+					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
 					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
 					name: sub.plan.name,
 					percentCompleted: sub.percentCompleted,
