@@ -36,7 +36,8 @@
 		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
 			onclick={() => onSubClicked(s)}
-			class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
+			class="col-2 flex w-full flex-col overflow-hidden p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
+			style="height: 100px"
 		>
 			<div class="flex w-full">
 				<span class="pb-2 text-2xl">{s.plan.name}</span>
@@ -44,11 +45,9 @@
 				<span class="text-support-a-500">{s.percentCompleted}%</span>
 			</div>
 
-			<div class="text-sm">
+			<div class="text-md truncate ...">
 				{#each s.plan.description as d}
-					<span>
-						{d}
-					</span>
+					<span>&nbsp;</span><span>{d}</span>
 				{/each}
 			</div>
 		</div>

@@ -57,12 +57,15 @@
 
 {#snippet plansListView()}
 	{#each planList as p}
-		<div class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100">
+		<div
+			class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
+			style="height: 100px"
+		>
 			<div class="flex w-full">
 				<span class="pb-2 text-2xl">{p.name}</span>
 			</div>
 
-			<div class="text-sm">
+			<div class="truncate text-sm">
 				{#each p.description as d}
 					<span>
 						{d}
