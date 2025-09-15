@@ -104,3 +104,11 @@ export function NullSub(): Sub {
         version: 0
     };
 }
+
+export interface Booknames {
+   booknamesById: Map<string, string>
+   booknamesByName: Map<string, number>
+   shortNames: Map<string, string>
+   maxChapterById: Map<string,number>
+   bookchapterversecountById: Map<string, Map<string, number>>
+}

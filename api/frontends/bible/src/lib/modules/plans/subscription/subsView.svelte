@@ -257,11 +257,13 @@
 
 {#if plansDisplay === PLANS_VIEWS.SUBS_LIST}
 	<Header
+		bind:headerHeight
 		title="My Plans"
 		onClose={onClosePlansList}
 		bind:plansDisplay
 		menuDropdownToggleViews={[PLANS_VIEWS.SUBS_ACTIONS, PLANS_VIEWS.SUBS_LIST]}
 	></Header>
+
 	<div class="w-full max-w-lg">
 		<div
 			style="height: {clientHeight - headerHeight}px"
@@ -272,6 +274,7 @@
 	</div>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
 	<Header
+		bind:headerHeight
 		title="My Plans"
 		onClose={undefined}
 		bind:plansDisplay
@@ -288,6 +291,7 @@
 	</div>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_DETAILS}
 	<Header
+		bind:headerHeight
 		title="My Plans"
 		onClose={onCloseSubDetails}
 		bind:plansDisplay

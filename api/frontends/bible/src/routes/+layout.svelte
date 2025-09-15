@@ -49,8 +49,8 @@
 			}, 5000);
 		}
 
-		// let plan = localStorage.getItem('tmp')
-		// await plansApi.put(JSON.parse(plan))
+		let plan = localStorage.getItem('tmp')
+		await subsApi.put(JSON.parse(plan))
 
 	});
 

@@ -3,9 +3,10 @@
 		title = $bindable(),
 		onClose,
 		menuDropdownToggleViews,
-		plansDisplay = $bindable()
+		plansDisplay = $bindable(),
+        headerHeight =$bindable()
 	} = $props();
-	let headerHeight = $state(0);
+	
 </script>
 
 <header

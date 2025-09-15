@@ -75,6 +75,7 @@
 
 {#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
 	<Header
+		bind:headerHeight
 		title="Discover Plans"
 		onClose={onClosePlansList}
 		bind:plansDisplay
@@ -92,6 +93,7 @@
 	</div>
 {:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}
 	<Header
+		bind:headerHeight
 		title="Discover Plans"
 		onClose={() => {}}
 		bind:plansDisplay

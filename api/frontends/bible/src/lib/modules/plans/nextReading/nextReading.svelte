@@ -44,6 +44,7 @@
 
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
+
 	}
 
 	function updateNextReadings() {
@@ -146,6 +147,7 @@
 {/snippet}
 
 <Header
+    bind:headerHeight
 	title="Next Readings"
 	onClose={onCloseNextReadings}
 	bind:plansDisplay

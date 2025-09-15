@@ -114,6 +114,7 @@ async function addReadingsToSubs() {
 		});
 		let filteredReadings: any = {}
 		let readingIndexes: number[] = []
+		sub.readings = {}
 		results.forEach((r) => {
 			r.result.forEach((id) => {
 				let index = readings[id].index
@@ -123,7 +124,7 @@ async function addReadingsToSubs() {
 			// TODO sub readings is tracked readings.
 			sub.readings = filteredReadings
 		});
-		
+
 		let plan = plans[sub.planID]
 		sub.plan = plan
 		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
