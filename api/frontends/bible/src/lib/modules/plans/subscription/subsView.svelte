@@ -50,12 +50,10 @@
 
 	async function onGetAllSubs(data: any) {
 		if (data) {
-			console.log(data.subs);
-			subsMap = new Map<string, Sub>(Object.entries(data.subs));
+			subsMap = data.subs;
 			subsList.length = 0;
 			subsMap
-				.entries()
-				.map((s, _): Sub => s[1])
+				.values()
 				.toArray()
 				.sort((a: any, b: any) => a.dateCreated - b.dateCreated)
 				.forEach((s: any) => subsList.push(s));

@@ -4,6 +4,7 @@ import { notesApi } from '$lib/api/notes.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
+import type { CompletedReading, Sub } from '$lib/modules/plans/models';
 import { bibleDB, PLANS, SEARCH } from '$lib/storer/bible.db';
 import { extractBookChapter } from '$lib/utils/chapter';
 import { sleep } from '$lib/utils/sleep';
@@ -43,7 +44,7 @@ let readingsDocument = new FlexSearch.Document({
 });
 
 let plans: any = {}
-let subs: any = {}
+let subs: Map<string, Sub> = new Map()
 let readings: any = {}
 
 let booknames: any = {}
@@ -106,19 +107,22 @@ function getNextReadingIndex(readingIndexes: number[]): number {
 }
 
 async function addReadingsToSubs() {
-	let subKeys = Object.keys(subs)
+	let subKeys = subs.keys().toArray()
 	for (let i = 0; i < subKeys.length; i++) {
-		let sub = subs[subKeys[i]]
+		let sub = subs.get(subKeys[i])
+		if (!sub){
+			return
+		}
 		const results = await readingsDocument.searchAsync(sub.id, {
 			index: ['subID'],
 		});
-		let filteredReadings: any = {}
+		let filteredReadings: Map<number, CompletedReading> = new Map()
 		let readingIndexes: number[] = []
-		sub.readings = {}
+		sub.readings = new Map()
 		results.forEach((r) => {
 			r.result.forEach((id) => {
 				let index = readings[id].index
-				filteredReadings[index] = readings[id];
+				filteredReadings.set(index, readings[id]);
 				readingIndexes.push(index)
 			});
 			// TODO sub readings is tracked readings.
@@ -149,7 +153,7 @@ async function init() {
 	for (let i = 0; i < cachedSubs.length; i++) {
 		let s = cachedSubs[i]
 		await subsDocument.addAsync(s.id, s);
-		subs[s.id] = s
+		subs.set(s.id, s)
 	}
 
 	// CORE NOTE: Reading ids are composite priamry keys subID & id
@@ -183,14 +187,14 @@ function deletePlan(planID: string) {
 
 
 async function addSubs(subID: string, sub: any) {
-	subs[subID] = sub;
+	subs.set(subID, sub);
 	subsDocument.add(subID, sub);
 	await addReadingsToSubs()
 	getAllSubs();
 }
 
 function deleteSub(subID: string) {
-	delete subs[subID];
+	subs.delete(subID);
 	subsDocument.remove(subID);
 	getAllSubs();
 }
@@ -198,7 +202,7 @@ function deleteSub(subID: string) {
 async function putReading(data: any, subID: any) {
 	await readingsDocument.addAsync(data.id, data)
 	readings[data.id] = data
-	subs[subID].readings[data.index] = data
+	subs.get(subID)?.readings.set(data.index, data)
 	addReadingsToSubs()
 }
 
@@ -209,7 +213,7 @@ async function addReadings(readingID: string, reading: any) {
 }
 
 async function deleteReadings(readingID: string) {
-	delete subs[readingID];
+	subs.delete(readingID);
 	readingsDocument.remove(readingID);
 	await addReadingsToSubs()
 }
