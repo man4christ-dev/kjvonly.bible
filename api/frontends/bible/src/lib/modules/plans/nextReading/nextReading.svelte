@@ -84,11 +84,10 @@
 			plansService.putReading(readingsData, plan.subID);
 
 			let sub = subsMap.get(plan.subID);
-            // SHOULD ALWAYS EXIST. MAKE COMPILER HAPPY
 			if (!sub) {
 				return;
 			}
-			sub.readings[plan.readingIndex] = readingsData;
+			sub.readings.set(plan.readingIndex, readingsData);
 			sub.nextReadingIndex = getNextReadingIndex(Object.keys(sub.readings).map((v) => parseInt(v)));
 		}
 	}
@@ -113,9 +112,7 @@
 </script>
 
 {#snippet nextReading(n: any, idx: any)}
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<div
+	<button
 		onclick={() => onSelectedNextReading(idx, PLANS_VIEWS.NEXT_LIST)}
 		class=" flex w-full flex-col px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 	>
@@ -143,7 +140,7 @@
 				</div>
 			</div>
 		</div>
-	</div>
+	</button>
 {/snippet}
 
 <Header

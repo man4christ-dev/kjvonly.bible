@@ -57,7 +57,7 @@
 
 {#snippet plansListView()}
 	{#each planList as p}
-		<div
+		<button
 			class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
 			style="height: 100px"
 		>
@@ -72,7 +72,7 @@
 					</span>
 				{/each}
 			</div>
-		</div>
+		</button>
 	{/each}
 {/snippet}
 

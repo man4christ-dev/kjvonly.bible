@@ -74,7 +74,7 @@ export interface Sub {
     id: string;
     planID: string;
     userID: string;
-    readings: CompletedReading[];
+    readings: Map<number, CompletedReading>;
     plan: Plan;
     nextReadingIndex: number;
     percentCompleted: number;
@@ -88,7 +88,7 @@ export function NullSub(): Sub {
         id: '',
         planID: '',
         userID: '',
-        readings: [],
+        readings: new Map(),
         plan: {
             id: '',
             userID: '',
@@ -106,9 +106,9 @@ export function NullSub(): Sub {
 }
 
 export interface Booknames {
-   booknamesById: Map<string, string>
-   booknamesByName: Map<string, number>
-   shortNames: Map<string, string>
-   maxChapterById: Map<string,number>
-   bookchapterversecountById: Map<string, Map<string, number>>
+    booknamesById: Map<string, string>
+    booknamesByName: Map<string, number>
+    shortNames: Map<string, string>
+    maxChapterById: Map<string, number>
+    bookchapterversecountById: Map<string, Map<string, number>>
 }

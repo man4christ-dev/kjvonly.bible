@@ -1,12 +1,6 @@
 <script lang="ts">
-	import { readingsApi } from '$lib/api/readings.api';
-	import { plansService } from '$lib/services/plans.service';
-	import { getNextReadingIndex } from '$lib/utils/plan';
-	import { sleep } from '$lib/utils/sleep';
-	import { onDestroy, onMount } from 'svelte';
 	import Header from '../components/header.svelte';
-	import { type NavPlan, type CompletedReading, type Sub, NullSub, PLANS_VIEWS } from '../models';
-	import uuid4 from 'uuid4';
+	import { PLANS_VIEWS } from '../models';
 	import { paneService } from '$lib/services/pane.service.svelte';
 
 	let {
@@ -28,13 +22,12 @@
 	function onClosePlansList() {
 		paneService.onDeletePane(paneService.rootPane, paneId);
 	}
+    
 </script>
 
 {#snippet subsListView()}
 	{#each subsList as s}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
-		<div
+		<button
 			onclick={() => onSubClicked(s)}
 			class="col-2 flex w-full flex-col overflow-hidden p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
 			style="height: 100px"
@@ -50,7 +43,7 @@
 					<span>&nbsp;</span><span>{d}</span>
 				{/each}
 			</div>
-		</div>
+		</button>
 	{/each}
 {/snippet}
 

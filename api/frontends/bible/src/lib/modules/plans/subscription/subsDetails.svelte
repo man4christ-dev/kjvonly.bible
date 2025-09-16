@@ -23,8 +23,9 @@
 	function loadMoreSubReadings() {
 		let toShow = 0;
 		let count = 0;
+        const BATCH_SIZE_TO_SHOW = 30
 
-		while (toShow !== 30 && count + subListReadingsToShow < selectedSub.plan.readings.length) {
+		while (toShow !== BATCH_SIZE_TO_SHOW && count + subListReadingsToShow < selectedSub.plan.readings.length) {
 			let hasCompletedReading = selectedSub.readings[subListReadingsToShow + count];
 			count++;
 			if (hasCompletedReading && !showCompletedReadings) {
@@ -127,9 +128,7 @@
 		<div class="flex w-full flex-col text-base">
 			{#each Array(subListReadingsToShow) as _, idx}
 				{#if !sub.readings[idx] || (sub.readings[idx] && showCompletedReadings)}
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<!-- svelte-ignore a11y_no_static_element_interactions -->
-					<div
+					<button
 						onclick={() => onSelectedSubReading(idx, PLANS_VIEWS.SUBS_DETAILS)}
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
@@ -150,7 +149,7 @@
 								</div>
 							</div>
 						</div>
-					</div>
+					</button>
 				{/if}
 			{/each}
 		</div>
