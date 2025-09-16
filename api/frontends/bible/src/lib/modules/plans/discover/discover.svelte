@@ -5,7 +5,7 @@
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
 	import ActionItemsList from '../components/actionItemsList.svelte';
-	import { PLANS_VIEWS } from '../models';
+	import { PLANS_VIEWS, type Plan } from '../models';
 
 	let {
 		plansDisplay = $bindable(),
@@ -16,8 +16,8 @@
 
 	let PLAN_SUBSCRIBER_ID: string = uuid4();
 
-	let plansMap: any = $state({});
-	let planList: any = $state([]);
+	let plansMap: Map<string, Plan> = $state(new Map());
+	let planList: Plan[] = $state([]);
 
 	let planActionItems: any = {
 		'my plans': () => {
@@ -35,11 +35,10 @@
 	function onGetAllPlans(data: any) {
 		if (data) {
 			plansMap = data.plans;
-			Object.keys(plansMap)
-				.sort((a: any, b: any) => a.dateCreated - b.dateCreated)
-				.forEach((k: any) => {
-					planList.push(plansMap[k]);
-				});
+			planList = plansMap
+				.values()
+				.toArray()
+				.sort((a: Plan, b: Plan) => a.dateCreated - b.dateCreated)
 		}
 	}
 

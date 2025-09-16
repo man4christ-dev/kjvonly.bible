@@ -4,7 +4,7 @@ import { notesApi } from '$lib/api/notes.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import type { CompletedReading, Sub } from '$lib/modules/plans/models';
+import type { CompletedReading, Plan, Sub } from '$lib/modules/plans/models';
 import { bibleDB, PLANS, SEARCH } from '$lib/storer/bible.db';
 import { extractBookChapter } from '$lib/utils/chapter';
 import { sleep } from '$lib/utils/sleep';
@@ -43,7 +43,7 @@ let readingsDocument = new FlexSearch.Document({
 	}
 });
 
-let plans: any = {}
+let plans: Map<string, Plan> = new Map()
 let subs: Map<string, Sub> = new Map()
 let readings: any = {}
 
@@ -87,7 +87,7 @@ async function parsePlans() {
 		let planReadings = plan.readings
 		plan.readings = parsePlanReadings(planReadings)
 		await plansDocument.addAsync(plan.id, plan);
-		plans[plan.id] = plan
+		plans.set(plan.id, plan)
 	}
 }
 
@@ -116,22 +116,25 @@ async function addReadingsToSubs() {
 		const results = await readingsDocument.searchAsync(sub.id, {
 			index: ['subID'],
 		});
-		let filteredReadings: Map<number, CompletedReading> = new Map()
+		let completedReadings: Map<number, CompletedReading> = new Map()
 		let readingIndexes: number[] = []
 		sub.readings = new Map()
 		results.forEach((r) => {
 			r.result.forEach((id) => {
 				let index = readings[id].index
-				filteredReadings.set(index, readings[id]);
+				completedReadings.set(index, readings[id]);
 				readingIndexes.push(index)
 			});
 			// TODO sub readings is tracked readings.
-			sub.readings = filteredReadings
+			sub.readings = completedReadings
 		});
-
-		let plan = plans[sub.planID]
-		sub.plan = plan
 		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
+		
+		let plan = plans.get(sub.planID)
+		if (!plan){
+			continue
+		}
+		sub.plan = plan
 		sub.percentCompleted = Math.ceil(readingIndexes.length / sub.plan.readings.length * 100)
 
 		for (let j = 0; j < sub.plan.readings.length; j++) {
@@ -174,17 +177,16 @@ async function init() {
 }
 
 function addPlan(planID: string, plan: any) {
-	plans[planID] = plan;
+	plans.set(planID, plan);
 	plansDocument.add(planID, plan);
 	getAllPlans();
 }
 
 function deletePlan(planID: string) {
-	delete plans[planID];
+	plans.delete(planID);
 	plansDocument.remove(planID);
 	getAllPlans();
 }
-
 
 async function addSubs(subID: string, sub: any) {
 	subs.set(subID, sub);
