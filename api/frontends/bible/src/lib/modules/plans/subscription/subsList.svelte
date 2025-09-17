@@ -6,7 +6,7 @@
 	let {
 		plansDisplay = $bindable(),
 		pane = $bindable(),
-		paneId,
+		paneId = $bindable(),
 		clientHeight = $bindable(),
 		selectedSub = $bindable(),
 		subsList = $bindable()
@@ -22,7 +22,7 @@
 	function onClosePlansList() {
 		paneService.onDeletePane(paneService.rootPane, paneId);
 	}
-    
+
 </script>
 
 {#snippet subsListView()}

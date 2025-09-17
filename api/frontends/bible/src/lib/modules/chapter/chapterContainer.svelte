@@ -12,6 +12,7 @@
 	import EditOptions from './editOptions.svelte';
 	import { extractBookChapter } from '$lib/utils/chapter';
 	import { Buffer } from '$lib/models/buffer.model';
+	import type { NavPlan } from '../plans/models';
 
 	type WordAnnots = {
 		class: string[];
@@ -66,22 +67,24 @@
 	});
 
 	async function _nextPlanChapter() {
-		let ci = mode.plan.currentReadingsIndex;
+		let plan: NavPlan = mode.plan
+		let ci = plan.currentReadingsIndex;
 		let nextIndex = ci + 1;
-		if (nextIndex > mode.plan.readings.length - 1) {
+		if (nextIndex > plan.reading.length - 1) {
 			pane.updateBuffer('Plans');
 		} else {
 			mode.plan.currentReadingsIndex = nextIndex;
-			chapterKey = mode.plan.readings[nextIndex].chapterKey;
+			chapterKey = plan.reading[nextIndex].chapterKey;
 		}
 	}
 
 	async function _previousPlanChapter() {
-		let ci = mode.plan.currentReadingsIndex;
+		let plan: NavPlan = mode.plan
+		let ci = plan.currentReadingsIndex;
 		let nextIndex = ci - 1;
 		if (nextIndex >= 0) {
-			mode.plan.currentReadingsIndex = nextIndex;
-			chapterKey = mode.plan.readings[nextIndex].chapterKey;
+			plan.currentReadingsIndex = nextIndex;
+			chapterKey = plan.reading[nextIndex].chapterKey;
 		}
 	}
 

@@ -26,14 +26,14 @@
 
 	function onSelectedNextReading(idx: number, returnView: string) {
 		let nextReading: NextReading = nextReadings[idx];
-		let readings: Reading[] = nextReading.reading;
-		let updReadings: Reading[] = readings.map((r: any) => {
+		let readings: BCV[] = nextReading.reading;
+		let updReadings: BCV[] = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r;
 		});
 
 		let np: NavPlan = {
-			readings: updReadings,
+			reading: updReadings,
 			currentReadingsIndex: 0,
 			subID: nextReading.subID,
 			readingIndex: nextReading.readingIndex,

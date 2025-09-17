@@ -13,7 +13,7 @@
 	let {
 		plansDisplay = $bindable(),
 		pane = $bindable(),
-		paneId,
+		paneId=$bindable(),
 		clientHeight = $bindable()
 	} = $props();
 
@@ -73,7 +73,7 @@
 </script>
 
 {#if plansDisplay === PLANS_VIEWS.SUBS_LIST}
-	<SubsList paneId bind:clientHeight bind:pane bind:plansDisplay bind:selectedSub bind:subsList
+	<SubsList bind:paneId bind:clientHeight bind:pane bind:plansDisplay bind:selectedSub bind:subsList
 	></SubsList>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
 	<SubsAction bind:plansDisplay bind:pane bind:clientHeight paneId></SubsAction>

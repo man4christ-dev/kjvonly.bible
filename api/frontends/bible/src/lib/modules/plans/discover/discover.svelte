@@ -10,7 +10,7 @@
 	let {
 		plansDisplay = $bindable(),
 		clientHeight = $bindable(),
-		paneId,
+		paneId=$bindable(),
 		pane = $bindable()
 	} = $props();
 

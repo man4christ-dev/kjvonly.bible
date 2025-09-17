@@ -13,7 +13,7 @@ export const PLANS_VIEWS = {
 };
 
 export interface NavPlan {
-    readings: BCV[];
+    reading: BCV[];
     currentReadingsIndex: number;
     subID: string;
     readingIndex: number

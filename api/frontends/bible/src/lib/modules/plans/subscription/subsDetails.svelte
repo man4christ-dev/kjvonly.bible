@@ -2,7 +2,7 @@
 	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS, type BCV, type NavPlan, type Sub } from '../models';
+	import { PLANS_VIEWS, type BCV, type NavPlan, type Readings, type Sub } from '../models';
 	import Reading from '../components/reading.svelte';
 	import uuid4 from 'uuid4';
 
@@ -38,14 +38,14 @@
 	}
 
 	function onSelectedSubReading(idx: number, returnView: string) {
-		let readings: BCV[] = selectedSub.plan.readings[idx];
-		let updReadings: BCV[] = readings.map((r: any) => {
+		let readings: Readings = selectedSub.plan.readings[idx];
+		let updReadings: BCV[] = readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r as BCV;
 		});
 
 		let np: NavPlan = {
-			readings: updReadings,
+			reading: updReadings,
 			currentReadingsIndex: 0, // What to start at
 			subID: selectedSub.id,
 			readingIndex: idx,
