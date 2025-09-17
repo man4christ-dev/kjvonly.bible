@@ -4,7 +4,7 @@ import { notesApi } from '$lib/api/notes.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import type { CompletedReading, Plan, Sub } from '$lib/modules/plans/models';
+import type { CompletedReading, Plan, PlanReading, Sub } from '$lib/modules/plans/models';
 import { bibleDB, PLANS, SEARCH } from '$lib/storer/bible.db';
 import { extractBookChapter } from '$lib/utils/chapter';
 import { sleep } from '$lib/utils/sleep';
@@ -50,60 +50,79 @@ let readings: any = {}
 let booknames: any = {}
 
 
-function parseReadingEntries(reading: any): any[] {
-	let entries = []
-	let readingGroup = reading.split(';')
+/**
+ * Snag the book and return a list of {@link PlanReading}
+ * @param anthology semi-colin delimited string of bcvs (book, chapter, verses)
+ * @returns 
+ */
+function parseAnthology(anthology: any): any[] {
+	let parsedBcvs: PlanReading[] = []
+	let bcvs = anthology.split(';')
 
-	for (let i = 0; i < readingGroup.length; i++) {
-		let bcv = readingGroup[i].split('/')
+	for (let i = 0; i < bcvs.length; i++) {
+		let bcv = bcvs[i].split('/')
 		let bookName = booknames['booknamesById'][bcv[0]]
 		let chapter = bcv[1]
 		let verses = bcv[2]
-		let entry = {
+		let parsedBcv: PlanReading = {
 			bookName: bookName,
 			bookID: bcv[0],
 			chapter: chapter,
 			verses: verses,
-			chapterKey: readingGroup[i].replaceAll('/', '_')
+			chapterKey: bcvs[i].replaceAll('/', '_')
 		}
-		entries.push(entry)
+		parsedBcvs.push(parsedBcv)
 	}
-	return entries
+	return parsedBcvs
 }
 
-function parsePlanReadings(planReadings: any): any[] {
-	let readings = []
-	for (let i = 0; i < planReadings.length; i++) {
-		let entries = parseReadingEntries(planReadings[i])
-		readings.push(entries)
+/**
+ * 
+ * @param anthologies
+ * @returns 
+ */
+function parseAnthologies(anthologies: any): any[] {
+	let parsedAnthologies = []
+	for (let i = 0; i < anthologies.length; i++) {
+		let anthology = parseAnthology(anthologies[i])
+		parsedAnthologies.push(anthology)
 	}
-	return readings
+	return parsedAnthologies
 }
 
-async function parsePlans() {
-	let chachedPlans = await plansApi.gets()
-	for (let i = 0; i < chachedPlans.length; i++) {
-		let plan = chachedPlans[i]
-		let planReadings = plan.readings
-		plan.readings = parsePlanReadings(planReadings)
+
+/**
+ * Retrieves the the cached plans and and parses the anthologies. 
+ */
+async function parsePlanAnthologies() {
+	let cachedPlans: any[] = await plansApi.gets()
+	for (let i = 0; i < cachedPlans.length; i++) {
+		let plan = cachedPlans[i]
+		let anthologies = plan.readings
+		plan.readings = parseAnthologies(anthologies)
 		await plansDocument.addAsync(plan.id, plan);
 		plans.set(plan.id, plan)
 	}
 }
 
+/**
+ * Helper function to get next anthology index in a subscription.
+ * 
+ * @param completedAnthologies the completed anthologies in a subscription
+ * @returns next anthology index in subscription that is incomplete
+ */
+function getNextAnthologyIndex(completedAnthologies: number[]): number {
+	completedAnthologies.sort((a: number, b: number) => a - b)
 
-function getNextReadingIndex(readingIndexes: number[]): number {
-	readingIndexes.sort((a: number, b: number) => a - b)
-
-	let nextReadingIndex = 0
-	for (let j = 0; j < readingIndexes.length; j++) {
-		if (readingIndexes[j] != j) {
-			return nextReadingIndex
+	let nextAnthologyIndex = 0
+	for (let i = 0; i < completedAnthologies.length; i++) {
+		if (completedAnthologies[i] != i) {
+			return nextAnthologyIndex
 		}
-		nextReadingIndex = j + 1
+		nextAnthologyIndex = i + 1
 	}
 
-	return nextReadingIndex
+	return nextAnthologyIndex
 }
 
 async function addReadingsToSubs() {
@@ -128,7 +147,7 @@ async function addReadingsToSubs() {
 			// TODO sub readings is tracked readings.
 			sub.readings = completedReadings
 		});
-		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
+		sub.nextReadingIndex = getNextAnthologyIndex(readingIndexes)
 		
 		let plan = plans.get(sub.planID)
 		if (!plan){
@@ -150,9 +169,9 @@ async function addReadingsToSubs() {
 
 async function init() {
 	booknames = await chapterApi.getBooknames()
-	await parsePlans()
+	await parsePlanAnthologies()
 
-	let cachedSubs = await subsApi.gets()
+	let cachedSubs: Sub[] = await subsApi.gets()
 	for (let i = 0; i < cachedSubs.length; i++) {
 		let s = cachedSubs[i]
 		await subsDocument.addAsync(s.id, s);
@@ -162,7 +181,7 @@ async function init() {
 	// CORE NOTE: Reading ids are composite priamry keys subID & id
 	// id is just the index in of the reading plan. FlexSearch id 
 	// is <subid>/<id> for a reading
-	let cachedReadings = await readingsApi.gets()
+	let cachedReadings: CompletedReading[] = await readingsApi.gets()
 	for (let i = 0; i < cachedReadings.length; i++) {
 		let r = cachedReadings[i]
 		await readingsDocument.addAsync(r.id, r);
@@ -290,5 +309,10 @@ onmessage = async (e) => {
 	}
 };
 
+/**
+ * hasInitialized is checked before returning any uninitialzed data
+ * to users onmessage. A subscriber could request data before
+ * initialization is complte.
+ */
 let hasInitialized = false
 init();
