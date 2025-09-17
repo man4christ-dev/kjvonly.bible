@@ -2,7 +2,7 @@ import { chapterApi } from '$lib/api/chapters.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import type { CompletedReading, Plan, PlanReadings, Sub } from '$lib/modules/plans/models';
+import type { CompletedReading, Plan, Readings, Sub } from '$lib/modules/plans/models';
 import FlexSearch, { type Id } from 'flexsearch';
 
 
@@ -56,11 +56,11 @@ function parseReadingEntries(reading: any): any[] {
 }
 
 function parsePlanReadings(planReadings: any): any[] {
-	let readings: PlanReadings[] = []
+	let readings: Readings[] = []
 	for (let i = 0; i < planReadings.length; i++) {
 		let entries = parseReadingEntries(planReadings[i])
-		let p: PlanReadings = {
-			entries: entries
+		let p: Readings = {
+			bcvs: entries
 		}
 		readings.push(p)
 
@@ -127,8 +127,8 @@ async function addReadingsToSubs() {
 
 		for (let j = 0; j < sub.plan.readings.length; j++) {
 			let totalVerses = 0
-			for (let k = 0; k < sub.plan.readings[j].entries.length; k++) {
-				let split = sub.plan.readings[j].entries[k].verses.split('-')
+			for (let k = 0; k < sub.plan.readings[j].bcvs.length; k++) {
+				let split = sub.plan.readings[j].bcvs[k].verses.split('-')
 				totalVerses += parseInt(split[1]) - parseInt(split[0]) + 2
 			}
 			sub.plan.readings[j].totalVerses = totalVerses

@@ -2,7 +2,7 @@
 	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS, type PlanReading, type NavPlan } from '../models';
+	import { PLANS_VIEWS, type BCV, type NavPlan } from '../models';
 	import Reading from '../components/reading.svelte';
 	import uuid4 from 'uuid4';
 
@@ -38,10 +38,10 @@
 	}
 
 	function onSelectedSubReading(idx: number, returnView: string) {
-		let readings: PlanReading[] = selectedSub.plan.readings[idx];
-		let updReadings: PlanReading[] = readings.map((r: any) => {
+		let readings: BCV[] = selectedSub.plan.readings[idx];
+		let updReadings: BCV[] = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
-			return r as PlanReading;
+			return r as BCV;
 		});
 
 		let np: NavPlan = {
@@ -127,19 +127,19 @@
 
 		<div class="flex w-full flex-col text-base">
 			{#each Array(subListReadingsToShow) as _, idx}
-				{#if !sub.readings[idx] || (sub.readings[idx] && showCompletedReadings)}
+				{#if !sub.readings.get(idx) || (sub.readings.get(idx) && showCompletedReadings)}
 					<button
 						onclick={() => onSelectedSubReading(idx, PLANS_VIEWS.SUBS_DETAILS)}
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							<Reading bind:planReading={sub.plan.readings[idx].entries}></Reading>
+							<Reading bind:planReading={sub.plan.readings[idx].bcvs}></Reading>
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">
 							<div class="flex w-full">
 								<span class="flex flex-grow"></span>
-								<div class="text-lg {sub.readings[idx]?.index === idx ? 'text-support-a-500' : ''}">
+								<div class="text-lg {sub.readings.get(idx)?.index === idx ? 'text-support-a-500' : ''}">
 									{idx + 1} of {sub.plan.readings.length}
 								</div>
 							</div>

@@ -7,7 +7,7 @@
 	import { readingsApi } from '$lib/api/readings.api';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
-	import type { Sub, NextReading, PlanReading, NavPlan, CompletedReading } from '../models';
+	import type { Sub, NextReading, BCV, NavPlan, CompletedReading } from '../models';
 	import { PLANS_VIEWS } from '../models';
 
 	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight = $bindable() } = $props();
@@ -26,8 +26,8 @@
 
 	function onSelectedNextReading(idx: number, returnView: string) {
 		let nextReading: NextReading = nextReadings[idx];
-		let readings: PlanReading[] = nextReading.reading;
-		let updReadings: PlanReading[] = readings.map((r: any) => {
+		let readings: Reading[] = nextReading.reading;
+		let updReadings: Reading[] = readings.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r;
 		});
@@ -54,7 +54,7 @@
 			let sub: Sub | undefined = subsMap.get(subKeys[i]);
 			if (sub && sub.plan.readings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
-					reading: sub.plan.readings[sub.nextReadingIndex].entries,
+					reading: sub.plan.readings[sub.nextReadingIndex].bcvs,
 					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
 					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
 					name: sub.plan.name,

@@ -1,7 +1,7 @@
 <script lang="ts">
-	import type { PlanReading } from "../models";
+	import type { BCV } from "../models";
 
-    let {planReading=$bindable<PlanReading[]>()} = $props()
+    let {planReading=$bindable<BCV[]>()} = $props()
 </script>
 
 	<table class="table-fixed">

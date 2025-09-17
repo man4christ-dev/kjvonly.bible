@@ -13,7 +13,7 @@ export const PLANS_VIEWS = {
 };
 
 export interface NavPlan {
-    readings: PlanReading[];
+    readings: BCV[];
     currentReadingsIndex: number;
     subID: string;
     readingIndex: number
@@ -28,7 +28,7 @@ export interface NavPlan {
  * verses: "1-31",
  * chapterKey: "1_1_1-31"
  */
-export interface PlanReading {
+export interface BCV {
     bookName: string;
     bookID: number;
     chapter: number;
@@ -36,13 +36,13 @@ export interface PlanReading {
     chapterKey: string;
 }
 
-export interface PlanReadings {
+export interface Readings {
     totalVerses: number;
-    entries: PlanReading[];
+    bcvs: BCV[];
 }
 
 export interface NextReading {
-    reading: PlanReading[];
+    reading: BCV[];
     totalVerses: number;
     planDateCreated: number;
     name: string;
@@ -70,7 +70,7 @@ export interface Plan {
     userID: string;
     name: string;
     description: string[];
-    readings: PlanReadings[];
+    readings: Readings[];
     dateCreated: number;
     version: number;
 }
