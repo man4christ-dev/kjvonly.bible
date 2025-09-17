@@ -2,7 +2,7 @@ import { chapterApi } from '$lib/api/chapters.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import type { CompletedReading, Plan, Readings, Sub } from '$lib/modules/plans/models';
+import { NullPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
 import FlexSearch, { type Id } from 'flexsearch';
 
 
@@ -73,7 +73,7 @@ async function parsePlans() {
 	for (let i = 0; i < chachedPlans.length; i++) {
 		let plan: Plan = chachedPlans[i]
 		let planReadings = plan.readings
-		plan.readings  = parsePlanReadings(planReadings)
+		plan.readings = parsePlanReadings(planReadings)
 		await plansDocument.addAsync(plan.id, plan);
 		plans.set(plan.id, plan)
 	}
@@ -94,36 +94,52 @@ function getNextReadingIndex(readingIndexes: number[]): number {
 	return nextReadingIndex
 }
 
+function setNextReadingIndex(sub: Sub) {
+	sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
+}
+
+async function setCompletedReadings(sub: Sub): Promise<number> {
+	const results = await readingsDocument.searchAsync(sub.id, {
+		index: ['subID'],
+	});
+	sub.completedReadings = new Map<number, CompletedReading>()
+	let completedReadingCount = 0
+	results.forEach((r) => {
+		r.result.forEach((id) => {
+			completedReadingCount++
+			sub.completedReadings.set(readings[id].index, readings[id]);
+		});
+	});
+	return completedReadingCount
+}
+
+function setPlan(sub: Sub) {
+	let plan = plans.get(sub.planID)
+	if (!plan) {
+		sub.plan = NullPlan()
+	} else {
+		sub.plan = plan
+	}
+}
+
+function setPercentComplete(sub: Sub, completedReadingCount: number){
+		sub.percentCompleted = Math.ceil(completedReadingCount / sub.plan.readings.length * 100)
+}
+
+function setTotalVerses(){
+//TODO
+}
 async function addReadingsToSubs() {
 	let subKeys = subs.keys().toArray()
 	for (let i = 0; i < subKeys.length; i++) {
 		let sub = subs.get(subKeys[i])
-		if (!sub){
+		if (!sub) {
 			return
 		}
-		const results = await readingsDocument.searchAsync(sub.id, {
-			index: ['subID'],
-		});
-		let completedReadings: Map<number, CompletedReading> = new Map()
-		let readingIndexes: number[] = []
-		sub.completedReadings = new Map()
-		results.forEach((r) => {
-			r.result.forEach((id) => {
-				let index = readings[id].index
-				completedReadings.set(index, readings[id]);
-				readingIndexes.push(index)
-			});
-			// TODO sub readings is tracked readings.
-			sub.completedReadings = completedReadings
-		});
-		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
-		
-		let plan = plans.get(sub.planID)
-		if (!plan){
-			continue
-		}
-		sub.plan = plan
-		sub.percentCompleted = Math.ceil(readingIndexes.length / sub.plan.readings.length * 100)
+		let completedReadingCount = await setCompletedReadings(sub)
+		setNextReadingIndex(sub)
+		setPlan(sub)
+		setPercentComplete(sub, completedReadingCount)
 
 		for (let j = 0; j < sub.plan.readings.length; j++) {
 			let totalVerses = 0

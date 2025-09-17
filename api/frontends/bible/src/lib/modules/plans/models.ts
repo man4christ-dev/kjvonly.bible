@@ -88,6 +88,18 @@ export interface Sub {
     version: number;
 }
 
+export function NullPlan(): Plan {
+    return {
+        id: "",
+        userID: "",
+        name: "",
+        description: [],
+        readings: [],
+        dateCreated: 0,
+        version: 0
+    }
+}
+
 export function NullSub(): Sub {
     return {
         id: '',
