@@ -73,7 +73,7 @@
 		if (nextIndex > plan.reading.length - 1) {
 			pane.updateBuffer('Plans');
 		} else {
-			mode.plan.currentReadingsIndex = nextIndex;
+			plan.currentReadingsIndex = nextIndex;
 			chapterKey = plan.reading[nextIndex].chapterKey;
 		}
 	}

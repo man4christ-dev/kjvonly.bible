@@ -1,4 +1,6 @@
 <script lang="ts">
+	import type { NavPlan } from "../plans/models";
+
 	let { plan = $bindable(), showPlanReadingPopup = $bindable(), chapterKey =$bindable() } = $props();
 
 	let clientHeight = $state(0);
@@ -8,7 +10,8 @@
 
     function rowClicked(e:any, r:any, idx: number){
         e.stopPropagation()
-        plan.currentReadingsIndex = idx
+        let p: NavPlan = plan
+        p.currentReadingsIndex = idx
         chapterKey = r.chapterKey
         showPlanReadingPopup = false
     }
@@ -47,7 +50,7 @@
 		>
 			<table class="table-fixed">
 				<tbody>
-					{#each plan.readings as r, idx}
+					{#each plan.reading as r, idx}
 						<tr class="h-16 hover:cursor-pointer hover:bg-neutral-100" onclick={(event) => rowClicked(event, r, idx)}>
 							<td class="w-0 ps-3 pe-3 text-right text-nowrap">{r.bookName}</td>
 							<td class="">{r.chapter}:{r.verses}</td>
