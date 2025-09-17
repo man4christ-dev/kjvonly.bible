@@ -106,7 +106,7 @@ async function addReadingsToSubs() {
 		});
 		let completedReadings: Map<number, CompletedReading> = new Map()
 		let readingIndexes: number[] = []
-		sub.readings = new Map()
+		sub.completedReadings = new Map()
 		results.forEach((r) => {
 			r.result.forEach((id) => {
 				let index = readings[id].index
@@ -114,7 +114,7 @@ async function addReadingsToSubs() {
 				readingIndexes.push(index)
 			});
 			// TODO sub readings is tracked readings.
-			sub.readings = completedReadings
+			sub.completedReadings = completedReadings
 		});
 		sub.nextReadingIndex = getNextReadingIndex(readingIndexes)
 		
@@ -192,7 +192,7 @@ function deleteSub(subID: string) {
 async function putReading(data: any, subID: any) {
 	await readingsDocument.addAsync(data.id, data)
 	readings[data.id] = data
-	subs.get(subID)?.readings.set(data.index, data)
+	subs.get(subID)?.completedReadings.set(data.index, data)
 	addReadingsToSubs()
 }
 

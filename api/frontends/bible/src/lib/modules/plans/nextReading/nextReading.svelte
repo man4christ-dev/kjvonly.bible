@@ -87,8 +87,8 @@
 			if (!sub) {
 				return;
 			}
-			sub.readings.set(plan.readingIndex, readingsData);
-			sub.nextReadingIndex = getNextReadingIndex(Object.keys(sub.readings).map((v) => parseInt(v)));
+			sub.completedReadings.set(plan.readingIndex, readingsData);
+			sub.nextReadingIndex = getNextReadingIndex(Object.keys(sub.completedReadings).map((v) => parseInt(v)));
 		}
 	}
 

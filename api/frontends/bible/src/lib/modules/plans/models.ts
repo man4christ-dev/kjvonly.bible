@@ -79,7 +79,7 @@ export interface Sub {
     id: string;
     planID: string;
     userID: string;
-    readings: Map<number, CompletedReading>;
+    completedReadings: Map<number, CompletedReading>;
     plan: Plan;
     nextReadingIndex: number;
     percentCompleted: number;
@@ -93,7 +93,7 @@ export function NullSub(): Sub {
         id: '',
         planID: '',
         userID: '',
-        readings: new Map(),
+        completedReadings: new Map(),
         plan: {
             id: '',
             userID: '',

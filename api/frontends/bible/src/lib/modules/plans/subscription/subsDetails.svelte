@@ -2,7 +2,7 @@
 	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS, type BCV, type NavPlan } from '../models';
+	import { PLANS_VIEWS, type BCV, type NavPlan, type Sub } from '../models';
 	import Reading from '../components/reading.svelte';
 	import uuid4 from 'uuid4';
 
@@ -11,7 +11,7 @@
 		pane = $bindable(),
 		paneId,
 		clientHeight = $bindable(),
-		selectedSub = $bindable()
+		selectedSub = $bindable<Sub>()
 	} = $props();
 
 	let headerHeight = $state(0);
@@ -26,7 +26,7 @@
         const BATCH_SIZE_TO_SHOW = 30
 
 		while (toShow !== BATCH_SIZE_TO_SHOW && count + subListReadingsToShow < selectedSub.plan.readings.length) {
-			let hasCompletedReading = selectedSub.readings[subListReadingsToShow + count];
+			let hasCompletedReading = selectedSub.completedReadings[subListReadingsToShow + count];
 			count++;
 			if (hasCompletedReading && !showCompletedReadings) {
 				continue;
@@ -127,7 +127,7 @@
 
 		<div class="flex w-full flex-col text-base">
 			{#each Array(subListReadingsToShow) as _, idx}
-				{#if !sub.readings.get(idx) || (sub.readings.get(idx) && showCompletedReadings)}
+				{#if !sub.completedReadings.get(idx) || (sub.completedReadings.get(idx) && showCompletedReadings)}
 					<button
 						onclick={() => onSelectedSubReading(idx, PLANS_VIEWS.SUBS_DETAILS)}
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
@@ -139,7 +139,7 @@
 						<div class="flex w-full min-w-50 flex-col">
 							<div class="flex w-full">
 								<span class="flex flex-grow"></span>
-								<div class="text-lg {sub.readings.get(idx)?.index === idx ? 'text-support-a-500' : ''}">
+								<div class="text-lg {sub.completedReadings.get(idx)?.index === idx ? 'text-support-a-500' : ''}">
 									{idx + 1} of {sub.plan.readings.length}
 								</div>
 							</div>
