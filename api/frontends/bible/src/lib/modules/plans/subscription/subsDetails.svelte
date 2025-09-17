@@ -133,7 +133,7 @@
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							<Reading bind:planReading={sub.plan.readings[idx]}></Reading>
+							<Reading bind:planReading={sub.plan.readings[idx].entries}></Reading>
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">

@@ -1,26 +1,10 @@
-import { read } from '$app/server';
 import { chapterApi } from '$lib/api/chapters.api';
-import { notesApi } from '$lib/api/notes.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import type { CompletedReading, Plan, Sub } from '$lib/modules/plans/models';
-import { bibleDB, PLANS, SEARCH } from '$lib/storer/bible.db';
-import { extractBookChapter } from '$lib/utils/chapter';
-import { sleep } from '$lib/utils/sleep';
+import type { CompletedReading, Plan, PlanReadings, Sub } from '$lib/modules/plans/models';
 import FlexSearch, { type Id } from 'flexsearch';
 
-
-async function waitForSearchIndex(): Promise<boolean> {
-	while (1) {
-		let searchIndex = await bibleDB.getValue(SEARCH, 'v1');
-		if (searchIndex) {
-			return true;
-		}
-		await sleep(1000);
-	}
-	return false;
-}
 
 let plansDocument = new FlexSearch.Document({
 	document: {
@@ -72,10 +56,14 @@ function parseReadingEntries(reading: any): any[] {
 }
 
 function parsePlanReadings(planReadings: any): any[] {
-	let readings = []
+	let readings: PlanReadings[] = []
 	for (let i = 0; i < planReadings.length; i++) {
 		let entries = parseReadingEntries(planReadings[i])
-		readings.push(entries)
+		let p: PlanReadings = {
+			entries: entries
+		}
+		readings.push(p)
+
 	}
 	return readings
 }
@@ -83,9 +71,9 @@ function parsePlanReadings(planReadings: any): any[] {
 async function parsePlans() {
 	let chachedPlans = await plansApi.gets()
 	for (let i = 0; i < chachedPlans.length; i++) {
-		let plan = chachedPlans[i]
+		let plan: Plan = chachedPlans[i]
 		let planReadings = plan.readings
-		plan.readings = parsePlanReadings(planReadings)
+		plan.readings  = parsePlanReadings(planReadings)
 		await plansDocument.addAsync(plan.id, plan);
 		plans.set(plan.id, plan)
 	}
@@ -139,8 +127,8 @@ async function addReadingsToSubs() {
 
 		for (let j = 0; j < sub.plan.readings.length; j++) {
 			let totalVerses = 0
-			for (let k = 0; k < sub.plan.readings[j].length; k++) {
-				let split = sub.plan.readings[j][k].verses.split('-')
+			for (let k = 0; k < sub.plan.readings[j].entries.length; k++) {
+				let split = sub.plan.readings[j].entries[k].verses.split('-')
 				totalVerses += parseInt(split[1]) - parseInt(split[0]) + 2
 			}
 			sub.plan.readings[j].totalVerses = totalVerses

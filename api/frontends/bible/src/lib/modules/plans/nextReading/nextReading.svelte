@@ -54,7 +54,7 @@
 			let sub: Sub | undefined = subsMap.get(subKeys[i]);
 			if (sub && sub.plan.readings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
-					reading: sub.plan.readings[sub.nextReadingIndex],
+					reading: sub.plan.readings[sub.nextReadingIndex].entries,
 					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
 					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
 					name: sub.plan.name,
@@ -93,9 +93,10 @@
 	}
 
 	async function onGetAllSubs(data: any) {
+        
 		if (data) {
-			subsMap = new Map<string, Sub>(Object.entries(data.subs));
-
+            subsMap = data.subs;
+		
 			await onReturnPlan();
 			await updateNextReadings();
 		}

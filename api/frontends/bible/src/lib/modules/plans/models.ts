@@ -36,6 +36,11 @@ export interface PlanReading {
     chapterKey: string;
 }
 
+export interface PlanReadings {
+    totalVerses: number;
+    entries: PlanReading[];
+}
+
 export interface NextReading {
     reading: PlanReading[];
     totalVerses: number;
@@ -65,7 +70,7 @@ export interface Plan {
     userID: string;
     name: string;
     description: string[];
-    readings: PlanReading[][];
+    readings: PlanReadings[];
     dateCreated: number;
     version: number;
 }
