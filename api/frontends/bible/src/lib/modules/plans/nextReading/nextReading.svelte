@@ -88,7 +88,7 @@
 				return;
 			}
 			sub.completedReadings.set(plan.readingIndex, readingsData);
-			sub.nextReadingIndex = getNextReadingIndex(Object.keys(sub.completedReadings).map((v) => parseInt(v)));
+			sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray());
 		}
 	}
 

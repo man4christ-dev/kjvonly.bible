@@ -3,6 +3,7 @@ import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import { NullPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
+import { getNextReadingIndex } from '$lib/utils/plan';
 import FlexSearch, { type Id } from 'flexsearch';
 
 
@@ -80,26 +81,12 @@ async function parsePlans() {
 }
 
 
-function getNextReadingIndex(readingIndexes: number[]): number {
-	readingIndexes.sort((a: number, b: number) => a - b)
-
-	let nextReadingIndex = 0
-	for (let j = 0; j < readingIndexes.length; j++) {
-		if (readingIndexes[j] != j) {
-			return nextReadingIndex
-		}
-		nextReadingIndex = j + 1
-	}
-
-	return nextReadingIndex
-}
 
 function setNextReadingIndex(sub: Sub) {
 	sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
 }
 
-
-async function getReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]>{
+async function getReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]> {
 	return readingsDocument.searchAsync(search, {
 		index: index
 	});
@@ -148,13 +135,19 @@ function setTotalVerses(sub: Sub) {
 	})
 }
 
-async function addReadingsToSubs() {
-	for (let [_, sub] of subs) {
+async function addReadingsToSub(sub: Sub | undefined) {
+	if (sub) {
 		await setCompletedReadings(sub)
 		setNextReadingIndex(sub)
 		setPlan(sub)
 		setPercentComplete(sub)
 		setTotalVerses(sub)
+	}
+}
+
+async function addReadingsToSubs() {
+	for (let [_, sub] of subs) {
+		await addReadingsToSub(sub)
 	}
 }
 
@@ -214,22 +207,12 @@ function deleteSub(subID: string) {
 async function putReading(data: any, subID: any) {
 	await readingsDocument.addAsync(data.id, data)
 	readings[data.id] = data
-	subs.get(subID)?.completedReadings.set(data.index, data)
-	addReadingsToSubs()
+	let sub = subs.get(subID)
+	if (sub) {
+		sub.completedReadings.set(data.index, data)
+		await addReadingsToSub(sub)
+	}
 }
-
-async function addReadings(readingID: string, reading: any) {
-	readings[readingID] = reading;
-	readingsDocument.add(readingID, reading);
-	await addReadingsToSubs()
-}
-
-async function deleteReadings(readingID: string) {
-	subs.delete(readingID);
-	readingsDocument.remove(readingID);
-	await addReadingsToSubs()
-}
-
 
 async function search(id: string, searchTerm: string, indexes: string[], flexDocument: any, map: any) {
 	const results = await flexDocument.searchAsync(searchTerm, {
