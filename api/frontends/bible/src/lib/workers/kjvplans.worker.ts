@@ -98,57 +98,63 @@ function setNextReadingIndex(sub: Sub) {
 	sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
 }
 
-async function setCompletedReadings(sub: Sub): Promise<number> {
-	const results = await readingsDocument.searchAsync(sub.id, {
-		index: ['subID'],
+
+async function getReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]>{
+	return readingsDocument.searchAsync(search, {
+		index: index
 	});
+}
+
+async function setCompletedReadings(sub: Sub) {
 	sub.completedReadings = new Map<number, CompletedReading>()
-	let completedReadingCount = 0
-	results.forEach((r) => {
+	let result = await getReadings(sub.id, ['subID'])
+	result.forEach((r: FlexSearch.SimpleDocumentSearchResultSetUnit) => {
 		r.result.forEach((id) => {
-			completedReadingCount++
 			sub.completedReadings.set(readings[id].index, readings[id]);
 		});
 	});
-	return completedReadingCount
 }
 
 function setPlan(sub: Sub) {
-	let plan = plans.get(sub.planID)
-	if (!plan) {
-		sub.plan = NullPlan()
-	} else {
-		sub.plan = plan
+	sub.plan = plans.get(sub.planID) || NullPlan()
+}
+
+function setPercentComplete(sub: Sub) {
+	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.plan.readings.length * 100)
+}
+
+function parseVerseGroup(grp: string): number[] {
+	try {
+		let startEndVerses = grp.split('-')
+		return [parseInt(startEndVerses[0]), parseInt(startEndVerses[1])]
+	} catch {
+		console.log(`error parsing verse group ${grp}`)
 	}
+	return [0, 0]
 }
 
-function setPercentComplete(sub: Sub, completedReadingCount: number){
-		sub.percentCompleted = Math.ceil(completedReadingCount / sub.plan.readings.length * 100)
+function sumVerseGroup(grp: string): number {
+	let [start, end] = parseVerseGroup(grp)
+	const includeStartAndEndVerse = 2
+	return end - start + includeStartAndEndVerse
 }
 
-function setTotalVerses(){
-//TODO
+function setTotalVerses(sub: Sub) {
+	sub.plan.readings.forEach(r => {
+		let totalVerses = r.bcvs
+			.map(b => sumVerseGroup(b.verses))
+			.reduce((a, b) => a + b)
+		r.totalVerses = totalVerses
+	})
 }
+
 async function addReadingsToSubs() {
-	let subKeys = subs.keys().toArray()
-	for (let i = 0; i < subKeys.length; i++) {
-		let sub = subs.get(subKeys[i])
-		if (!sub) {
-			return
-		}
-		let completedReadingCount = await setCompletedReadings(sub)
+	for (let [_, sub] of subs) {
+		await setCompletedReadings(sub)
 		setNextReadingIndex(sub)
 		setPlan(sub)
-		setPercentComplete(sub, completedReadingCount)
-
-		for (let j = 0; j < sub.plan.readings.length; j++) {
-			let totalVerses = 0
-			for (let k = 0; k < sub.plan.readings[j].bcvs.length; k++) {
-				let split = sub.plan.readings[j].bcvs[k].verses.split('-')
-				totalVerses += parseInt(split[1]) - parseInt(split[0]) + 2
-			}
-			sub.plan.readings[j].totalVerses = totalVerses
-		}
+		setPercentComplete(sub)
+		setTotalVerses(sub)
 	}
 }
 
