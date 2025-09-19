@@ -64,8 +64,9 @@ export function sumVerseRange(rng: string): number {
 }
 
 /**
+ * Sums the verses in each reading.
  * 
- * @param sub 
+ * @param sub subscription
  */
 export function setTotalVerses(sub: Sub) {
     sub.plan.readings.forEach(r => {

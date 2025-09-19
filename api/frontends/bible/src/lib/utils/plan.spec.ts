@@ -1,5 +1,5 @@
 import { assert, describe, it } from "vitest";
-import { getNextReadingIndex, setNextReadingIndex, sumVerseRange } from "./plan";
+import { getNextReadingIndex, setNextReadingIndex, setTotalVerses, sumVerseRange } from "./plan";
 import { NullCompletedReading, NullSub, type CompletedReading, type Sub } from "$lib/modules/plans/models";
 
 describe('path util functions', () => {
@@ -85,4 +85,79 @@ describe('verse group', () => {
             assert.equal(result, t.expectedResult, `expected ${t.expectedResult} but got ${result}`)
         })
     }
+})
+
+describe('set total verses', () => {
+    it('should set totalVerses', () => {
+        let sub = NullSub();
+        sub.plan.readings = [
+            {
+                totalVerses: 0,
+                bcvs: [
+                    {
+                        bookName: "",
+                        bookID: 0,
+                        chapter: 0,
+                        verses: "1-5",
+                        chapterKey: ""
+                    },
+                    {
+                        bookName: "",
+                        bookID: 0,
+                        chapter: 0,
+                        verses: "1-5",
+                        chapterKey: ""
+                    }
+                ]
+            },
+            {
+                totalVerses: 0,
+                bcvs: [
+                    {
+                        bookName: "",
+                        bookID: 0,
+                        chapter: 0,
+                        verses: "1-10",
+                        chapterKey: ""
+                    },
+                    {
+                        bookName: "",
+                        bookID: 0,
+                        chapter: 0,
+                        verses: "1-10",
+                        chapterKey: ""
+                    }
+                ]
+            },
+            {
+                totalVerses: 0,
+                bcvs: [
+                    {
+                        bookName: "",
+                        bookID: 0,
+                        chapter: 0,
+                        verses: "1-15",
+                        chapterKey: ""
+                    },
+                    {
+                        bookName: "",
+                        bookID: 0,
+                        chapter: 0,
+                        verses: "1-15",
+                        chapterKey: ""
+                    }
+                ]
+            },
+        ]
+
+        setTotalVerses(sub)
+
+        sub.plan.readings.forEach((r, idx) => {
+            assert.equal(
+                r.totalVerses,
+                (idx + 1) * 10,
+                `expected ${idx * 10} but got ${r.totalVerses}`
+            )
+        })
+    })
 })
