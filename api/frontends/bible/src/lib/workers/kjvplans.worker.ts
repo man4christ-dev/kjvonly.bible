@@ -3,7 +3,7 @@ import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import { NullPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
-import { getNextReadingIndex } from '$lib/utils/plan';
+import { getNextReadingIndex, setNextReadingIndex } from '$lib/utils/plan';
 import FlexSearch, { type Id } from 'flexsearch';
 
 
@@ -81,10 +81,6 @@ async function parsePlans() {
 }
 
 
-
-function setNextReadingIndex(sub: Sub) {
-	sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
-}
 
 async function getReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]> {
 	return readingsDocument.searchAsync(search, {

@@ -65,6 +65,15 @@ export interface CompletedReading {
     version: number;
 }
 
+export function NullCompletedReading(): CompletedReading {
+    return {
+        id: "",
+        subID: "",
+        index: 0,
+        version: 0
+    }
+}
+
 export interface Plan {
     id: string;
     userID: string;
