@@ -1,5 +1,5 @@
 import { assert, describe, it } from "vitest";
-import { getNextReadingIndex, setNextReadingIndex } from "./plan";
+import { getNextReadingIndex, setNextReadingIndex, sumVerseGroup } from "./plan";
 import { NullCompletedReading, NullSub, type CompletedReading, type Sub } from "$lib/modules/plans/models";
 
 describe('path util functions', () => {
@@ -49,8 +49,40 @@ describe('path util functions', () => {
                 t.expectedResult,
                 `should have set nextReadingIndex to ${t.expectedResult} but got ${sub.nextReadingIndex} instead.`
             )
-
         })
     }
+})
 
+describe('verse group', () => {
+    interface tt {
+        grp: string
+        total: number
+        expectedResult: number
+    }
+
+    let testTable: tt[] = [
+        {
+            grp: '1-1',
+            total: 1,
+            expectedResult: 1
+        },
+        {
+            grp: '1-2',
+            total: 2,
+            expectedResult: 2
+        },
+        {
+            grp: '1-31',
+            total: 31,
+            expectedResult: 31
+        }
+    ]
+
+    for (const t of testTable) {
+
+        it('should return correct total', () => {
+            let result = sumVerseGroup(t.grp)
+            assert.equal(result, t.expectedResult, `expected ${t.expectedResult} but got ${result}`)
+        })
+    }
 })

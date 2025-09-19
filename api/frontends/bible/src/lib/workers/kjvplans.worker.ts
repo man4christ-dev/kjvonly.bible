@@ -3,7 +3,7 @@ import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import { NullPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
-import { getNextReadingIndex, setNextReadingIndex } from '$lib/utils/plan';
+import { getNextReadingIndex, setNextReadingIndex, setTotalVerses } from '$lib/utils/plan';
 import FlexSearch, { type Id } from 'flexsearch';
 
 
@@ -61,7 +61,8 @@ function parsePlanReadings(planReadings: any): any[] {
 	for (let i = 0; i < planReadings.length; i++) {
 		let entries = parseReadingEntries(planReadings[i])
 		let p: Readings = {
-			bcvs: entries
+			bcvs: entries,
+			totalVerses: 0
 		}
 		readings.push(p)
 
@@ -104,31 +105,6 @@ function setPlan(sub: Sub) {
 
 function setPercentComplete(sub: Sub) {
 	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.plan.readings.length * 100)
-}
-
-function parseVerseGroup(grp: string): number[] {
-	try {
-		let startEndVerses = grp.split('-')
-		return [parseInt(startEndVerses[0]), parseInt(startEndVerses[1])]
-	} catch {
-		console.log(`error parsing verse group ${grp}`)
-	}
-	return [0, 0]
-}
-
-function sumVerseGroup(grp: string): number {
-	let [start, end] = parseVerseGroup(grp)
-	const includeStartAndEndVerse = 2
-	return end - start + includeStartAndEndVerse
-}
-
-function setTotalVerses(sub: Sub) {
-	sub.plan.readings.forEach(r => {
-		let totalVerses = r.bcvs
-			.map(b => sumVerseGroup(b.verses))
-			.reduce((a, b) => a + b)
-		r.totalVerses = totalVerses
-	})
 }
 
 async function addReadingsToSub(sub: Sub | undefined) {

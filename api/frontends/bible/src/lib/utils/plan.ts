@@ -32,3 +32,33 @@ export function getNextReadingIndex(completedReadings: number[]): number {
 export function setNextReadingIndex(sub: Sub) {
 	sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
 }
+
+
+function parseVerseGroup(grp: string): number[] {
+	try {
+		let startEndVerses = grp.split('-')
+		return [parseInt(startEndVerses[0]), parseInt(startEndVerses[1])]
+	} catch {
+		console.log(`error parsing verse group ${grp}`)
+	}
+	return [0, 0]
+}
+
+export function sumVerseGroup(grp: string): number {
+	let [start, end] = parseVerseGroup(grp)
+	const includeStartAndEndVerse = 1
+	return end - start + includeStartAndEndVerse
+}
+
+/**
+ * 
+ * @param sub 
+ */
+export function setTotalVerses(sub: Sub) {
+	sub.plan.readings.forEach(r => {
+		let totalVerses = r.bcvs
+			.map(b => sumVerseGroup(b.verses))
+			.reduce((a, b) => a + b)
+		r.totalVerses = totalVerses
+	})
+}
