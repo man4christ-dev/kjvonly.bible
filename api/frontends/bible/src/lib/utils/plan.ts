@@ -12,14 +12,14 @@ import type { Sub } from "$lib/modules/plans/models"
  * @returns lowest incomplete reading index
  */
 export function getNextReadingIndex(completedReadings: number[]): number {
-	return  completedReadings
-	.sort((a, b) => a - b)
-	.map((i, idx) => ({ 
-		readingIndex: i,
-		arrayIndex: idx
-	}))
-	.filter((i, idx) => i.readingIndex != idx)
-	.at(0)?.arrayIndex || completedReadings.length
+    return completedReadings
+        .sort((a, b) => a - b)
+        .map((i, idx) => ({
+            readingIndex: i,
+            arrayIndex: idx
+        }))
+        .filter((i, idx) => i.readingIndex != idx)
+        .at(0)?.arrayIndex || completedReadings.length
 }
 
 /**
@@ -30,24 +30,37 @@ export function getNextReadingIndex(completedReadings: number[]): number {
  *
  */
 export function setNextReadingIndex(sub: Sub) {
-	sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
+    sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
 }
 
 
-function parseVerseGroup(grp: string): number[] {
-	try {
-		let startEndVerses = grp.split('-')
-		return [parseInt(startEndVerses[0]), parseInt(startEndVerses[1])]
-	} catch {
-		console.log(`error parsing verse group ${grp}`)
-	}
-	return [0, 0]
+function parseVerseRange(rng: string): number[] {
+    let startEndVerses = rng.split('-')
+    let start = parseInt(startEndVerses[0], 10)
+    let end = parseInt(startEndVerses[1], 10)
+
+    if (Number.isNaN(start) || Number.isNaN(end)) {
+        start = 0
+        end = 0
+    }
+
+    return [start, end]
 }
 
-export function sumVerseGroup(grp: string): number {
-	let [start, end] = parseVerseGroup(grp)
-	const includeStartAndEndVerse = 1
-	return end - start + includeStartAndEndVerse
+/**
+ * 
+ * @param rng a verse group
+ * @returns 
+ */
+export function sumVerseRange(rng: string): number {
+    let [start, end] = parseVerseRange(rng)
+
+    if (start + end === 0) {
+        return 0
+    }
+
+    const includeStartAndEndVerse = 1
+    return end - start + includeStartAndEndVerse
 }
 
 /**
@@ -55,10 +68,10 @@ export function sumVerseGroup(grp: string): number {
  * @param sub 
  */
 export function setTotalVerses(sub: Sub) {
-	sub.plan.readings.forEach(r => {
-		let totalVerses = r.bcvs
-			.map(b => sumVerseGroup(b.verses))
-			.reduce((a, b) => a + b)
-		r.totalVerses = totalVerses
-	})
+    sub.plan.readings.forEach(r => {
+        let totalVerses = r.bcvs
+            .map(b => sumVerseRange(b.verses))
+            .reduce((a, b) => a + b)
+        r.totalVerses = totalVerses
+    })
 }
