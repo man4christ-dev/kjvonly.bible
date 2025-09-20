@@ -25,7 +25,7 @@
 		let count = 0;
         const BATCH_SIZE_TO_SHOW = 30
 
-		while (toShow !== BATCH_SIZE_TO_SHOW && count + subListReadingsToShow < selectedSub.plan.readings.length) {
+		while (toShow !== BATCH_SIZE_TO_SHOW && count + subListReadingsToShow < selectedSub.plan.nestedReadings.length) {
 			let hasCompletedReading = selectedSub.completedReadings[subListReadingsToShow + count];
 			count++;
 			if (hasCompletedReading && !showCompletedReadings) {
@@ -38,7 +38,7 @@
 	}
 
 	function onSelectedSubReading(idx: number, returnView: string) {
-		let readings: Readings = selectedSub.plan.readings[idx];
+		let readings: Readings = selectedSub.plan.nestedReadings[idx];
 		let updReadings: BCV[] = readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r as BCV;
@@ -133,19 +133,19 @@
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							<Reading bind:planReading={sub.plan.readings[idx].bcvs}></Reading>
+							<Reading bind:planReading={sub.plan.nestedReadings[idx].bcvs}></Reading>
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">
 							<div class="flex w-full">
 								<span class="flex flex-grow"></span>
 								<div class="text-lg {sub.completedReadings.get(idx)?.index === idx ? 'text-support-a-500' : ''}">
-									{idx + 1} of {sub.plan.readings.length}
+									{idx + 1} of {sub.plan.nestedReadings.length}
 								</div>
 							</div>
 							<div class="flex w-full justify-end">
 								<div class="text-base text-nowrap">
-									Verses: {sub.plan.readings[idx].totalVerses}
+									Verses: {sub.plan.nestedReadings[idx].totalVerses}
 								</div>
 							</div>
 						</div>

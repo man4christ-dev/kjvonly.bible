@@ -2,7 +2,7 @@ import { chapterApi } from '$lib/api/chapters.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import { NullPlan, type CachedPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
+import { NullPlan, type BCV, type CachedPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
 import { getNextReadingIndex, setNextReadingIndex, setPercentComplete, setTotalVerses } from '$lib/utils/plan';
 import FlexSearch, { type Id } from 'flexsearch';
 
@@ -35,33 +35,34 @@ let readings: any = {}
 let booknames: any = {}
 
 
-function parseReadingEntries(reading: string): any[] {
-	let entries = []
-	let readings = reading.split(';')
+function decodeReadings(encodedReadings: string): BCV[] {
+	let decodedReadings: BCV[] = []
+	let readings = encodedReadings.split(';')
 
 	for (let i = 0; i < readings.length; i++) {
 		let bcv = readings[i].split('/')
 		let bookName = booknames['booknamesById'][bcv[0]]
-		let chapter = bcv[1]
+		let bookID = parseInt(bcv[0])
+		let chapter = parseInt(bcv[1])
 		let verses = bcv[2]
-		let entry = {
+		let entry:  BCV = {
 			bookName: bookName,
-			bookID: bcv[0],
+			bookID: bookID,
 			chapter: chapter,
 			verses: verses,
 			chapterKey: readings[i].replaceAll('/', '_')
 		}
-		entries.push(entry)
+		decodedReadings.push(entry)
 	}
-	return entries
+	return decodedReadings
 }
 
-function parsePlanReadings(planReadings: string[]): any[] {
+function parseEncodedReadings(encodedReading: string[]): Readings[] {
 	let readings: Readings[] = []
-	for (let i = 0; i < planReadings.length; i++) {
-		let entries = parseReadingEntries(planReadings[i])
+	for (let i = 0; i < encodedReading.length; i++) {
+		let bcvs = decodeReadings(encodedReading[i])
 		let p: Readings = {
-			bcvs: entries,
+			bcvs: bcvs,
 			totalVerses: 0
 		}
 		readings.push(p)
@@ -72,16 +73,16 @@ function parsePlanReadings(planReadings: string[]): any[] {
 
 
 async function parsePlans() {
-	let cachedPlans = await plansApi.gets()
+	let cachedPlans: CachedPlan[] = await plansApi.gets()
 	for (let cp of cachedPlans) {
-		let readings: Readings[] = parsePlanReadings(cp.readings)
+		let nrs: Readings[] = parseEncodedReadings(cp.readings)
 
 		let plan: Plan = {
 			id: cp.id,
 			userID: cp.userID,
 			name: cp.name,
 			description: cp.description,
-			readings: readings,
+			nestedReadings: nrs,
 			dateCreated: cp.dateCreated,
 			version: cp.version
 		}

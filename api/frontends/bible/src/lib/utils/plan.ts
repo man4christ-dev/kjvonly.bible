@@ -69,7 +69,7 @@ export function sumVerseRange(rng: string): number {
  * @param sub subscription
  */
 export function setTotalVerses(sub: Sub) {
-    sub.plan.readings.forEach(r => {
+    sub.plan.nestedReadings.forEach(r => {
         let totalVerses = r.bcvs
             .map(b => sumVerseRange(b.verses))
             .reduce((a, b) => a + b)
@@ -79,5 +79,5 @@ export function setTotalVerses(sub: Sub) {
 
 
 export function setPercentComplete(sub: Sub) {
-	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.plan.readings.length * 100)
+	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.plan.nestedReadings.length * 100)
 }

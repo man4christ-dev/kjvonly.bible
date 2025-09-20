@@ -89,7 +89,7 @@ describe('verse rng', () => {
 describe('set total verses', () => {
     it('should set totalVerses', () => {
         let sub = NullSub();
-        sub.plan.readings = [
+        sub.plan.nestedReadings = [
             {
                 totalVerses: 0,
                 bcvs: [
@@ -151,7 +151,7 @@ describe('set total verses', () => {
 
         setTotalVerses(sub)
 
-        sub.plan.readings.forEach((r, idx) => {
+        sub.plan.nestedReadings.forEach((r, idx) => {
             assert.equal(
                 r.totalVerses,
                 (idx + 1) * 10,
@@ -202,7 +202,7 @@ describe('set percent complete', () => {
             let sub = NullSub()
 
             for (let _ of Array(t.readingsCount)) {
-                sub.plan.readings.push(NullReadings())
+                sub.plan.nestedReadings.push(NullReadings())
             }
 
 

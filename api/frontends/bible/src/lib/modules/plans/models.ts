@@ -97,7 +97,7 @@ export interface Plan {
     userID: string;
     name: string;
     description: string[];
-    readings: Readings[];
+    nestedReadings: Readings[];
     dateCreated: number;
     version: number;
 }
@@ -121,7 +121,7 @@ export function NullPlan(): Plan {
         userID: "",
         name: "",
         description: [],
-        readings: [],
+        nestedReadings: [],
         dateCreated: 0,
         version: 0
     }
@@ -138,7 +138,7 @@ export function NullSub(): Sub {
             userID: '',
             name: '',
             description: [],
-            readings: [],
+            nestedReadings: [],
             version: 0,
             dateCreated: 0
         },

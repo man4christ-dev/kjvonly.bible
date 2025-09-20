@@ -52,15 +52,15 @@
 		let subKeys = subsMap.keys().toArray();
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub: Sub | undefined = subsMap.get(subKeys[i]);
-			if (sub && sub.plan.readings.length - 1 > sub.nextReadingIndex) {
+			if (sub && sub.plan.nestedReadings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
-					reading: sub.plan.readings[sub.nextReadingIndex].bcvs,
-					totalVerses: sub.plan.readings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
+					reading: sub.plan.nestedReadings[sub.nextReadingIndex].bcvs,
+					totalVerses: sub.plan.nestedReadings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
 					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
 					name: sub.plan.name,
 					percentCompleted: sub.percentCompleted,
 					readingIndex: sub.nextReadingIndex,
-					totalReadings: sub.plan.readings.length,
+					totalReadings: sub.plan.nestedReadings.length,
 					subID: sub.id
 				};
 				nrs.push(nr);
