@@ -3,7 +3,7 @@ import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import { NullPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
-import { getNextReadingIndex, setNextReadingIndex, setTotalVerses } from '$lib/utils/plan';
+import { getNextReadingIndex, setNextReadingIndex, setPercentComplete, setTotalVerses } from '$lib/utils/plan';
 import FlexSearch, { type Id } from 'flexsearch';
 
 
@@ -103,9 +103,7 @@ function setPlan(sub: Sub) {
 	sub.plan = plans.get(sub.planID) || NullPlan()
 }
 
-function setPercentComplete(sub: Sub) {
-	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.plan.readings.length * 100)
-}
+
 
 async function addReadingsToSub(sub: Sub | undefined) {
 	if (sub) {

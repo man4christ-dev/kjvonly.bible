@@ -1,6 +1,6 @@
 import { assert, describe, it } from "vitest";
-import { getNextReadingIndex, setNextReadingIndex, setTotalVerses, sumVerseRange } from "./plan";
-import { NullCompletedReading, NullSub, type CompletedReading, type Sub } from "$lib/modules/plans/models";
+import { getNextReadingIndex, setNextReadingIndex, setPercentComplete, setTotalVerses, sumVerseRange } from "./plan";
+import { NullCompletedReading, NullReadings, NullSub, type CompletedReading, type Sub } from "$lib/modules/plans/models";
 
 describe('path util functions', () => {
     interface tt {
@@ -53,7 +53,7 @@ describe('path util functions', () => {
     }
 })
 
-describe('verse group', () => {
+describe('verse rng', () => {
     interface tt {
         grp: string
         expectedResult: number
@@ -79,7 +79,6 @@ describe('verse group', () => {
     ]
 
     for (const t of testTable) {
-
         it('should return correct total', () => {
             let result = sumVerseRange(t.grp)
             assert.equal(result, t.expectedResult, `expected ${t.expectedResult} but got ${result}`)
@@ -159,5 +158,66 @@ describe('set total verses', () => {
                 `expected ${idx * 10} but got ${r.totalVerses}`
             )
         })
+    })
+})
+
+describe('set percent complete', () => {
+    it('should set percent complete', () => {
+
+        interface tt {
+            readingsCount: number
+            completedReadingsCount: number
+            expectedResult: number
+        }
+
+        let testTable: tt[] = [
+            {
+                readingsCount: 100,
+                completedReadingsCount: 10,
+                expectedResult: 10
+            },
+            {
+                readingsCount: 75,
+                completedReadingsCount: 25,
+                expectedResult: 34
+            },
+            {
+                readingsCount: 100,
+                completedReadingsCount: 0,
+                expectedResult: 0
+            },
+            {
+                readingsCount: 100,
+                completedReadingsCount: 100,
+                expectedResult: 100
+            },
+            {
+                readingsCount: 1000,
+                completedReadingsCount: 198,
+                expectedResult: 20
+            },
+        ]
+
+        for (let t of testTable) {
+            let sub = NullSub()
+
+            for (let _ of Array(t.readingsCount)) {
+                sub.plan.readings.push(NullReadings())
+            }
+
+
+            let index = 0
+            for (let _ of Array(t.completedReadingsCount)) {
+                sub.completedReadings.set(index, NullCompletedReading())
+                index += 1
+            }
+
+            setPercentComplete(sub)
+            assert.equal(
+                sub.percentCompleted,
+                t.expectedResult,
+                `expected percent complete to equal ${t.expectedResult} but got ${sub.percentCompleted}`
+            )
+        }
     })
 })

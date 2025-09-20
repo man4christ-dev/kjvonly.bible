@@ -76,3 +76,8 @@ export function setTotalVerses(sub: Sub) {
         r.totalVerses = totalVerses
     })
 }
+
+
+export function setPercentComplete(sub: Sub) {
+	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.plan.readings.length * 100)
+}

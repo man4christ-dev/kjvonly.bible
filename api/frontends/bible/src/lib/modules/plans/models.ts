@@ -41,6 +41,13 @@ export interface Readings {
     bcvs: BCV[];
 }
 
+export function NullReadings(): Readings {
+    return {
+        totalVerses: 0,
+        bcvs: []
+    }
+}
+
 export interface NextReading {
     reading: BCV[];
     totalVerses: number;
