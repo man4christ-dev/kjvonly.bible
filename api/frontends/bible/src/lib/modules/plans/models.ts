@@ -81,6 +81,17 @@ export function NullCompletedReading(): CompletedReading {
     }
 }
 
+
+export interface CachedPlan {
+    id: string;
+    userID: string;
+    name: string;
+    description: string[];
+    readings: string[];
+    dateCreated: number;
+    version: number;
+}
+
 export interface Plan {
     id: string;
     userID: string;

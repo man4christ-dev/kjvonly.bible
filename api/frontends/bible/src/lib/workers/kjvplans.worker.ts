@@ -2,7 +2,7 @@ import { chapterApi } from '$lib/api/chapters.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import { NullPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
+import { NullPlan, type CachedPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
 import { getNextReadingIndex, setNextReadingIndex, setPercentComplete, setTotalVerses } from '$lib/utils/plan';
 import FlexSearch, { type Id } from 'flexsearch';
 
@@ -35,12 +35,12 @@ let readings: any = {}
 let booknames: any = {}
 
 
-function parseReadingEntries(reading: any): any[] {
+function parseReadingEntries(reading: string): any[] {
 	let entries = []
-	let readingGroup = reading.split(';')
+	let readings = reading.split(';')
 
-	for (let i = 0; i < readingGroup.length; i++) {
-		let bcv = readingGroup[i].split('/')
+	for (let i = 0; i < readings.length; i++) {
+		let bcv = readings[i].split('/')
 		let bookName = booknames['booknamesById'][bcv[0]]
 		let chapter = bcv[1]
 		let verses = bcv[2]
@@ -49,14 +49,14 @@ function parseReadingEntries(reading: any): any[] {
 			bookID: bcv[0],
 			chapter: chapter,
 			verses: verses,
-			chapterKey: readingGroup[i].replaceAll('/', '_')
+			chapterKey: readings[i].replaceAll('/', '_')
 		}
 		entries.push(entry)
 	}
 	return entries
 }
 
-function parsePlanReadings(planReadings: any): any[] {
+function parsePlanReadings(planReadings: string[]): any[] {
 	let readings: Readings[] = []
 	for (let i = 0; i < planReadings.length; i++) {
 		let entries = parseReadingEntries(planReadings[i])
@@ -65,17 +65,27 @@ function parsePlanReadings(planReadings: any): any[] {
 			totalVerses: 0
 		}
 		readings.push(p)
-
 	}
 	return readings
 }
 
+
+
 async function parsePlans() {
-	let chachedPlans = await plansApi.gets()
-	for (let i = 0; i < chachedPlans.length; i++) {
-		let plan: Plan = chachedPlans[i]
-		let planReadings = plan.readings
-		plan.readings = parsePlanReadings(planReadings)
+	let cachedPlans = await plansApi.gets()
+	for (let cp of cachedPlans) {
+		let readings: Readings[] = parsePlanReadings(cp.readings)
+
+		let plan: Plan = {
+			id: cp.id,
+			userID: cp.userID,
+			name: cp.name,
+			description: cp.description,
+			readings: readings,
+			dateCreated: cp.dateCreated,
+			version: cp.version
+		}
+		
 		await plansDocument.addAsync(plan.id, plan);
 		plans.set(plan.id, plan)
 	}
@@ -102,8 +112,6 @@ async function setCompletedReadings(sub: Sub) {
 function setPlan(sub: Sub) {
 	sub.plan = plans.get(sub.planID) || NullPlan()
 }
-
-
 
 async function addReadingsToSub(sub: Sub | undefined) {
 	if (sub) {
