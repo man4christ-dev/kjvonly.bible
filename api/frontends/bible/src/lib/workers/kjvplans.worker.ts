@@ -36,43 +36,28 @@ let booknames: any = {}
 
 
 function decodeReadings(encodedReadings: string): BCV[] {
-	let decodedReadings: BCV[] = []
-	let readings = encodedReadings.split(';')
-
-	for (let i = 0; i < readings.length; i++) {
-		let bcv = readings[i].split('/')
-		let bookName = booknames['booknamesById'][bcv[0]]
-		let bookID = parseInt(bcv[0])
-		let chapter = parseInt(bcv[1])
-		let verses = bcv[2]
-		let entry:  BCV = {
-			bookName: bookName,
-			bookID: bookID,
-			chapter: chapter,
-			verses: verses,
-			chapterKey: readings[i].replaceAll('/', '_')
+	return encodedReadings.split(';').map(r => {
+		let bcv = r.split('/')
+		return {
+			bookName: booknames['booknamesById'][bcv[0]],
+			bookID: parseInt(bcv[0]),
+			chapter: parseInt(bcv[1]),
+			verses: bcv[2],
+			chapterKey: r.replaceAll('/', '_')
 		}
-		decodedReadings.push(entry)
-	}
-	return decodedReadings
+	})
 }
 
-function parseEncodedReadings(encodedReading: string[]): Readings[] {
-	let readings: Readings[] = []
-	for (let i = 0; i < encodedReading.length; i++) {
-		let bcvs = decodeReadings(encodedReading[i])
-		let p: Readings = {
-			bcvs: bcvs,
+function parseEncodedReadings(encodedReadings: string[]): Readings[] {
+	return encodedReadings.map((ers: string) => {
+		return {
+			bcvs: decodeReadings(ers),
 			totalVerses: 0
 		}
-		readings.push(p)
-	}
-	return readings
+	})
 }
 
-
-
-async function parsePlans() {
+async function initializePlans() {
 	let cachedPlans: CachedPlan[] = await plansApi.gets()
 	for (let cp of cachedPlans) {
 		let nrs: Readings[] = parseEncodedReadings(cp.readings)
@@ -86,7 +71,7 @@ async function parsePlans() {
 			dateCreated: cp.dateCreated,
 			version: cp.version
 		}
-		
+
 		await plansDocument.addAsync(plan.id, plan);
 		plans.set(plan.id, plan)
 	}
@@ -132,7 +117,7 @@ async function addReadingsToSubs() {
 
 async function init() {
 	booknames = await chapterApi.getBooknames()
-	await parsePlans()
+	await initializePlans()
 
 	let cachedSubs = await subsApi.gets()
 	for (let i = 0; i < cachedSubs.length; i++) {
