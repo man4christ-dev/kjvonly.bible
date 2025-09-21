@@ -3,9 +3,8 @@ import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import { cachedPlanToPlan, NullPlan, type BCV, type CachedPlan, type CachedSub, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
-import { setNextReadingIndex, setPercentComplete, setTotalVerses } from '$lib/utils/plan';
+import { plansDecodeService } from '$lib/services/plansDecode.service';
 import FlexSearch, { type Id } from 'flexsearch';
-
 
 let plansDocument = new FlexSearch.Document({
 	document: {
@@ -102,11 +101,11 @@ function setSubPlanData(sub: Sub) {
 
 async function addReadingsToSub(sub: Sub | undefined) {
 	if (sub) {
-		await setCompletedReadings(sub)
-		setNextReadingIndex(sub)
+		await setCompletedReadings(sub, )
+		plansDecodeService.setNextReadingIndex(sub)
 		setSubPlanData(sub)
-		setPercentComplete(sub)
-		setTotalVerses(sub)
+		plansDecodeService.setPercentComplete(sub)
+		plansDecodeService.setTotalVerses(sub)
 	}
 }
 
@@ -115,6 +114,8 @@ async function addReadingsToSubs() {
 		await addReadingsToSub(sub)
 	}
 }
+
+
 
 async function init() {
 	booknames = await chapterApi.getBooknames()
