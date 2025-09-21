@@ -5,6 +5,8 @@ import { cachedPlanToPlan, type BCV, type Booknames, type CachedPlan, type Plan,
 export class PlansDecodeService {
 
     booknames: any
+
+    // ====================== SUBS ==========================
     /**
      * Parse start and end verse. 
      * 
@@ -99,7 +101,6 @@ export class PlansDecodeService {
     }
 
     // ========================== Plans =============================
-
     decodeReadings(encodedReadings: string): BCV[] {
         return encodedReadings.split(';').map(r => {
             let bcv = r.split('/')
@@ -122,7 +123,6 @@ export class PlansDecodeService {
         })
     }
 
-
     async decodePlans(): Promise<Plan[]> {
         let cachedPlans: CachedPlan[] = await plansApi.gets()
         return cachedPlans.map((cp: CachedPlan) => {
@@ -130,7 +130,6 @@ export class PlansDecodeService {
             plan.nestedReadings = this.parseEncodedReadings(cp.readings)
             return plan
         })
-        //	addPlansToIndex(plans)
     }
 
     constructor() {

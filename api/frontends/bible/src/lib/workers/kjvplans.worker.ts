@@ -4,6 +4,8 @@ import {  NullPlan, type CachedSub, type CompletedReading, type Plan, type Sub }
 import { plansDecodeService } from '$lib/services/plansDecode.service';
 import FlexSearch from 'flexsearch';
 
+let workerHasInitialized = false
+
 let plansDocument = new FlexSearch.Document({
 	document: {
 		id: 'id',
@@ -29,55 +31,23 @@ let plans: Map<string, Plan> = new Map()
 let subs: Map<string, Sub> = new Map()
 let completedReadings: Map<string, CompletedReading> = new Map()
 
-//=================== PLANS =======================
+//=================== INIT  =======================
+async function init() {
+	let plans = await plansDecodeService.decodePlans()
+	await initializePlans(plans)
+	await initializeSubs()
+	await initializeCompletedReadings()
+	await enrichSubs()
+
+	workerHasInitialized = true
+	publishPlans();
+	publishSubs()
+}
 
 async function initializePlans(newPlans: Plan[]) {
 	for (let p of newPlans) {
 		await plansDocument.addAsync(p.id, p);
 		plans.set(p.id, p)
-	}
-}
-//=================== SUB =======================
-
-async function getCompletedReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]> {
-	return completedReadingsDocument.searchAsync(search, {
-		index: index
-	});
-}
-
-async function setCompletedReadings(sub: Sub) {
-	sub.completedReadings = new Map<number, CompletedReading>()
-	let result = await getCompletedReadings(sub.id, ['subID'])
-	result.forEach((r) => {
-		r.result.forEach((id) => {
-			let cr = completedReadings.get(id.toString())
-			if (cr) {
-				sub.completedReadings.set(cr.index, cr);
-			}
-		});
-	});
-}
-
-function setSubPlanData(sub: Sub) {
-	let plan = plans.get(sub.planID) || NullPlan()
-	sub.nestedReadings = plan.nestedReadings
-	sub.description = plan.description
-	sub.name = plan.name
-}
-
-async function addReadingsToSub(sub: Sub | undefined) {
-	if (sub) {
-		await setCompletedReadings(sub)
-		setSubPlanData(sub)
-		plansDecodeService.setNextReadingIndex(sub)
-		plansDecodeService.setPercentComplete(sub)
-		plansDecodeService.setTotalVerses(sub)
-	}
-}
-
-async function addReadingsToSubs() {
-	for (let [_, sub] of subs) {
-		await addReadingsToSub(sub)
 	}
 }
 
@@ -102,19 +72,52 @@ async function initializeCompletedReadings() {
 	}
 }
 
-async function init() {
-	let plans = await plansDecodeService.decodePlans()
-	await initializePlans(plans)
-	await initializeSubs()
-	await initializeCompletedReadings()
-	await addReadingsToSubs()
+//=================== SUB =======================
 
-	hasInitialized = true
-	publishPlans();
-	publishSubs()
+async function enrichSubs() {
+	for (let [_, sub] of subs) {
+		await enrichSub(sub)
+	}
+}
+
+async function enrichSub(sub: Sub | undefined) {
+	if (sub) {
+		await setCompletedReadings(sub)
+		setSubPlanData(sub)
+		plansDecodeService.setNextReadingIndex(sub)
+		plansDecodeService.setPercentComplete(sub)
+		plansDecodeService.setTotalVerses(sub)
+	}
+}
+
+async function setCompletedReadings(sub: Sub) {
+	sub.completedReadings = new Map<number, CompletedReading>()
+	let result = await getCompletedReadings(sub.id, ['subID'])
+	result.forEach((r) => {
+		r.result.forEach((id) => {
+			let cr = completedReadings.get(id.toString())
+			if (cr) {
+				sub.completedReadings.set(cr.index, cr);
+			}
+		});
+	});
+}
+
+async function getCompletedReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]> {
+	return completedReadingsDocument.searchAsync(search, {
+		index: index
+	});
+}
+
+function setSubPlanData(sub: Sub) {
+	let plan = plans.get(sub.planID) || NullPlan()
+	sub.nestedReadings = plan.nestedReadings
+	sub.description = plan.description
+	sub.name = plan.name
 }
 
 // ======================== PUB SUB ==========================
+
 
 function addPlan(planID: string, plan: any) {
 	plans.set(planID, plan);
@@ -131,7 +134,7 @@ function deletePlan(planID: string) {
 async function addSubs(subID: string, sub: any) {
 	subs.set(subID, sub);
 	subsDocument.add(subID, sub);
-	await addReadingsToSubs()
+	await enrichSubs() //TODO this could be enrich sub only
 	publishSubs();
 }
 
@@ -147,7 +150,7 @@ async function putReading(data: any, subID: any) {
 	let sub = subs.get(subID)
 	if (sub) {
 		sub.completedReadings.set(data.index, data)
-		await addReadingsToSub(sub)
+		await enrichSub(sub)
 	}
 }
 
@@ -169,21 +172,19 @@ async function search(id: string, searchTerm: string, indexes: string[], flexDoc
 }
 
 function publishPlans() {
-	if (hasInitialized) {
+	if (workerHasInitialized) {
 		postMessage({ id: 'getAllPlans', plans: plans });
 	}
 }
 
-
 function publishSubs() {
-	if (hasInitialized) {
+	if (workerHasInitialized) {
 		postMessage({ id: 'getAllSubs', subs: subs });
 	}
 }
 
-
 function getAllReadings() {
-	if (hasInitialized) {
+	if (workerHasInitialized) {
 		postMessage({ id: 'getAllReadings', readings: completedReadings });
 	}
 }
@@ -220,5 +221,4 @@ onmessage = async (e) => {
 	}
 };
 
-let hasInitialized = false
 init();
