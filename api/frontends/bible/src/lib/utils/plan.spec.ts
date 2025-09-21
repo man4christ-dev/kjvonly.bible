@@ -1,5 +1,5 @@
-import { assert, describe, it } from "vitest";
-import { getNextReadingIndex, setNextReadingIndex, setPercentComplete, setTotalVerses, sumVerseRange } from "./plan";
+import { assert, describe, expect, it } from "vitest";
+import { getNextReadingIndex, setNextReadingIndex, setPercentComplete, setTotalVerses } from "./plan";
 import { NullCompletedReading, NullReadings, NullSub, type CompletedReading, type Sub } from "$lib/modules/plans/models";
 
 describe('path util functions', () => {
@@ -53,43 +53,10 @@ describe('path util functions', () => {
     }
 })
 
-describe('verse rng', () => {
-    interface tt {
-        grp: string
-        expectedResult: number
-    }
-
-    let testTable: tt[] = [
-        {
-            grp: '1-b',
-            expectedResult: 0
-        },
-        {
-            grp: '1-1',
-            expectedResult: 1
-        },
-        {
-            grp: '1-2',
-            expectedResult: 2
-        },
-        {
-            grp: '1-31',
-            expectedResult: 31
-        }
-    ]
-
-    for (const t of testTable) {
-        it('should return correct total', () => {
-            let result = sumVerseRange(t.grp)
-            assert.equal(result, t.expectedResult, `expected ${t.expectedResult} but got ${result}`)
-        })
-    }
-})
-
 describe('set total verses', () => {
     it('should set totalVerses', () => {
         let sub = NullSub();
-        sub.plan.nestedReadings = [
+        sub.nestedReadings = [
             {
                 totalVerses: 0,
                 bcvs: [
@@ -151,7 +118,7 @@ describe('set total verses', () => {
 
         setTotalVerses(sub)
 
-        sub.plan.nestedReadings.forEach((r, idx) => {
+        sub.nestedReadings.forEach((r, idx) => {
             assert.equal(
                 r.totalVerses,
                 (idx + 1) * 10,
@@ -202,7 +169,7 @@ describe('set percent complete', () => {
             let sub = NullSub()
 
             for (let _ of Array(t.readingsCount)) {
-                sub.plan.nestedReadings.push(NullReadings())
+                sub.nestedReadings.push(NullReadings())
             }
 
 

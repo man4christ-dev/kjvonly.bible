@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { readingsApi } from '$lib/api/readings.api';
-	import { plansService } from '$lib/services/plans.service';
+	import { plansPubSubService } from '$lib/services/plansPubSub.service';
 	import { getNextReadingIndex } from '$lib/utils/plan';
 	import { onDestroy, onMount } from 'svelte';
 	import type { CompletedReading, NavPlan, Sub } from '../models';
@@ -32,7 +32,7 @@
 				version: 0
 			};
 			await readingsApi.put(readingsData);
-			plansService.putReading(readingsData, plan.subID);
+			plansPubSubService.putReading(readingsData, plan.subID);
 
 			let sub = subsMap.get(plan.subID);
 			// SHOULD ALWAYS EXIST. MAKE COMPILER HAPPY
@@ -63,12 +63,12 @@
 	}
 
 	onDestroy(() => {
-		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
+		plansPubSubService.unsubscribe(PLAN_SUBSCRIBER_ID);
 	});
 
 	onMount(() => {
-		plansService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
-		plansService.getAllSubs();
+		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
+		plansPubSubService.getAllSubs();
 	});
 </script>
 

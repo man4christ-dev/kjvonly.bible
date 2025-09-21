@@ -1,15 +1,15 @@
 <script lang="ts">
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS } from '../models';
+	import { PLANS_VIEWS, type Sub } from '../models';
 	import { paneService } from '$lib/services/pane.service.svelte';
 
 	let {
-		plansDisplay = $bindable(),
+		plansDisplay = $bindable<string>(),
 		pane = $bindable(),
 		paneId = $bindable(),
 		clientHeight = $bindable(),
-		selectedSub = $bindable(),
-		subsList = $bindable()
+		selectedSub = $bindable<Sub>(),
+		subsList = $bindable<Sub[]>()
 	} = $props();
 
 	let headerHeight = $state(0);
@@ -33,13 +33,13 @@
 			style="height: 100px"
 		>
 			<div class="flex w-full">
-				<span class="pb-2 text-2xl">{s.plan.name}</span>
+				<span class="pb-2 text-2xl">{s.name}</span>
 				<span class="flex-grow"></span>
 				<span class="text-support-a-500">{s.percentCompleted}%</span>
 			</div>
 
 			<div class="text-md truncate ...">
-				{#each s.plan.description as d}
+				{#each s.description as d}
 					<span>&nbsp;</span><span>{d}</span>
 				{/each}
 			</div>

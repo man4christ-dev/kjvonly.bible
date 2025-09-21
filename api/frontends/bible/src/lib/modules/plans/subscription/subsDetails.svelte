@@ -25,7 +25,7 @@
 		let count = 0;
         const BATCH_SIZE_TO_SHOW = 30
 
-		while (toShow !== BATCH_SIZE_TO_SHOW && count + subListReadingsToShow < selectedSub.plan.nestedReadings.length) {
+		while (toShow !== BATCH_SIZE_TO_SHOW && count + subListReadingsToShow < selectedSub.nestedReadings.length) {
 			let hasCompletedReading = selectedSub.completedReadings[subListReadingsToShow + count];
 			count++;
 			if (hasCompletedReading && !showCompletedReadings) {
@@ -38,7 +38,7 @@
 	}
 
 	function onSelectedSubReading(idx: number, returnView: string) {
-		let readings: Readings = selectedSub.plan.nestedReadings[idx];
+		let readings: Readings = selectedSub.nestedReadings[idx];
 		let updReadings: BCV[] = readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r as BCV;
@@ -105,7 +105,7 @@
 {#snippet subListView(sub: any)}
 	<div class="flex w-full flex-col">
 		<div class="flex p-2">
-			<span class="pb-2 text-2xl">{sub.plan.name}</span>
+			<span class="pb-2 text-2xl">{sub.name}</span>
 			<span class="flex-grow"></span>
 
 			<label
@@ -133,19 +133,19 @@
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							<Reading bind:planReading={sub.plan.nestedReadings[idx].bcvs}></Reading>
+							<Reading bind:planReading={sub.nestedReadings[idx].bcvs}></Reading>
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">
 							<div class="flex w-full">
 								<span class="flex flex-grow"></span>
 								<div class="text-lg {sub.completedReadings.get(idx)?.index === idx ? 'text-support-a-500' : ''}">
-									{idx + 1} of {sub.plan.nestedReadings.length}
+									{idx + 1} of {sub.nestedReadings.length}
 								</div>
 							</div>
 							<div class="flex w-full justify-end">
 								<div class="text-base text-nowrap">
-									Verses: {sub.plan.nestedReadings[idx].totalVerses}
+									Verses: {sub.nestedReadings[idx].totalVerses}
 								</div>
 							</div>
 						</div>

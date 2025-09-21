@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { plansService } from '$lib/services/plans.service';
+	import { plansPubSubService } from '$lib/services/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
@@ -43,12 +43,12 @@
 	}
 
 	onDestroy(() => {
-		plansService.unsubscribe(PLAN_SUBSCRIBER_ID);
+		plansPubSubService.unsubscribe(PLAN_SUBSCRIBER_ID);
 	});
 
 	onMount(() => {
-		plansService.subscribe('getAllPlans', onGetAllPlans, PLAN_SUBSCRIBER_ID);
-		plansService.getAllPlans();
+		plansPubSubService.subscribe('getAllPlans', onGetAllPlans, PLAN_SUBSCRIBER_ID);
+		plansPubSubService.getAllPlans();
 	});
 
 	let headerHeight = $state(0);

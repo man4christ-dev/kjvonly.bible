@@ -2,8 +2,8 @@ import { chapterApi } from '$lib/api/chapters.api';
 import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import { NullPlan, type BCV, type CachedPlan, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
-import { getNextReadingIndex, setNextReadingIndex, setPercentComplete, setTotalVerses } from '$lib/utils/plan';
+import { cachedPlanToPlan, NullPlan, type BCV, type CachedPlan, type CachedSub, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
+import { setNextReadingIndex, setPercentComplete, setTotalVerses } from '$lib/utils/plan';
 import FlexSearch, { type Id } from 'flexsearch';
 
 
@@ -30,7 +30,7 @@ let readingsDocument = new FlexSearch.Document({
 
 let plans: Map<string, Plan> = new Map()
 let subs: Map<string, Sub> = new Map()
-let readings: any = {}
+let readings: Map<string, CompletedReading> = new Map()
 
 let booknames: any = {}
 
@@ -57,29 +57,24 @@ function parseEncodedReadings(encodedReadings: string[]): Readings[] {
 	})
 }
 
-async function initializePlans() {
-	let cachedPlans: CachedPlan[] = await plansApi.gets()
-	for (let cp of cachedPlans) {
-		let nrs: Readings[] = parseEncodedReadings(cp.readings)
-
-		let plan: Plan = {
-			id: cp.id,
-			userID: cp.userID,
-			name: cp.name,
-			description: cp.description,
-			nestedReadings: nrs,
-			dateCreated: cp.dateCreated,
-			version: cp.version
-		}
-
-		await plansDocument.addAsync(plan.id, plan);
-		plans.set(plan.id, plan)
+async function addPlansToIndex(newPlans: Plan[]) {
+	for (let p of newPlans) {
+		await plansDocument.addAsync(p.id, p);
+		plans.set(p.id, p)
 	}
 }
 
+async function initializePlans() {
+	let cachedPlans: CachedPlan[] = await plansApi.gets()
+	let plans = cachedPlans.map((cp: CachedPlan) => {
+		let plan: Plan = cachedPlanToPlan(cp)
+		plan.nestedReadings = parseEncodedReadings(cp.readings)
+		return plan
+	})
+	addPlansToIndex(plans)
+}
 
-
-async function getReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]> {
+async function getCompletedReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]> {
 	return readingsDocument.searchAsync(search, {
 		index: index
 	});
@@ -87,23 +82,29 @@ async function getReadings(search: string, index: string[]): Promise<FlexSearch.
 
 async function setCompletedReadings(sub: Sub) {
 	sub.completedReadings = new Map<number, CompletedReading>()
-	let result = await getReadings(sub.id, ['subID'])
+	let result = await getCompletedReadings(sub.id, ['subID'])
 	result.forEach((r: FlexSearch.SimpleDocumentSearchResultSetUnit) => {
 		r.result.forEach((id) => {
-			sub.completedReadings.set(readings[id].index, readings[id]);
+			let cr = readings.get(id.toString())
+			if (cr) {
+				sub.completedReadings.set(cr.index, cr);
+			}
 		});
 	});
 }
 
-function setPlan(sub: Sub) {
-	sub.plan = plans.get(sub.planID) || NullPlan()
+function setSubPlanData(sub: Sub) {
+	let plan = plans.get(sub.planID) || NullPlan()
+	sub.nestedReadings = plan.nestedReadings
+	sub.description = plan.description
+	sub.name = plan.name
 }
 
 async function addReadingsToSub(sub: Sub | undefined) {
 	if (sub) {
 		await setCompletedReadings(sub)
 		setNextReadingIndex(sub)
-		setPlan(sub)
+		setSubPlanData(sub)
 		setPercentComplete(sub)
 		setTotalVerses(sub)
 	}
@@ -119,7 +120,7 @@ async function init() {
 	booknames = await chapterApi.getBooknames()
 	await initializePlans()
 
-	let cachedSubs = await subsApi.gets()
+	let cachedSubs: CachedSub[] = await subsApi.gets()
 	for (let i = 0; i < cachedSubs.length; i++) {
 		let s = cachedSubs[i]
 		await subsDocument.addAsync(s.id, s);
@@ -133,7 +134,7 @@ async function init() {
 	for (let i = 0; i < cachedReadings.length; i++) {
 		let r = cachedReadings[i]
 		await readingsDocument.addAsync(r.id, r);
-		readings[r.id] = r
+		readings.set(r.id,  r)
 	}
 
 	await addReadingsToSubs()
@@ -170,7 +171,7 @@ function deleteSub(subID: string) {
 
 async function putReading(data: any, subID: any) {
 	await readingsDocument.addAsync(data.id, data)
-	readings[data.id] = data
+	readings.set(data.id, data)
 	let sub = subs.get(subID)
 	if (sub) {
 		sub.completedReadings.set(data.index, data)

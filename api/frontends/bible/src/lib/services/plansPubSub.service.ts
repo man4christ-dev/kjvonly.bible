@@ -1,11 +1,8 @@
-import uuid4 from "uuid4";
-
 const plansWorker = new Worker(new URL('../workers/kjvplans.worker?worker', import.meta.url), {
 	type: 'module'
 });
 
-export class PlansService {
-	//todo unsubscribe
+export class PlansPubSubService {
 	subscribers: any[] = [];
 
 	constructor() {
@@ -33,8 +30,6 @@ export class PlansService {
 		this.subscribers = tmpSubscribers
 	}
 
-
-
 	init() {
 		plansWorker.postMessage({ action: 'init' });
 	}
@@ -56,4 +51,4 @@ export class PlansService {
 	}
 }
 
-export let plansService = new PlansService()
+export let plansPubSubService = new PlansPubSubService()

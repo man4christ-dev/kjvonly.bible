@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { plansService } from '$lib/services/plans.service';
+	import { plansPubSubService } from '$lib/services/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import Reading from '../components/reading.svelte';
 
@@ -52,15 +52,15 @@
 		let subKeys = subsMap.keys().toArray();
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub: Sub | undefined = subsMap.get(subKeys[i]);
-			if (sub && sub.plan.nestedReadings.length - 1 > sub.nextReadingIndex) {
+			if (sub && sub.nestedReadings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
-					reading: sub.plan.nestedReadings[sub.nextReadingIndex].bcvs,
-					totalVerses: sub.plan.nestedReadings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
-					planDateCreated: sub.plan.dateCreated ? sub.plan.dateCreated : Date.now(),
-					name: sub.plan.name,
+					reading: sub.nestedReadings[sub.nextReadingIndex].bcvs,
+					totalVerses: sub.nestedReadings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
+					planDateCreated: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
+					name: sub.name,
 					percentCompleted: sub.percentCompleted,
 					readingIndex: sub.nextReadingIndex,
-					totalReadings: sub.plan.nestedReadings.length,
+					totalReadings: sub.nestedReadings.length,
 					subID: sub.id
 				};
 				nrs.push(nr);
@@ -81,7 +81,7 @@
 				version: 0
 			};
 			await readingsApi.put(readingsData);
-			plansService.putReading(readingsData, plan.subID);
+			plansPubSubService.putReading(readingsData, plan.subID);
 
 			let sub = subsMap.get(plan.subID);
 			if (!sub) {
@@ -103,12 +103,12 @@
 	}
 
 	onDestroy(() => {
-		plansService.unsubscribe(NEXT_READING_ID);
+		plansPubSubService.unsubscribe(NEXT_READING_ID);
 	});
 
 	onMount(() => {
-		plansService.subscribe('getAllSubs', onGetAllSubs, NEXT_READING_ID);
-		plansService.getAllSubs();
+		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, NEXT_READING_ID);
+		plansPubSubService.getAllSubs();
 	});
 </script>
 

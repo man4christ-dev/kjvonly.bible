@@ -92,6 +92,18 @@ export interface CachedPlan {
     version: number;
 }
 
+export function cachedPlanToPlan(cp: CachedPlan): Plan {
+    return {
+        id: cp.id,
+        userID: cp.userID,
+        name: cp.name,
+        description: cp.description,
+        nestedReadings: [],
+        dateCreated: cp.dateCreated,
+        version: cp.version
+    }
+}
+
 export interface Plan {
     id: string;
     userID: string;
@@ -102,17 +114,30 @@ export interface Plan {
     version: number;
 }
 
-export interface Sub {
+
+export interface CachedSub {
+    id: string
+    planID: string
+    userID: string
+    dateSubscribed: number
+    version: number
+}
+
+export interface Sub extends CachedSub {
     id: string;
     planID: string;
     userID: string;
+    dateSubscribed: number;
+    version: number;
+
+    // VM
+    name: string;
+    description: string[];
+    nestedReadings: Readings[];
     completedReadings: Map<number, CompletedReading>;
-    plan: Plan;
+    //plan: Plan;
     nextReadingIndex: number;
     percentCompleted: number;
-
-    dateSubscribed: Date;
-    version: number;
 }
 
 export function NullPlan(): Plan {
@@ -129,23 +154,17 @@ export function NullPlan(): Plan {
 
 export function NullSub(): Sub {
     return {
-        id: '',
-        planID: '',
-        userID: '',
+        id: "",
+        planID: "",
+        userID: "",
+        dateSubscribed: 0,
+        version: 0,
+        name: "",
+        description: [],
+        nestedReadings: [],
         completedReadings: new Map(),
-        plan: {
-            id: '',
-            userID: '',
-            name: '',
-            description: [],
-            nestedReadings: [],
-            version: 0,
-            dateCreated: 0
-        },
         nextReadingIndex: 0,
-        percentCompleted: 0,
-        dateSubscribed: new Date(),
-        version: 0
+        percentCompleted: 0
     };
 }
 

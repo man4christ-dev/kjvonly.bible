@@ -1,4 +1,5 @@
 import type { Sub } from "$lib/modules/plans/models"
+import { plansDecodeService } from "$lib/services/plansDecode.service"
 
 /**
  * 
@@ -33,45 +34,15 @@ export function setNextReadingIndex(sub: Sub) {
     sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray())
 }
 
-
-function parseVerseRange(rng: string): number[] {
-    let startEndVerses = rng.split('-')
-    let start = parseInt(startEndVerses[0], 10)
-    let end = parseInt(startEndVerses[1], 10)
-
-    if (Number.isNaN(start) || Number.isNaN(end)) {
-        start = 0
-        end = 0
-    }
-
-    return [start, end]
-}
-
-/**
- * 
- * @param rng a verse group
- * @returns 
- */
-export function sumVerseRange(rng: string): number {
-    let [start, end] = parseVerseRange(rng)
-
-    if (start + end === 0) {
-        return 0
-    }
-
-    const includeStartAndEndVerse = 1
-    return end - start + includeStartAndEndVerse
-}
-
 /**
  * Sums the verses in each reading.
  * 
  * @param sub subscription
  */
 export function setTotalVerses(sub: Sub) {
-    sub.plan.nestedReadings.forEach(r => {
+    sub.nestedReadings.forEach(r => {
         let totalVerses = r.bcvs
-            .map(b => sumVerseRange(b.verses))
+            .map(b => plansDecodeService.sumVerseRange(b.verses))
             .reduce((a, b) => a + b)
         r.totalVerses = totalVerses
     })
@@ -79,5 +50,5 @@ export function setTotalVerses(sub: Sub) {
 
 
 export function setPercentComplete(sub: Sub) {
-	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.plan.nestedReadings.length * 100)
+	sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.nestedReadings.length * 100)
 }
