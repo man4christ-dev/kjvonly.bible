@@ -1,7 +1,6 @@
 <script lang="ts">
 	import { readingsApi } from '$lib/api/readings.api';
 	import { plansPubSubService } from '$lib/services/plansPubSub.service';
-	import { getNextReadingIndex } from '$lib/utils/plan';
 	import { onDestroy, onMount } from 'svelte';
 	import type { CompletedReading, NavPlan, Sub } from '../models';
 	import { NullSub, PLANS_VIEWS } from '../models';
@@ -9,11 +8,12 @@
 	import SubsDetails from './subsDetails.svelte';
 	import SubsList from './subsList.svelte';
 	import uuid4 from 'uuid4';
+	import { plansDecodeService } from '$lib/services/plansDecode.service';
 
 	let {
 		plansDisplay = $bindable(),
 		pane = $bindable(),
-		paneId=$bindable(),
+		paneId = $bindable(),
 		clientHeight = $bindable()
 	} = $props();
 
@@ -41,7 +41,9 @@
 			}
 
 			sub.completedReadings.set(plan.readingIndex, readingsData);
-			sub.nextReadingIndex = getNextReadingIndex(Object.keys(sub.completedReadings).map((v) => parseInt(v)));
+			sub.nextReadingIndex = plansDecodeService.getNextReadingIndex(
+				Object.keys(sub.completedReadings).map((v) => parseInt(v))
+			);
 			console.log('before');
 			selectedSub = sub;
 			console.log('after');

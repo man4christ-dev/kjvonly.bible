@@ -1,10 +1,8 @@
-import { chapterApi } from '$lib/api/chapters.api';
-import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
-import { cachedPlanToPlan, NullPlan, type BCV, type CachedPlan, type CachedSub, type CompletedReading, type Plan, type Readings, type Sub } from '$lib/modules/plans/models';
+import {  NullPlan, type CachedSub, type CompletedReading, type Plan, type Sub } from '$lib/modules/plans/models';
 import { plansDecodeService } from '$lib/services/plansDecode.service';
-import FlexSearch, { type Id } from 'flexsearch';
+import FlexSearch from 'flexsearch';
 
 let plansDocument = new FlexSearch.Document({
 	document: {
@@ -20,7 +18,7 @@ let subsDocument = new FlexSearch.Document({
 	}
 });
 
-let readingsDocument = new FlexSearch.Document({
+let completedReadingsDocument = new FlexSearch.Document({
 	document: {
 		id: 'id',
 		index: ['subID']
@@ -29,52 +27,20 @@ let readingsDocument = new FlexSearch.Document({
 
 let plans: Map<string, Plan> = new Map()
 let subs: Map<string, Sub> = new Map()
-let readings: Map<string, CompletedReading> = new Map()
+let completedReadings: Map<string, CompletedReading> = new Map()
 
-let booknames: any = {}
+//=================== PLANS =======================
 
-
-function decodeReadings(encodedReadings: string): BCV[] {
-	return encodedReadings.split(';').map(r => {
-		let bcv = r.split('/')
-		return {
-			bookName: booknames['booknamesById'][bcv[0]],
-			bookID: parseInt(bcv[0]),
-			chapter: parseInt(bcv[1]),
-			verses: bcv[2],
-			chapterKey: r.replaceAll('/', '_')
-		}
-	})
-}
-
-function parseEncodedReadings(encodedReadings: string[]): Readings[] {
-	return encodedReadings.map((ers: string) => {
-		return {
-			bcvs: decodeReadings(ers),
-			totalVerses: 0
-		}
-	})
-}
-
-async function addPlansToIndex(newPlans: Plan[]) {
+async function initializePlans(newPlans: Plan[]) {
 	for (let p of newPlans) {
 		await plansDocument.addAsync(p.id, p);
 		plans.set(p.id, p)
 	}
 }
-
-async function initializePlans() {
-	let cachedPlans: CachedPlan[] = await plansApi.gets()
-	let plans = cachedPlans.map((cp: CachedPlan) => {
-		let plan: Plan = cachedPlanToPlan(cp)
-		plan.nestedReadings = parseEncodedReadings(cp.readings)
-		return plan
-	})
-	addPlansToIndex(plans)
-}
+//=================== SUB =======================
 
 async function getCompletedReadings(search: string, index: string[]): Promise<FlexSearch.SimpleDocumentSearchResultSetUnit[]> {
-	return readingsDocument.searchAsync(search, {
+	return completedReadingsDocument.searchAsync(search, {
 		index: index
 	});
 }
@@ -82,9 +48,9 @@ async function getCompletedReadings(search: string, index: string[]): Promise<Fl
 async function setCompletedReadings(sub: Sub) {
 	sub.completedReadings = new Map<number, CompletedReading>()
 	let result = await getCompletedReadings(sub.id, ['subID'])
-	result.forEach((r: FlexSearch.SimpleDocumentSearchResultSetUnit) => {
+	result.forEach((r) => {
 		r.result.forEach((id) => {
-			let cr = readings.get(id.toString())
+			let cr = completedReadings.get(id.toString())
 			if (cr) {
 				sub.completedReadings.set(cr.index, cr);
 			}
@@ -101,9 +67,9 @@ function setSubPlanData(sub: Sub) {
 
 async function addReadingsToSub(sub: Sub | undefined) {
 	if (sub) {
-		await setCompletedReadings(sub, )
-		plansDecodeService.setNextReadingIndex(sub)
+		await setCompletedReadings(sub)
 		setSubPlanData(sub)
+		plansDecodeService.setNextReadingIndex(sub)
 		plansDecodeService.setPercentComplete(sub)
 		plansDecodeService.setTotalVerses(sub)
 	}
@@ -115,64 +81,69 @@ async function addReadingsToSubs() {
 	}
 }
 
-
-
-async function init() {
-	booknames = await chapterApi.getBooknames()
-	await initializePlans()
-
+async function initializeSubs() {
 	let cachedSubs: CachedSub[] = await subsApi.gets()
 	for (let i = 0; i < cachedSubs.length; i++) {
 		let s = cachedSubs[i]
 		await subsDocument.addAsync(s.id, s);
 		subs.set(s.id, s)
 	}
+}
 
-	// CORE NOTE: Reading ids are composite priamry keys subID & id
-	// id is just the index in of the reading plan. FlexSearch id 
-	// is <subid>/<id> for a reading
+// CORE NOTE: Reading ids are composite primary keys subID & id
+// id is just the index in of the reading plan. FlexSearch id 
+// is <subid>/<id> for a reading
+async function initializeCompletedReadings() {
 	let cachedReadings = await readingsApi.gets()
 	for (let i = 0; i < cachedReadings.length; i++) {
 		let r = cachedReadings[i]
-		await readingsDocument.addAsync(r.id, r);
-		readings.set(r.id,  r)
+		await completedReadingsDocument.addAsync(r.id, r);
+		completedReadings.set(r.id, r)
 	}
+}
 
+async function init() {
+	let plans = await plansDecodeService.decodePlans()
+	await initializePlans(plans)
+	await initializeSubs()
+	await initializeCompletedReadings()
 	await addReadingsToSubs()
 
 	hasInitialized = true
-	getAllPlans();
-	getAllSubs()
+	publishPlans();
+	publishSubs()
 }
+
+// ======================== PUB SUB ==========================
 
 function addPlan(planID: string, plan: any) {
 	plans.set(planID, plan);
 	plansDocument.add(planID, plan);
-	getAllPlans();
+	publishPlans();
 }
 
 function deletePlan(planID: string) {
 	plans.delete(planID);
 	plansDocument.remove(planID);
-	getAllPlans();
+	publishPlans();
 }
 
 async function addSubs(subID: string, sub: any) {
 	subs.set(subID, sub);
 	subsDocument.add(subID, sub);
 	await addReadingsToSubs()
-	getAllSubs();
+	publishSubs();
 }
 
 function deleteSub(subID: string) {
 	subs.delete(subID);
 	subsDocument.remove(subID);
-	getAllSubs();
+	publishSubs();
 }
 
 async function putReading(data: any, subID: any) {
-	await readingsDocument.addAsync(data.id, data)
-	readings.set(data.id, data)
+	await completedReadingsDocument.addAsync(data.id, data)
+	completedReadings.set(data.id, data)
 	let sub = subs.get(subID)
 	if (sub) {
 		sub.completedReadings.set(data.index, data)
@@ -197,14 +168,14 @@ async function search(id: string, searchTerm: string, indexes: string[], flexDoc
 	}
 }
 
-function getAllPlans() {
+function publishPlans() {
 	if (hasInitialized) {
 		postMessage({ id: 'getAllPlans', plans: plans });
 	}
 }
 
 
-function getAllSubs() {
+function publishSubs() {
 	if (hasInitialized) {
 		postMessage({ id: 'getAllSubs', subs: subs });
 	}
@@ -213,7 +184,7 @@ function getAllSubs() {
 
 function getAllReadings() {
 	if (hasInitialized) {
-		postMessage({ id: 'getAllReadings', readings: readings });
+		postMessage({ id: 'getAllReadings', readings: completedReadings });
 	}
 }
 
@@ -235,13 +206,13 @@ onmessage = async (e) => {
 			await search(e.data.id, e.data.text, e.data.indexes, subsDocument, subs);
 			break;
 		case 'searchReadings':
-			await search(e.data.id, e.data.text, e.data.indexes, readingsDocument, readings);
+			await search(e.data.id, e.data.text, e.data.indexes, completedReadingsDocument, completedReadings);
 			break;
 		case 'getAllPlans':
-			getAllPlans();
+			publishPlans();
 			break;
 		case 'getAllSubs':
-			getAllSubs();
+			publishSubs();
 			break;
 		case 'putReading':
 			putReading(e.data.data, e.data.subID);

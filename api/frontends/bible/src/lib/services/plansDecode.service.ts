@@ -1,7 +1,10 @@
-import type { Sub } from "$lib/modules/plans/models"
+import { chapterApi } from "$lib/api/chapters.api"
+import { plansApi } from "$lib/api/plans.api"
+import { cachedPlanToPlan, type BCV, type Booknames, type CachedPlan, type Plan, type Readings, type Sub } from "$lib/modules/plans/models"
 
 export class PlansDecodeService {
 
+    booknames: any
     /**
      * Parse start and end verse. 
      * 
@@ -93,6 +96,49 @@ export class PlansDecodeService {
 
     setPercentComplete(sub: Sub) {
         sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.nestedReadings.length * 100)
+    }
+
+    // ========================== Plans =============================
+
+    decodeReadings(encodedReadings: string): BCV[] {
+        return encodedReadings.split(';').map(r => {
+            let bcv = r.split('/')
+            return {
+                bookName: this.booknames['booknamesById'][bcv[0]],
+                bookID: parseInt(bcv[0]),
+                chapter: parseInt(bcv[1]),
+                verses: bcv[2],
+                chapterKey: r.replaceAll('/', '_')
+            }
+        })
+    }
+
+    parseEncodedReadings(encodedReadings: string[]): Readings[] {
+        return encodedReadings.map((ers: string) => {
+            return {
+                bcvs: this.decodeReadings(ers),
+                totalVerses: 0
+            }
+        })
+    }
+
+
+    async decodePlans(): Promise<Plan[]> {
+        let cachedPlans: CachedPlan[] = await plansApi.gets()
+        return cachedPlans.map((cp: CachedPlan) => {
+            let plan: Plan = cachedPlanToPlan(cp)
+            plan.nestedReadings = this.parseEncodedReadings(cp.readings)
+            return plan
+        })
+        //	addPlansToIndex(plans)
+    }
+
+    constructor() {
+        chapterApi.getBooknames().then((data) => {
+            this.booknames = data
+        })
+
+
     }
 
 }

@@ -2,24 +2,23 @@
 	import { plansPubSubService } from '$lib/services/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import Reading from '../components/reading.svelte';
-
-	import { getNextReadingIndex } from '$lib/utils/plan';
 	import { readingsApi } from '$lib/api/readings.api';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
 	import type { Sub, NextReading, BCV, NavPlan, CompletedReading } from '../models';
 	import { PLANS_VIEWS } from '../models';
+	import { plansDecodeService } from '$lib/services/plansDecode.service';
 
 	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight = $bindable() } = $props();
 
 	let NEXT_READING_ID: string = uuid4();
 	let nextReadingViewID = uuid4();
-	
-    let headerHeight = $state(0);
-    let nextReadings: NextReading[] = $state([]);
-	
-    let subsMap: Map<string, Sub> = new Map<string, Sub>();
-	
+
+	let headerHeight = $state(0);
+	let nextReadings: NextReading[] = $state([]);
+
+	let subsMap: Map<string, Sub> = new Map<string, Sub>();
+
 	function onCloseNextReadings() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
 	}
@@ -44,7 +43,6 @@
 
 		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
-
 	}
 
 	function updateNextReadings() {
@@ -88,15 +86,16 @@
 				return;
 			}
 			sub.completedReadings.set(plan.readingIndex, readingsData);
-			sub.nextReadingIndex = getNextReadingIndex(sub.completedReadings.keys().toArray());
+			sub.nextReadingIndex = plansDecodeService.getNextReadingIndex(
+				sub.completedReadings.keys().toArray()
+			);
 		}
 	}
 
 	async function onGetAllSubs(data: any) {
-        
 		if (data) {
-            subsMap = data.subs;
-		
+			subsMap = data.subs;
+
 			await onReturnPlan();
 			await updateNextReadings();
 		}
@@ -145,7 +144,7 @@
 {/snippet}
 
 <Header
-    bind:headerHeight
+	bind:headerHeight
 	title="Next Readings"
 	onClose={onCloseNextReadings}
 	bind:plansDisplay
