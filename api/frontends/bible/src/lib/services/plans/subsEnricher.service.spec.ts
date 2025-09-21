@@ -1,41 +1,8 @@
 import { assert, describe, expect, it } from "vitest";
-import { plansDecodeService } from "./plansDecode.service";
 import { NullCompletedReading, NullReadings, NullSub, type CompletedReading, type Sub } from "$lib/modules/plans/models";
+import { subsEnricherService } from "./subsEnricher.service";
 
 
-describe('verse rng', () => {
-    interface tt {
-        grp: string
-        expectedResult: number
-    }
-
-    let testTable: tt[] = [
-        {
-            grp: '1-b',
-            expectedResult: 0
-        },
-        {
-            grp: '1-1',
-            expectedResult: 1
-        },
-        {
-            grp: '1-2',
-            expectedResult: 2
-        },
-        {
-            grp: '1-31',
-            expectedResult: 31
-        }
-    ]
-
-    for (const t of testTable) {
-        it('should return correct total', () => {
-            
-            let result = plansDecodeService.sumVerseRange(t.grp)
-            assert.equal(result, t.expectedResult, `expected ${t.expectedResult} but got ${result}`)
-        })
-    }
-})
 
 
 
@@ -67,7 +34,7 @@ describe('path util functions', () => {
 
     for (const t of testTable) {
         it('returns next number in sequence', () => {
-            let result = plansDecodeService.getNextReadingIndex(t.completedReadings)
+            let result = subsEnricherService.getNextReadingIndex(t.completedReadings)
             assert.equal(result, t.expectedResult, `should have returned ${t.expectedResult} but got ${result} instead.`)
         })
     }
@@ -80,7 +47,7 @@ describe('path util functions', () => {
                 completedReading.set(cr, NullCompletedReading())
             }
             sub.completedReadings = completedReading
-            plansDecodeService.setNextReadingIndex(sub)
+            subsEnricherService.setNextReadingIndex(sub)
             assert.equal(
                 sub.nextReadingIndex,
                 t.expectedResult,
@@ -90,80 +57,6 @@ describe('path util functions', () => {
     }
 })
 
-describe('set total verses', () => {
-    it('should set totalVerses', () => {
-        let sub = NullSub();
-        sub.nestedReadings = [
-            {
-                totalVerses: 0,
-                bcvs: [
-                    {
-                        bookName: "",
-                        bookID: 0,
-                        chapter: 0,
-                        verses: "1-5",
-                        chapterKey: ""
-                    },
-                    {
-                        bookName: "",
-                        bookID: 0,
-                        chapter: 0,
-                        verses: "1-5",
-                        chapterKey: ""
-                    }
-                ]
-            },
-            {
-                totalVerses: 0,
-                bcvs: [
-                    {
-                        bookName: "",
-                        bookID: 0,
-                        chapter: 0,
-                        verses: "1-10",
-                        chapterKey: ""
-                    },
-                    {
-                        bookName: "",
-                        bookID: 0,
-                        chapter: 0,
-                        verses: "1-10",
-                        chapterKey: ""
-                    }
-                ]
-            },
-            {
-                totalVerses: 0,
-                bcvs: [
-                    {
-                        bookName: "",
-                        bookID: 0,
-                        chapter: 0,
-                        verses: "1-15",
-                        chapterKey: ""
-                    },
-                    {
-                        bookName: "",
-                        bookID: 0,
-                        chapter: 0,
-                        verses: "1-15",
-                        chapterKey: ""
-                    }
-                ]
-            },
-        ]
-
-        plansDecodeService.setTotalVerses(sub)
-
-        sub.nestedReadings.forEach((r, idx) => {
-            assert.equal(
-                r.totalVerses,
-                (idx + 1) * 10,
-                `expected ${idx * 10} but got ${r.totalVerses}`
-            )
-        })
-    })
-})
 
 describe('set percent complete', () => {
     it('should set percent complete', () => {
@@ -216,7 +109,7 @@ describe('set percent complete', () => {
                 index += 1
             }
 
-            plansDecodeService.setPercentComplete(sub)
+            subsEnricherService.setPercentComplete(sub)
             assert.equal(
                 sub.percentCompleted,
                 t.expectedResult,

@@ -1239,7 +1239,7 @@ export class BibleNavigationService {
 			});
 		}
 		for (const [key, value] of Object.entries(this.bookNames['shortNames'])) {
-			if (shortBook.toLowerCase() === value.toLowerCase()) {
+			if (shortBook.toLowerCase() === (value as string).toLowerCase()) {
 				return key + '_' + chapter;
 			}
 		}

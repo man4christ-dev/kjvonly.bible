@@ -8,7 +8,7 @@
 	import SubsDetails from './subsDetails.svelte';
 	import SubsList from './subsList.svelte';
 	import uuid4 from 'uuid4';
-	import { plansDecodeService } from '$lib/services/plansDecode.service';
+		import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 
 	let {
 		plansDisplay = $bindable(),
@@ -41,7 +41,7 @@
 			}
 
 			sub.completedReadings.set(plan.readingIndex, readingsData);
-			sub.nextReadingIndex = plansDecodeService.getNextReadingIndex(
+			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				Object.keys(sub.completedReadings).map((v) => parseInt(v))
 			);
 			console.log('before');

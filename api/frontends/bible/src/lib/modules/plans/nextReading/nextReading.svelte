@@ -7,7 +7,8 @@
 	import Header from '../components/header.svelte';
 	import type { Sub, NextReading, BCV, NavPlan, CompletedReading } from '../models';
 	import { PLANS_VIEWS } from '../models';
-	import { plansDecodeService } from '$lib/services/plansDecode.service';
+	import { plansDecoderService } from '$lib/services/plans/plansDecoder.service';
+	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 
 	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight = $bindable() } = $props();
 
@@ -86,7 +87,7 @@
 				return;
 			}
 			sub.completedReadings.set(plan.readingIndex, readingsData);
-			sub.nextReadingIndex = plansDecodeService.getNextReadingIndex(
+			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				sub.completedReadings.keys().toArray()
 			);
 		}

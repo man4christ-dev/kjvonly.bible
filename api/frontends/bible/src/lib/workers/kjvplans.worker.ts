@@ -1,7 +1,8 @@
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import {  NullPlan, type CachedSub, type CompletedReading, type Plan, type Sub } from '$lib/modules/plans/models';
-import { plansDecodeService } from '$lib/services/plansDecode.service';
+import { plansDecoderService } from '$lib/services/plans/plansDecoder.service';
+import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 import FlexSearch from 'flexsearch';
 
 let workerHasInitialized = false
@@ -33,7 +34,7 @@ let completedReadings: Map<string, CompletedReading> = new Map()
 
 //=================== INIT  =======================
 async function init() {
-	let plans = await plansDecodeService.decodePlans()
+	let plans = await plansDecoderService.decodePlans()
 	await initializePlans(plans)
 	await initializeSubs()
 	await initializeCompletedReadings()
@@ -52,7 +53,7 @@ async function initializePlans(newPlans: Plan[]) {
 }
 
 async function initializeSubs() {
-	let cachedSubs: CachedSub[] = await subsApi.gets()
+	let cachedSubs: any[] = await subsApi.gets()
 	for (let i = 0; i < cachedSubs.length; i++) {
 		let s = cachedSubs[i]
 		await subsDocument.addAsync(s.id, s);
@@ -84,9 +85,8 @@ async function enrichSub(sub: Sub | undefined) {
 	if (sub) {
 		await setCompletedReadings(sub)
 		setSubPlanData(sub)
-		plansDecodeService.setNextReadingIndex(sub)
-		plansDecodeService.setPercentComplete(sub)
-		plansDecodeService.setTotalVerses(sub)
+		subsEnricherService.setNextReadingIndex(sub)
+		subsEnricherService.setPercentComplete(sub)
 	}
 }
 

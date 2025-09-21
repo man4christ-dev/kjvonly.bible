@@ -41,7 +41,7 @@
 
 		let sortedKeys: any = [];
 		if (checked.length > 1) {
-			sortedKeys = checked.sort((a, b) => {
+			sortedKeys = checked.sort((a: any, b: any) => {
 				return parseInt(a) - parseInt(b);
 			});
 		} else {
@@ -55,7 +55,7 @@
 
 		let buckets = [];
 		let range: string[] = [];
-		sortedKeys.forEach((k) => {
+		sortedKeys.forEach((k: any) => {
 			if (k - lastKey > 1) {
 				buckets.push(range);
 				range = [k];

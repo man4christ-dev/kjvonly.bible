@@ -2,11 +2,10 @@ import { chapterApi } from "$lib/api/chapters.api"
 import { plansApi } from "$lib/api/plans.api"
 import { cachedPlanToPlan, type BCV, type Booknames, type CachedPlan, type Plan, type Readings, type Sub } from "$lib/modules/plans/models"
 
-export class PlansDecodeService {
+export class PlansDecoderService {
 
     booknames: any
 
-    // ====================== SUBS ==========================
     /**
      * Parse start and end verse. 
      * 
@@ -53,54 +52,12 @@ export class PlansDecodeService {
      * 
      * @param sub subscription
      */
-    setTotalVerses(sub: Sub) {
-        sub.nestedReadings.forEach(r => {
-            let totalVerses = r.bcvs
-                .map(b => this.sumVerseRange(b.verses))
-                .reduce((a, b) => a + b)
-            r.totalVerses = totalVerses
-        })
+    setTotalVerses(bcvs: BCV[]) {
+        return bcvs
+            .map(b => this.sumVerseRange(b.verses))
+            .reduce((a, b) => a + b)
     }
 
-    /**
-     * 
-     * Given an array of completed reading indexes
-     * return the next reading to read. Note users
-     * could read out of order. Regardless of the 
-     * latest reading return the lowest incomplete
-     * reading index.
-     * 
-     * @param completedReadingIndexes completed reading indexes
-     * @returns lowest incomplete reading index
-     */
-    getNextReadingIndex(completedReadings: number[]): number {
-        return completedReadings
-            .sort((a, b) => a - b)
-            .map((i, idx) => ({
-                readingIndex: i,
-                arrayIndex: idx
-            }))
-            .filter((i, idx) => i.readingIndex != idx)
-            .at(0)?.arrayIndex || completedReadings.length
-    }
-
-    /**
-     * Subscription have a next reading. The next reading is the lowest incomplete
-     * reading index in the plan. Readings are 0 indexed stored in an array of the plan.
-     * This function sets the next reading to the lowest incomplete reading index.
-     * @param sub subscription
-     *
-     */
-    setNextReadingIndex(sub: Sub) {
-        sub.nextReadingIndex = this.getNextReadingIndex(sub.completedReadings.keys().toArray())
-    }
-
-
-    setPercentComplete(sub: Sub) {
-        sub.percentCompleted = Math.ceil(sub.completedReadings.size / sub.nestedReadings.length * 100)
-    }
-
-    // ========================== Plans =============================
     decodeReadings(encodedReadings: string): BCV[] {
         return encodedReadings.split(';').map(r => {
             let bcv = r.split('/')
@@ -116,9 +73,10 @@ export class PlansDecodeService {
 
     parseEncodedReadings(encodedReadings: string[]): Readings[] {
         return encodedReadings.map((ers: string) => {
+            let bcvs = this.decodeReadings(ers);
             return {
-                bcvs: this.decodeReadings(ers),
-                totalVerses: 0
+                bcvs: bcvs,
+                totalVerses: this.setTotalVerses(bcvs)
             }
         })
     }
@@ -142,4 +100,4 @@ export class PlansDecodeService {
 
 }
 
-export let plansDecodeService = new PlansDecodeService()
+export const plansDecoderService = new PlansDecoderService()
