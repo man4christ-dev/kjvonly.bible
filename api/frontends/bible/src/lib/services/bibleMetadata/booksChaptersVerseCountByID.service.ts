@@ -8,7 +8,11 @@ export class BooksChaptersVerseCountByIDService {
 		return book;
 	}
 
-	map = new Map([
+	keys(): string[] {
+		return this.map.keys().toArray();
+	}
+
+	private map = new Map([
 		[
 			'1',
 			new Map([

@@ -1,10 +1,10 @@
-import { chapterApi } from '$lib/api/chapters.api';
 import type { BCV, CachedPlan, Readings } from '$lib/modules/plans/models';
 import { bookNamesByIDService } from '../bibleMetadata/bookNamesByID.service';
 
 /**
  * {@link CachedPlan.readings} are stored encoded in the backend. This service decodes the
- * plan {@link CachedPlan.readings}[] (a string[]) to {@link Readings}[] that include an array of {@link BCV}[]
+ * plan {@link CachedPlan.readings}[] (a string[]) to {@link Readings}[] that include an
+ * array of {@link BCV}[]
  * (i.e. book chapter verses) that contain all grouped readings a user would
  * read in together in sequence.
  *
@@ -92,14 +92,6 @@ import { bookNamesByIDService } from '../bibleMetadata/bookNamesByID.service';
  *
  * */
 export class EncodedReadingsDecoderService {
-	booknames: any;
-
-	constructor() {
-		chapterApi.getBooknames().then((data) => {
-			this.booknames = data;
-		});
-	}
-
 	/**
 	 *	Loops through all encoded readings decoding them and setting
 	 *  total verses.

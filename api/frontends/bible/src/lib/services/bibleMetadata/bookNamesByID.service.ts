@@ -8,6 +8,10 @@ export class BookNamesByIDService {
 		return bookName;
 	}
 
+	keys(): string[] {
+		return this.map.keys().toArray();
+	}
+
 	map = new Map([
 		['1', 'Genesis'],
 		['2', 'Exodus'],

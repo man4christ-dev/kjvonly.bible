@@ -1,4 +1,4 @@
-export class BookNamesByIDService {
+export class BookIDByBookNameService {
 	get(id: string): string {
 		let bookName = this.map.get(id);
 		if (!bookName) {
@@ -6,6 +6,10 @@ export class BookNamesByIDService {
 			console.log(`error retrieving book name by id. Invalid id ${id}`);
 		}
 		return bookName;
+	}
+
+	keys(): string[] {
+		return this.map.keys().toArray();
 	}
 
 	map = new Map([
@@ -78,4 +82,4 @@ export class BookNamesByIDService {
 	]);
 }
 
-export const bookNamesByIDService = new BookNamesByIDService();
+export const bookIDByBookNameService = new BookIDByBookNameService();

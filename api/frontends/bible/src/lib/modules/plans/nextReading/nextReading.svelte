@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { plansPubSubService } from '$lib/services/plansPubSub.service';
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import Reading from '../components/reading.svelte';
 	import { readingsApi } from '$lib/api/readings.api';

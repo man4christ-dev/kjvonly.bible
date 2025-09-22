@@ -5,6 +5,7 @@
 	import '../../node_modules/quill/dist/quill.snow.css';
 	import { syncService } from '$lib/services/sync.service';
 	import { authService } from '$lib/services/auth.service';
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 
 	function register() {
 		// Listen for connection coming online
@@ -30,7 +31,7 @@
 	onMount(async () => {
 		/* This pulls the chapter and strongs data from api and stores in indexdb for offline use. */
 		await syncService.init();
-
+		plansPubSubService.init();
 		if (authService.isLoggedIn()) {
 			register();
 			setTimeout(() => {

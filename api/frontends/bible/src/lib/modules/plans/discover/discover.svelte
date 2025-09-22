@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { plansPubSubService } from '$lib/services/plansPubSub.service';
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
@@ -10,7 +10,7 @@
 	let {
 		plansDisplay = $bindable(),
 		clientHeight = $bindable(),
-		paneId=$bindable(),
+		paneId = $bindable(),
 		pane = $bindable()
 	} = $props();
 
@@ -38,7 +38,7 @@
 			planList = plansMap
 				.values()
 				.toArray()
-				.sort((a: Plan, b: Plan) => a.dateCreated - b.dateCreated)
+				.sort((a: Plan, b: Plan) => a.dateCreated - b.dateCreated);
 		}
 	}
 
@@ -47,7 +47,11 @@
 	});
 
 	onMount(() => {
-		plansPubSubService.subscribe('getAllPlans', onGetAllPlans, PLAN_SUBSCRIBER_ID);
+		plansPubSubService.subscribe(
+			'getAllPlans',
+			onGetAllPlans,
+			PLAN_SUBSCRIBER_ID
+		);
 		plansPubSubService.getAllPlans();
 	});
 
@@ -81,7 +85,10 @@
 		title="Discover Plans"
 		onClose={onClosePlansList}
 		bind:plansDisplay
-		menuDropdownToggleViews={[PLANS_VIEWS.PLANS_ACTIONS, PLANS_VIEWS.PLANS_LIST]}
+		menuDropdownToggleViews={[
+			PLANS_VIEWS.PLANS_ACTIONS,
+			PLANS_VIEWS.PLANS_LIST
+		]}
 	></Header>
 
 	<div class="w-full max-w-lg">
@@ -99,12 +106,15 @@
 		title="Discover Plans"
 		onClose={() => {}}
 		bind:plansDisplay
-		menuDropdownToggleViews={[PLANS_VIEWS.PLANS_LIST, PLANS_VIEWS.PLANS_ACTIONS]}
+		menuDropdownToggleViews={[
+			PLANS_VIEWS.PLANS_LIST,
+			PLANS_VIEWS.PLANS_ACTIONS
+		]}
 	></Header>
 	<div class="flex w-full max-w-lg">
 		<div
-			style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight -
-				headerHeight}px"
+			style="max-height: {clientHeight -
+				headerHeight}px; min-height: {clientHeight - headerHeight}px"
 			class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 		>
 			<!-- {@render today()} -->

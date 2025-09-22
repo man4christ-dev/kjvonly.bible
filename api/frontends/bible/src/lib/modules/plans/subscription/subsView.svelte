@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { readingsApi } from '$lib/api/readings.api';
-	import { plansPubSubService } from '$lib/services/plansPubSub.service';
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import type { CompletedReading, NavPlan, Sub } from '../models';
 	import { NullSub, PLANS_VIEWS } from '../models';
@@ -8,7 +8,7 @@
 	import SubsDetails from './subsDetails.svelte';
 	import SubsList from './subsList.svelte';
 	import uuid4 from 'uuid4';
-		import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
+	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 
 	let {
 		plansDisplay = $bindable(),
@@ -69,16 +69,32 @@
 	});
 
 	onMount(() => {
-		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, PLAN_SUBSCRIBER_ID);
+		plansPubSubService.subscribe(
+			'getAllSubs',
+			onGetAllSubs,
+			PLAN_SUBSCRIBER_ID
+		);
 		plansPubSubService.getAllSubs();
 	});
 </script>
 
 {#if plansDisplay === PLANS_VIEWS.SUBS_LIST}
-	<SubsList bind:paneId bind:clientHeight bind:pane bind:plansDisplay bind:selectedSub bind:subsList
+	<SubsList
+		bind:paneId
+		bind:clientHeight
+		bind:pane
+		bind:plansDisplay
+		bind:selectedSub
+		bind:subsList
 	></SubsList>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
 	<SubsAction bind:plansDisplay bind:pane bind:clientHeight paneId></SubsAction>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_DETAILS}
-	<SubsDetails paneId bind:clientHeight bind:pane bind:plansDisplay bind:selectedSub></SubsDetails>
+	<SubsDetails
+		paneId
+		bind:clientHeight
+		bind:pane
+		bind:plansDisplay
+		bind:selectedSub
+	></SubsDetails>
 {/if}
