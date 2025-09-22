@@ -1,3 +1,5 @@
+import { Buffer } from '$lib/models/buffer.model';
+
 export const PLANS_VIEWS = {
 	PLANS_LIST: 'PLANS_LIST',
 	PLANS_ACTIONS: 'PLANS_ACTION',
@@ -10,20 +12,34 @@ export const PLANS_VIEWS = {
 	NEXT_LIST: 'NEXT_LIST'
 };
 
+/**
+ * When a user selects a reading for a subscription, the app routes to the bible
+ * module. The bible module will check the {@link Buffer.bag} for a plan
+ * variable. If it exists the bible module restricts the module to only display
+ * the {@link BCV}[] in the readings.
+ */
 export interface NavPlan {
-	reading: BCV[];
+	reading: BCV[]; // TODO update this to readings plural
 	currentReadingsIndex: number;
 	subID: string;
-	readingIndex: number;
+	readingIndex: number; //TODO update this to readingsIndex plural
 	returnView: string;
 }
 
 /**
- * bookName: "Genesis",
- * bookID: 1,
- * chapter: 1,
- * verses: "1-31",
- * chapterKey: "1_1_1-31"
+ * TODO pull out to common models.
+ *
+ * BCV is an abbreviation for Book, Chapter, Verse[s]. BCV contains metadata
+ * associated to the Book Chapter verse.
+ *
+ * @example
+ * let bcv: BCV {
+ *      bookName: "Genesis",
+ *      bookID: 1,
+ *      chapter: 1,
+ *      verses: "1-31",
+ *      chapterKey: "1_1_1-31"
+ * }
  */
 export interface BCV {
 	bookName: string;
@@ -33,7 +49,14 @@ export interface BCV {
 	chapterKey: string;
 }
 
+/**
+ * Readings consist of the {@link BCV}[] (book, chapter, verses) to read. The
+ * {@link BCV}s
+ */
 export interface Readings {
+	// TODO move totalVerses to new interface
+	// TODO add a date field to track when the reading should be completed if
+	//      user desires a scheduled plan vs tracked reading.
 	totalVerses: number;
 	bcvs: BCV[];
 }
@@ -118,6 +141,22 @@ export interface CachedSub {
 	version: number;
 }
 
+export function cachedSubToSub(cs: CachedSub): Sub {
+	return {
+		id: cs.id,
+		planID: cs.planID,
+		userID: cs.userID,
+		dateSubscribed: cs.dateSubscribed,
+		version: cs.version,
+		name: '',
+		description: [],
+		nestedReadings: [],
+		completedReadings: new Map(),
+		nextReadingIndex: 0,
+		percentCompleted: 0
+	};
+}
+
 export interface Sub extends CachedSub {
 	id: string;
 	planID: string;
@@ -131,7 +170,7 @@ export interface Sub extends CachedSub {
 	nestedReadings: Readings[];
 	completedReadings: Map<number, CompletedReading>;
 	//plan: Plan;
-	nextReadingIndex: number;
+	nextReadingIndex: number; // TODO update name to nextReadingsIndex
 	percentCompleted: number;
 }
 

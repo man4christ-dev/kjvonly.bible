@@ -3,6 +3,7 @@ import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import {
 	cachedPlanToPlan,
+	cachedSubToSub,
 	NullPlan,
 	type CachedPlan,
 	type CachedSub,
@@ -15,6 +16,14 @@ import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 import FlexSearch from 'flexsearch';
 
 let workerHasInitialized = false;
+
+// ================================ PLANS DATA =================================
+
+let plans: Map<string, Plan> = new Map();
+let subs: Map<string, Sub> = new Map();
+let completedReadings: Map<string, CompletedReading> = new Map();
+
+// ================================ FLEX DOCS ==================================
 
 let plansDocument = new FlexSearch.Document({
 	document: {
@@ -37,11 +46,8 @@ let completedReadingsDocument = new FlexSearch.Document({
 	}
 });
 
-let plans: Map<string, Plan> = new Map();
-let subs: Map<string, Sub> = new Map();
-let completedReadings: Map<string, CompletedReading> = new Map();
+// ================================== INIT =====================================
 
-//=================== INIT  =======================
 async function init() {
 	await initializePlans();
 	await initializeSubs();
@@ -55,43 +61,47 @@ async function init() {
 
 async function initializePlans() {
 	let cachedPlans: CachedPlan[] = await plansApi.gets();
-	let enrichedPlans = cachedPlans.map((cp: CachedPlan) => {
-		let plan = cachedPlanToPlan(cp);
-		plan.nestedReadings = encodedReadingsDecoderService.parseEncodedReadings(
+	for (let cp of cachedPlans) {
+		let p = cachedPlanToPlan(cp);
+		p.nestedReadings = encodedReadingsDecoderService.parseEncodedReadings(
 			cp.readings
 		);
-		return plan;
-	});
-
-	for (let p of enrichedPlans) {
 		await plansDocument.addAsync(p.id, p);
 		plans.set(p.id, p);
 	}
 }
 
 async function initializeSubs() {
-	let cachedSubs: any[] = await subsApi.gets();
-	for (let i = 0; i < cachedSubs.length; i++) {
-		let s = cachedSubs[i];
+	let cachedSubs: CachedSub[] = await subsApi.gets();
+	for (let cs of cachedSubs) {
+		let s = cachedSubToSub(cs);
 		await subsDocument.addAsync(s.id, s);
 		subs.set(s.id, s);
 	}
 }
 
-// CORE NOTE: Reading ids are composite primary keys subID & id
-// id is just the index in of the reading plan. FlexSearch id
-// is <subid>/<id> for a reading
 async function initializeCompletedReadings() {
 	let cachedReadings = await readingsApi.gets();
-	for (let i = 0; i < cachedReadings.length; i++) {
-		let r = cachedReadings[i];
+	for (let r of cachedReadings) {
 		await completedReadingsDocument.addAsync(r.id, r);
 		completedReadings.set(r.id, r);
 	}
 }
 
-//=================== SUB =======================
+// =================================== SUB =====================================
 
+/**
+ * User subs are stored normalized in the DB. The Sub readings data exists in
+ * the initialized {@link plans} and can be looked up by the {@link Sub.planID}.
+ *  Users progress on a subscription is determined by the
+ * {@link completedReadings} for the subscription. {@link CompletedReading} are
+ * stored in the DB with an ID of <SubID/ReadingsIndex> and a SubID column.
+ * Enriching the sub includes fetching the {@link completedReading} for the Sub
+ * and assigning it to {@link Sub.completedReadings} field. Additionally, other
+ * useful data is added to the Sub such as {@link Sub.nextReadingIndex} and
+ *  {@link Sub.percentCompleted}.
+ *
+ * */
 async function enrichSubs() {
 	for (let [_, sub] of subs) {
 		await enrichSub(sub);
@@ -136,7 +146,7 @@ function setSubPlanData(sub: Sub) {
 	sub.name = plan.name;
 }
 
-// ======================== PUB SUB ==========================
+// ================================== PUB SUB ==================================
 
 function addPlan(planID: string, plan: any) {
 	plans.set(planID, plan);
@@ -214,6 +224,8 @@ function getAllReadings() {
 	}
 }
 
+// ================================= ONMESSAGE =================================
+
 onmessage = async (e) => {
 	switch (e.data.action) {
 		case 'init':
@@ -258,4 +270,7 @@ onmessage = async (e) => {
 	}
 };
 
+/**
+ * Initialize worker on start
+ */
 init();

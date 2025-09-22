@@ -1,2 +1,4 @@
 ◊ replace all booknames references with bible metadata service
 ◊ create enums for PlansPubSubService actions and ids
+◊ update Sub field name to nextReadingsIndex
+◊ move BCV interface to common models
