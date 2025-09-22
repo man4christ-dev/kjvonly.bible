@@ -1,7 +1,10 @@
+import { plansApi } from '$lib/api/plans.api';
 import { readingsApi } from '$lib/api/readings.api';
 import { subsApi } from '$lib/api/subs.api';
 import {
+	cachedPlanToPlan,
 	NullPlan,
+	type CachedPlan,
 	type CachedSub,
 	type CompletedReading,
 	type Plan,
@@ -40,8 +43,7 @@ let completedReadings: Map<string, CompletedReading> = new Map();
 
 //=================== INIT  =======================
 async function init() {
-	let plans = await encodedReadingsDecoderService.decodePlans();
-	await initializePlans(plans);
+	await initializePlans();
 	await initializeSubs();
 	await initializeCompletedReadings();
 	await enrichSubs();
@@ -51,8 +53,17 @@ async function init() {
 	publishSubs();
 }
 
-async function initializePlans(newPlans: Plan[]) {
-	for (let p of newPlans) {
+async function initializePlans() {
+	let cachedPlans: CachedPlan[] = await plansApi.gets();
+	let enrichedPlans = cachedPlans.map((cp: CachedPlan) => {
+		let plan = cachedPlanToPlan(cp);
+		plan.nestedReadings = encodedReadingsDecoderService.parseEncodedReadings(
+			cp.readings
+		);
+		return plan;
+	});
+
+	for (let p of enrichedPlans) {
 		await plansDocument.addAsync(p.id, p);
 		plans.set(p.id, p);
 	}

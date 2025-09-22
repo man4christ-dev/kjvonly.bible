@@ -1,12 +1,5 @@
 import { chapterApi } from '$lib/api/chapters.api';
-import { plansApi } from '$lib/api/plans.api';
-import {
-	cachedPlanToPlan,
-	type BCV,
-	type CachedPlan,
-	type Plan,
-	type Readings
-} from '$lib/modules/plans/models';
+import type { BCV, CachedPlan, Readings } from '$lib/modules/plans/models';
 
 /**
  * {@link CachedPlan.readings} are stored encoded in the backend. This service decodes the
@@ -107,25 +100,14 @@ export class EncodedReadingsDecoderService {
 	}
 
 	/**
-	 * Retrieves stashed plans and decodes the encoded readings
-	 *
-	 * @returns @{@link Plan}[]
-	 */
-	async decodePlans(): Promise<Plan[]> {
-		let cachedPlans: CachedPlan[] = await plansApi.gets();
-		return cachedPlans.map((cp: CachedPlan) => {
-			let plan: Plan = cachedPlanToPlan(cp);
-			plan.nestedReadings = this.parseEncodedReadings(cp.readings);
-			return plan;
-		});
-	}
-
-	/**
 	 *	Loops through all encoded readings decoding them and setting
 	 *  total verses.
 	 *
+	 *	encoded readings example: 1/1/1-31;47/1/1-25;15/1/1-11;51/1/1-26
+	 *
 	 * @param encodedReadings
 	 * @returns list of {@link Readings}[]
+	 *
 	 */
 	parseEncodedReadings(encodedReadings: string[]): Readings[] {
 		return encodedReadings.map((ers: string) => {
