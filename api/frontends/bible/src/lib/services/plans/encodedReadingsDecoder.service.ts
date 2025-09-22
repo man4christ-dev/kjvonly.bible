@@ -1,6 +1,6 @@
 import { chapterApi } from '$lib/api/chapters.api';
 import type { BCV, CachedPlan, Readings } from '$lib/modules/plans/models';
-import { bookNamesByIDService } from '../bcvMappings/bookNamesByID.service';
+import { bookNamesByIDService } from '../bibleMetadata/bookNamesByID.service';
 
 /**
  * {@link CachedPlan.readings} are stored encoded in the backend. This service decodes the
