@@ -1,5 +1,6 @@
 import { chapterApi } from '$lib/api/chapters.api';
 import type { BCV, CachedPlan, Readings } from '$lib/modules/plans/models';
+import { bookNamesByIDService } from '../bcvMappings/bookNamesByID.service';
 
 /**
  * {@link CachedPlan.readings} are stored encoded in the backend. This service decodes the
@@ -129,7 +130,7 @@ export class EncodedReadingsDecoderService {
 		return encodedReadings.split(';').map((r) => {
 			let bcv = r.split('/');
 			return {
-				bookName: this.booknames['booknamesById'][bcv[0]],
+				bookName: bookNamesByIDService.get(bcv[0]),
 				bookID: parseInt(bcv[0]),
 				chapter: parseInt(bcv[1]),
 				verses: bcv[2],

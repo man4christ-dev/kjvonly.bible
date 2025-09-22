@@ -156,6 +156,6 @@ describe('parseEncodedReadings', () => {
 		let nestedReadings =
 			encodedReadingsDecoderService.parseEncodedReadings(encodedReadings);
 
-		expect(nestedReadings).toBe(expectedReadings);
+		expect(nestedReadings).toMatchObject(expectedReadings);
 	});
 });

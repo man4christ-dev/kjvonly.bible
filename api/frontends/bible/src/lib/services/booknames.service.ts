@@ -1595,3 +1595,19 @@ let booknamesJson = `{
     }
   }
 }`;
+
+
+interface BookNames {
+        booknamesById: Map
+        booknamesByName: new Map(Object.entries(booknames['booknamesByName'])),
+        shortNames: new Map(Object.entries(booknames['shortNames'])),
+        maxChapterById: new Map(Object.entries(booknames['maxChapterById'])),
+        bookchapterversecountById: vc
+}
+let bn: Booknames = {
+			booknamesById: new Map(Object.entries(booknames['booknamesById'])),
+			booknamesByName: new Map(Object.entries(booknames['booknamesByName'])),
+			shortNames: new Map(Object.entries(booknames['shortNames'])),
+			maxChapterById: new Map(Object.entries(booknames['maxChapterById'])),
+			bookchapterversecountById: vc
+		}
