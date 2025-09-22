@@ -2,10 +2,6 @@ import { assert, describe, expect, it } from "vitest";
 import { NullCompletedReading, NullReadings, NullSub, type CompletedReading, type Sub } from "$lib/modules/plans/models";
 import { subsEnricherService } from "./subsEnricher.service";
 
-
-
-
-
 describe('path util functions', () => {
     interface tt {
         completedReadings: number[]

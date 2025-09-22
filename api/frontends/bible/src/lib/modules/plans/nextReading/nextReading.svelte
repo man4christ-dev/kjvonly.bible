@@ -5,12 +5,21 @@
 	import { readingsApi } from '$lib/api/readings.api';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
-	import type { Sub, NextReading, BCV, NavPlan, CompletedReading } from '../models';
+	import type {
+		Sub,
+		NextReading,
+		BCV,
+		NavPlan,
+		CompletedReading
+	} from '../models';
 	import { PLANS_VIEWS } from '../models';
-	import { plansDecoderService } from '$lib/services/plans/plansDecoder.service';
 	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 
-	let { pane = $bindable(), plansDisplay = $bindable(), clientHeight = $bindable() } = $props();
+	let {
+		pane = $bindable(),
+		plansDisplay = $bindable(),
+		clientHeight = $bindable()
+	} = $props();
 
 	let NEXT_READING_ID: string = uuid4();
 	let nextReadingViewID = uuid4();
@@ -154,7 +163,8 @@
 <div class="flex w-full max-w-lg">
 	<div
 		id="{nextReadingViewID}-scroll-container"
-		style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight - headerHeight}px"
+		style="max-height: {clientHeight -
+			headerHeight}px; min-height: {clientHeight - headerHeight}px"
 		class="flex w-full max-w-lg flex-col overflow-x-hidden overflow-y-scroll bg-neutral-50"
 	>
 		{#if nextReadings.length > 0}
