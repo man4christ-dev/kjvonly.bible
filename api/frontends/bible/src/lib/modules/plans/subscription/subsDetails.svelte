@@ -43,8 +43,11 @@
 		subListReadingsToShow += count;
 	}
 
-	function onSelectedSubReading(idx: number, returnView: string) {
-		let readings: Readings = selectedSub.nestedReadings[idx];
+	function onSelectedSubReading(
+		subNestedReadingsIndex: number,
+		returnView: string
+	) {
+		let readings: Readings = selectedSub.nestedReadings[subNestedReadingsIndex];
 		readings.bcvs = readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r as BCV;
@@ -52,10 +55,10 @@
 
 		let np: NavReadings = {
 			subID: selectedSub.id,
-			returnView: returnView,
+			subNestedReadingsIndex: subNestedReadingsIndex,
 			readings: readings,
-			currentReadingsIndex: 0,
-			selectedReadingsIndex: idx
+			currentNavReadingsIndex: 0,
+			returnView: returnView
 		};
 
 		pane.buffer.bag.navReadings = np;

@@ -43,10 +43,10 @@
 
 		let nr: NavReadings = {
 			subID: nrs.subID,
-			returnView: returnView,
+			subNestedReadingsIndex: nrs.subReadingsIndex,
 			readings: readings,
-			currentReadingsIndex: 0,
-			selectedReadingsIndex: nrs.readingIndex
+			currentNavReadingsIndex: 0,
+			returnView: returnView
 		};
 
 		pane.buffer.bag.navReadings = nr;
@@ -66,7 +66,7 @@
 					planDateCreated: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
 					name: sub.name,
 					percentCompleted: sub.percentCompleted,
-					readingIndex: sub.nextReadingIndex,
+					subReadingsIndex: sub.nextReadingIndex,
 					totalReadings: sub.nestedReadings.length,
 					subID: sub.id
 				};
@@ -82,8 +82,8 @@
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
 			let cr: CompletedReading = {
-				id: `${nr.subID}/${nr.selectedReadingsIndex}`,
-				index: nr.selectedReadingsIndex,
+				id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
+				index: nr.subNestedReadingsIndex,
 				subID: nr.subID,
 				version: 0
 			};
@@ -94,7 +94,7 @@
 			if (!sub) {
 				return;
 			}
-			sub.completedReadings.set(nr.selectedReadingsIndex, cr);
+			sub.completedReadings.set(nr.subNestedReadingsIndex, cr);
 			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				sub.completedReadings.keys().toArray()
 			);
@@ -139,7 +139,7 @@
 				<div class="flex w-full">
 					<span class="flex flex-grow"></span>
 					<div class="text-lg">
-						{n.readingIndex + 1} of {n.totalReadings}
+						{n.subReadingsIndex + 1} of {n.totalReadings}
 					</div>
 				</div>
 				<div class="flex w-full justify-end">

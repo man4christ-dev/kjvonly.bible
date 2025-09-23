@@ -7,10 +7,10 @@ import type { BCV } from './bible.model';
  * the {@link BCV}[] in the readings.
  */
 export interface NavReadings {
-	readings: Readings;
-	currentReadingsIndex: number;
 	subID: string;
-	selectedReadingsIndex: number;
+	subNestedReadingsIndex: number;
+	readings: Readings;
+	currentNavReadingsIndex: number;
 	returnView: string;
 }
 
@@ -39,11 +39,11 @@ export function NullReadings(): Readings {
 
 export interface NextReadings {
 	subID: string;
+	name: string;
 	readings: Readings;
 	planDateCreated: number; // This should be date subscribed
-	name: string;
 	percentCompleted: number;
-	readingIndex: number;
+	subReadingsIndex: number;
 	totalReadings: number;
 }
 

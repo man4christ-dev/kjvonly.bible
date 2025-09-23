@@ -68,23 +68,23 @@
 
 	async function _nextPlanChapter() {
 		let plan: NavReadings = mode.navReadings;
-		let ci = plan.currentReadingsIndex;
+		let ci = plan.currentNavReadingsIndex;
 		let nextIndex = ci + 1;
 		if (nextIndex > plan.readings.bcvs.length - 1) {
 			pane.updateBuffer('Plans');
 		} else {
-			plan.currentReadingsIndex = nextIndex;
+			plan.currentNavReadingsIndex = nextIndex;
 			chapterKey = plan.readings.bcvs[nextIndex].chapterKey;
 		}
 	}
 
 	async function _previousPlanChapter() {
-		let plan: NavReadings = mode.navReadings;
-		let ci = plan.currentReadingsIndex;
+		let nr: NavReadings = mode.navReadings;
+		let ci = nr.currentNavReadingsIndex;
 		let nextIndex = ci - 1;
 		if (nextIndex >= 0) {
-			plan.currentReadingsIndex = nextIndex;
-			chapterKey = plan.readings.bcvs[nextIndex].chapterKey;
+			nr.currentNavReadingsIndex = nextIndex;
+			chapterKey = nr.readings.bcvs[nextIndex].chapterKey;
 		}
 	}
 

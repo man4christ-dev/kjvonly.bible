@@ -14,7 +14,7 @@
 	function rowClicked(e: any, r: any, idx: number) {
 		e.stopPropagation();
 		let nr: NavReadings = navReadings;
-		nr.currentReadingsIndex = idx;
+		nr.currentNavReadingsIndex = idx;
 		chapterKey = r.chapterKey;
 		showNavReadingsPopup = false;
 	}

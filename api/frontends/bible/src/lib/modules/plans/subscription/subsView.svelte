@@ -28,24 +28,24 @@
 	let subsList: Sub[] = $state([]);
 
 	async function onReturnPlan() {
-		let plan: NavReadings = pane.buffer.bag?.navReadings;
-		if (plan) {
+		let nr: NavReadings = pane.buffer.bag?.navReadings;
+		if (nr) {
 			let readingsData: CompletedReading = {
-				id: `${plan.subID}/${plan.selectedReadingsIndex}`,
-				index: plan.selectedReadingsIndex,
-				subID: plan.subID,
+				id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
+				index: nr.subNestedReadingsIndex,
+				subID: nr.subID,
 				version: 0
 			};
 			await readingsApi.put(readingsData);
-			plansPubSubService.putReading(readingsData, plan.subID);
+			plansPubSubService.putReading(readingsData, nr.subID);
 
-			let sub = subsMap.get(plan.subID);
+			let sub = subsMap.get(nr.subID);
 			// SHOULD ALWAYS EXIST. MAKE COMPILER HAPPY
 			if (!sub) {
 				return;
 			}
 
-			sub.completedReadings.set(plan.selectedReadingsIndex, readingsData);
+			sub.completedReadings.set(nr.subNestedReadingsIndex, readingsData);
 			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				Object.keys(sub.completedReadings).map((v) => parseInt(v))
 			);
