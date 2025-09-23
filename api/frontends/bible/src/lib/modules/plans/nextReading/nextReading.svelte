@@ -10,7 +10,8 @@
 		NextReading,
 		BCV,
 		NavPlan,
-		CompletedReading
+		CompletedReading,
+		Readings
 	} from '../models';
 	import { PLANS_VIEWS } from '../models';
 	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
@@ -34,23 +35,24 @@
 	}
 
 	function onSelectedNextReading(idx: number, returnView: string) {
-		let nextReading: NextReading = nextReadings[idx];
-		let updReadings: BCV[] = nextReading.readings.bcvs.map((r: any) => {
+		let nrs: NextReading = nextReadings[idx];
+		let readings: Readings = nrs.readings;
+		readings.bcvs = readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r;
 		});
 
 		let np: NavPlan = {
-			reading: updReadings,
+			subID: nrs.subID,
+			returnView: returnView,
+			readings: readings,
 			currentReadingsIndex: 0,
-			subID: nextReading.subID,
-			readingIndex: nextReading.readingIndex,
-			returnView: returnView
+			readingIndex: nrs.readingIndex
 		};
 
 		pane.buffer.bag.plan = np;
 
-		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
+		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
 	}
 
@@ -131,7 +133,7 @@
 		</div>
 		<div class="flex flex-row">
 			<div class="min-w-50">
-				<Reading bind:planReading={n.reading}></Reading>
+				<Reading bind:planReading={n.readings.bcvs}></Reading>
 			</div>
 
 			<div class="flex w-full min-w-50 flex-col">
@@ -143,7 +145,7 @@
 				</div>
 				<div class="flex w-full justify-end">
 					<div class="text-base text-nowrap">
-						Verses: {n.totalVerses}
+						Verses: {n.readings.totalVerses}
 					</div>
 				</div>
 			</div>

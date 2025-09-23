@@ -19,7 +19,7 @@ export const PLANS_VIEWS = {
  * the {@link BCV}[] in the readings.
  */
 export interface NavPlan {
-	reading: BCV[]; // TODO update this to readings plural
+	readings: Readings; // TODO update this to readings plural
 	currentReadingsIndex: number;
 	subID: string;
 	readingIndex: number; //TODO update this to readingsIndex plural

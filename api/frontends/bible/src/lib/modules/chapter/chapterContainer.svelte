@@ -67,24 +67,24 @@
 	});
 
 	async function _nextPlanChapter() {
-		let plan: NavPlan = mode.plan
+		let plan: NavPlan = mode.plan;
 		let ci = plan.currentReadingsIndex;
 		let nextIndex = ci + 1;
-		if (nextIndex > plan.reading.length - 1) {
+		if (nextIndex > plan.readings.bcvs.length - 1) {
 			pane.updateBuffer('Plans');
 		} else {
 			plan.currentReadingsIndex = nextIndex;
-			chapterKey = plan.reading[nextIndex].chapterKey;
+			chapterKey = plan.readings.bcvs[nextIndex].chapterKey;
 		}
 	}
 
 	async function _previousPlanChapter() {
-		let plan: NavPlan = mode.plan
+		let plan: NavPlan = mode.plan;
 		let ci = plan.currentReadingsIndex;
 		let nextIndex = ci - 1;
 		if (nextIndex >= 0) {
 			plan.currentReadingsIndex = nextIndex;
-			chapterKey = plan.reading[nextIndex].chapterKey;
+			chapterKey = plan.readings.bcvs[nextIndex].chapterKey;
 		}
 	}
 
@@ -122,7 +122,8 @@
 		}
 
 		const threshold = 200; // Adjust this value as needed
-		const isReachBottom = el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+		const isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
 
 		if (isReachBottom) {
 			// this function will be called when window height changes i.e. changing a chapter.
@@ -189,7 +190,9 @@
 
 		if (pane?.buffer?.bag?.lastVerse) {
 			setTimeout(() => {
-				let vel = document.getElementById(`${id}-vno-${pane.buffer.bag.lastVerse}`);
+				let vel = document.getElementById(
+					`${id}-vno-${pane.buffer.bag.lastVerse}`
+				);
 				vel?.scrollIntoView({
 					behavior: 'instant',
 					block: 'center'
@@ -210,7 +213,11 @@
 			return false;
 		}}
 	>
-		<div {id} style="{containerHeight} {containerWidth}" class="overflow-y-scroll">
+		<div
+			{id}
+			style="{containerHeight} {containerWidth}"
+			class="overflow-y-scroll"
+		>
 			<div class="sticky top-0 z-[1500] flex w-full justify-center">
 				<ChapterActions
 					bind:mode
@@ -245,7 +252,10 @@
 		<div class="flex w-full justify-center">
 			<div class="w-full max-w-6xl">
 				{#if mode.value === ''}
-					<div style="transform: translate3d(0px, {buttonTopOffset}px, 0px);" class="sticky z-10">
+					<div
+						style="transform: translate3d(0px, {buttonTopOffset}px, 0px);"
+						class="sticky z-10"
+					>
 						<div class="absolute bottom-4 left-4">
 							<button
 								onclick={_previousChapter}
@@ -272,7 +282,10 @@
 							</button>
 						</div>
 					</div>
-					<div style="transform: translate3d(0px, {buttonTopOffset}px, 0px); " class="sticky z-10">
+					<div
+						style="transform: translate3d(0px, {buttonTopOffset}px, 0px); "
+						class="sticky z-10"
+					>
 						<div class="absolute right-4 bottom-4">
 							<button
 								onclick={_nextChapter}
@@ -301,7 +314,10 @@
 						</div>
 					</div>
 				{:else}
-					<div style="transform: translate3d(0px, 0px, 0px); " class="sticky z-10">
+					<div
+						style="transform: translate3d(0px, 0px, 0px); "
+						class="sticky z-10"
+					>
 						<div class="absolute bottom-0 w-full">
 							<EditOptions bind:mode bind:annotations></EditOptions>
 						</div>

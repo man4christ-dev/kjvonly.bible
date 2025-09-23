@@ -2,7 +2,13 @@
 	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS, type BCV, type NavPlan, type Readings, type Sub } from '../models';
+	import {
+		PLANS_VIEWS,
+		type BCV,
+		type NavPlan,
+		type Readings,
+		type Sub
+	} from '../models';
 	import Reading from '../components/reading.svelte';
 	import uuid4 from 'uuid4';
 
@@ -23,10 +29,14 @@
 	function loadMoreSubReadings() {
 		let toShow = 0;
 		let count = 0;
-        const BATCH_SIZE_TO_SHOW = 30
+		const BATCH_SIZE_TO_SHOW = 30;
 
-		while (toShow !== BATCH_SIZE_TO_SHOW && count + subListReadingsToShow < selectedSub.nestedReadings.length) {
-			let hasCompletedReading = selectedSub.completedReadings[subListReadingsToShow + count];
+		while (
+			toShow !== BATCH_SIZE_TO_SHOW &&
+			count + subListReadingsToShow < selectedSub.nestedReadings.length
+		) {
+			let hasCompletedReading =
+				selectedSub.completedReadings[subListReadingsToShow + count];
 			count++;
 			if (hasCompletedReading && !showCompletedReadings) {
 				continue;
@@ -39,22 +49,22 @@
 
 	function onSelectedSubReading(idx: number, returnView: string) {
 		let readings: Readings = selectedSub.nestedReadings[idx];
-		let updReadings: BCV[] = readings.bcvs.map((r: any) => {
+		readings.bcvs = readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r as BCV;
 		});
 
 		let np: NavPlan = {
-			reading: updReadings,
-			currentReadingsIndex: 0, // What to start at
 			subID: selectedSub.id,
-			readingIndex: idx,
-			returnView: returnView
+			returnView: returnView,
+			readings: readings,
+			currentReadingsIndex: 0,
+			readingIndex: idx
 		};
 
 		pane.buffer.bag.plan = np;
 
-		pane.buffer.bag.chapterKey = updReadings[0].chapterKey;
+		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
 	}
 
@@ -65,7 +75,8 @@
 		}
 
 		const threshold = 20; // Adjust this value as needed
-		const isReachBottom = el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+		const isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
 
 		if (isReachBottom) {
 			loadMoreSubReadings();
@@ -133,13 +144,18 @@
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							<Reading bind:planReading={sub.nestedReadings[idx].bcvs}></Reading>
+							<Reading bind:planReading={sub.nestedReadings[idx].bcvs}
+							></Reading>
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">
 							<div class="flex w-full">
 								<span class="flex flex-grow"></span>
-								<div class="text-lg {sub.completedReadings.get(idx)?.index === idx ? 'text-support-a-500' : ''}">
+								<div
+									class="text-lg {sub.completedReadings.get(idx)?.index === idx
+										? 'text-support-a-500'
+										: ''}"
+								>
 									{idx + 1} of {sub.nestedReadings.length}
 								</div>
 							</div>
@@ -167,7 +183,8 @@
 <div class="flex w-full max-w-lg">
 	<div
 		id="{subListViewID}-scroll-container"
-		style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight - headerHeight}px"
+		style="max-height: {clientHeight -
+			headerHeight}px; min-height: {clientHeight - headerHeight}px"
 		class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 	>
 		{@render subListView(selectedSub)}
