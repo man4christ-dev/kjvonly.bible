@@ -7,7 +7,7 @@
 	import Header from '../components/header.svelte';
 	import type {
 		Sub,
-		NextReading,
+		NextReadings,
 		CompletedReading,
 		Readings,
 		NavReadings
@@ -25,7 +25,7 @@
 	let nextReadingViewID = uuid4();
 
 	let headerHeight = $state(0);
-	let nextReadings: NextReading[] = $state([]);
+	let nextReadings: NextReadings[] = $state([]);
 
 	let subsMap: Map<string, Sub> = new Map<string, Sub>();
 
@@ -34,7 +34,7 @@
 	}
 
 	function onSelectedNextReading(idx: number, returnView: string) {
-		let nrs: NextReading = nextReadings[idx];
+		let nrs: NextReadings = nextReadings[idx];
 		let readings: Readings = nrs.readings;
 		readings.bcvs = readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
@@ -56,12 +56,12 @@
 	}
 
 	function updateNextReadings() {
-		let nrs: NextReading[] = [];
+		let nrs: NextReadings[] = [];
 		let subKeys = subsMap.keys().toArray();
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub: Sub | undefined = subsMap.get(subKeys[i]);
 			if (sub && sub.nestedReadings.length - 1 > sub.nextReadingIndex) {
-				let nr: NextReading = {
+				let nr: NextReadings = {
 					readings: sub.nestedReadings[sub.nextReadingIndex],
 					planDateCreated: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
 					name: sub.name,

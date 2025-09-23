@@ -37,7 +37,7 @@ export function NullReadings(): Readings {
 	};
 }
 
-export interface NextReading {
+export interface NextReadings {
 	subID: string;
 	readings: Readings;
 	planDateCreated: number; // This should be date subscribed
