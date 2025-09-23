@@ -46,7 +46,7 @@
 			returnView: returnView,
 			readings: readings,
 			currentReadingsIndex: 0,
-			readingIndexs: nrs.readingIndex
+			selectedReadingsIndex: nrs.readingIndex
 		};
 
 		pane.buffer.bag.plan = np;
@@ -82,8 +82,8 @@
 		let plan: NavPlan = pane.buffer.bag?.plan;
 		if (plan) {
 			let readingsData: CompletedReading = {
-				id: `${plan.subID}/${plan.readingIndexs}`,
-				index: plan.readingIndexs,
+				id: `${plan.subID}/${plan.selectedReadingsIndex}`,
+				index: plan.selectedReadingsIndex,
 				subID: plan.subID,
 				version: 0
 			};
@@ -94,7 +94,7 @@
 			if (!sub) {
 				return;
 			}
-			sub.completedReadings.set(plan.readingIndexs, readingsData);
+			sub.completedReadings.set(plan.selectedReadingsIndex, readingsData);
 			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				sub.completedReadings.keys().toArray()
 			);

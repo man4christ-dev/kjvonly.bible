@@ -31,8 +31,8 @@
 		let plan: NavPlan = pane.buffer.bag?.plan;
 		if (plan) {
 			let readingsData: CompletedReading = {
-				id: `${plan.subID}/${plan.readingIndexs}`,
-				index: plan.readingIndexs,
+				id: `${plan.subID}/${plan.selectedReadingsIndex}`,
+				index: plan.selectedReadingsIndex,
 				subID: plan.subID,
 				version: 0
 			};
@@ -45,7 +45,7 @@
 				return;
 			}
 
-			sub.completedReadings.set(plan.readingIndexs, readingsData);
+			sub.completedReadings.set(plan.selectedReadingsIndex, readingsData);
 			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				Object.keys(sub.completedReadings).map((v) => parseInt(v))
 			);

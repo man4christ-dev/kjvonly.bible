@@ -55,7 +55,7 @@
 			returnView: returnView,
 			readings: readings,
 			currentReadingsIndex: 0,
-			readingIndexs: idx
+			selectedReadingsIndex: idx
 		};
 
 		pane.buffer.bag.plan = np;

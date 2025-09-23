@@ -10,7 +10,7 @@ export interface NavPlan {
 	readings: Readings;
 	currentReadingsIndex: number;
 	subID: string;
-	readingIndexs: number; //TODO update this to readingsIndex plural
+	selectedReadingsIndex: number;
 	returnView: string;
 }
 
