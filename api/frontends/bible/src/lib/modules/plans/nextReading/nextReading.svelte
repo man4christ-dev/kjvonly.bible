@@ -10,7 +10,7 @@
 		NextReading,
 		CompletedReading,
 		Readings,
-		NavPlan
+		NavReadings
 	} from '../../../models/plans.model';
 	import { PLANS_VIEWS } from '../models';
 	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
@@ -41,7 +41,7 @@
 			return r;
 		});
 
-		let np: NavPlan = {
+		let nr: NavReadings = {
 			subID: nrs.subID,
 			returnView: returnView,
 			readings: readings,
@@ -49,7 +49,7 @@
 			selectedReadingsIndex: nrs.readingIndex
 		};
 
-		pane.buffer.bag.plan = np;
+		pane.buffer.bag.navReadings = nr;
 
 		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
 		pane.updateBuffer('ChapterContainer'); // TODO Make this a variable
@@ -79,22 +79,22 @@
 	}
 
 	async function onReturnPlan() {
-		let plan: NavPlan = pane.buffer.bag?.plan;
-		if (plan) {
-			let readingsData: CompletedReading = {
-				id: `${plan.subID}/${plan.selectedReadingsIndex}`,
-				index: plan.selectedReadingsIndex,
-				subID: plan.subID,
+		let nr: NavReadings = pane.buffer.bag?.navReadings;
+		if (nr) {
+			let cr: CompletedReading = {
+				id: `${nr.subID}/${nr.selectedReadingsIndex}`,
+				index: nr.selectedReadingsIndex,
+				subID: nr.subID,
 				version: 0
 			};
-			await readingsApi.put(readingsData);
-			plansPubSubService.putReading(readingsData, plan.subID);
+			await readingsApi.put(cr);
+			plansPubSubService.putReading(cr, nr.subID);
 
-			let sub = subsMap.get(plan.subID);
+			let sub = subsMap.get(nr.subID);
 			if (!sub) {
 				return;
 			}
-			sub.completedReadings.set(plan.selectedReadingsIndex, readingsData);
+			sub.completedReadings.set(nr.selectedReadingsIndex, cr);
 			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				sub.completedReadings.keys().toArray()
 			);

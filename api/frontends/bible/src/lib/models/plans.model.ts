@@ -6,7 +6,7 @@ import type { BCV } from './bible.model';
  * variable. If it exists the bible module restricts the module to only display
  * the {@link BCV}[] in the readings.
  */
-export interface NavPlan {
+export interface NavReadings {
 	readings: Readings;
 	currentReadingsIndex: number;
 	subID: string;

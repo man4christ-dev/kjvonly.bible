@@ -12,7 +12,7 @@
 	import EditOptions from './editOptions.svelte';
 	import { extractBookChapter } from '$lib/utils/chapter';
 	import { Buffer } from '$lib/models/buffer.model';
-	import type { NavPlan } from '../../models/plans.model';
+	import type { NavReadings } from '../../models/plans.model';
 
 	type WordAnnots = {
 		class: string[];
@@ -67,7 +67,7 @@
 	});
 
 	async function _nextPlanChapter() {
-		let plan: NavPlan = mode.plan;
+		let plan: NavReadings = mode.navReadings;
 		let ci = plan.currentReadingsIndex;
 		let nextIndex = ci + 1;
 		if (nextIndex > plan.readings.bcvs.length - 1) {
@@ -79,7 +79,7 @@
 	}
 
 	async function _previousPlanChapter() {
-		let plan: NavPlan = mode.plan;
+		let plan: NavReadings = mode.navReadings;
 		let ci = plan.currentReadingsIndex;
 		let nextIndex = ci - 1;
 		if (nextIndex >= 0) {
@@ -90,7 +90,7 @@
 
 	async function _nextChapter(e: Event) {
 		e.stopPropagation();
-		if (mode.plan) {
+		if (mode.navReadings) {
 			_nextPlanChapter();
 			return;
 		}
@@ -101,7 +101,7 @@
 
 	async function _previousChapter(e: Event) {
 		e.stopPropagation();
-		if (mode.plan) {
+		if (mode.navReadings) {
 			_previousPlanChapter();
 			return;
 		}
@@ -156,8 +156,8 @@
 			chapterSettings = newSettings();
 		}
 
-		if (pane?.buffer?.bag?.plan) {
-			mode.plan = pane?.buffer?.bag?.plan;
+		if (pane?.buffer?.bag?.navReadings) {
+			mode.navReadings = pane?.buffer?.bag?.navReadings;
 		}
 
 		let ck = pane.buffer.bag.chapterKey;

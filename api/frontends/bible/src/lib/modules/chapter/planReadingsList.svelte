@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { NavPlan } from '../../models/plans.model';
+	import type { NavReadings } from '../../models/plans.model';
 
 	let {
 		plan = $bindable(),
@@ -13,7 +13,7 @@
 
 	function rowClicked(e: any, r: any, idx: number) {
 		e.stopPropagation();
-		let p: NavPlan = plan;
+		let p: NavReadings = plan;
 		p.currentReadingsIndex = idx;
 		chapterKey = r.chapterKey;
 		showPlanReadingPopup = false;

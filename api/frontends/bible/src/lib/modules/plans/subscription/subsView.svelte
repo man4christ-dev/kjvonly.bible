@@ -11,7 +11,7 @@
 	import {
 		NullSub,
 		type Sub,
-		type NavPlan,
+		type NavReadings,
 		type CompletedReading
 	} from '$lib/models/plans.model';
 
@@ -28,7 +28,7 @@
 	let subsList: Sub[] = $state([]);
 
 	async function onReturnPlan() {
-		let plan: NavPlan = pane.buffer.bag?.plan;
+		let plan: NavReadings = pane.buffer.bag?.navReadings;
 		if (plan) {
 			let readingsData: CompletedReading = {
 				id: `${plan.subID}/${plan.selectedReadingsIndex}`,

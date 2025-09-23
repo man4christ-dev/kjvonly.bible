@@ -18,7 +18,7 @@
 	let clientHeight = $state(0);
 
 	onMount(() => {
-		let plan = pane?.buffer?.bag?.plan;
+		let plan = pane?.buffer?.bag?.navReadings;
 		if (plan) {
 			plansDisplay = plan.returnView;
 		} else {
@@ -32,11 +32,14 @@
 		<div bind:clientHeight style={containerHeight} class="overflow-hidden">
 			<div class="flex flex-col items-center">
 				{#if plansDisplay?.startsWith('PLANS')}
-					<Discover bind:plansDisplay bind:pane bind:paneId bind:clientHeight></Discover>
+					<Discover bind:plansDisplay bind:pane bind:paneId bind:clientHeight
+					></Discover>
 				{:else if plansDisplay?.startsWith('SUBS')}
-					<SubsView bind:plansDisplay bind:pane bind:paneId bind:clientHeight></SubsView>
+					<SubsView bind:plansDisplay bind:pane bind:paneId bind:clientHeight
+					></SubsView>
 				{:else if plansDisplay?.startsWith('NEXT')}
-					<NextReading bind:plansDisplay bind:pane bind:clientHeight></NextReading>
+					<NextReading bind:plansDisplay bind:pane bind:clientHeight
+					></NextReading>
 				{/if}
 			</div>
 		</div>

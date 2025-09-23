@@ -28,7 +28,7 @@
 
 	function onBookChapterClick(event: Event) {
 		event.stopPropagation();
-		if (mode.plan) {
+		if (mode.navReadings) {
 			showPlanReadingPopup = !showPlanReadingPopup;
 		} else {
 			showBookChapterPopup = !showBookChapterPopup;
@@ -51,8 +51,8 @@
 				let [start, end] = extractVerses(chapterKey);
 				if (start + end > 0) {
 					verses = `:${start + 1}-${end}`;
-				}else {
-					verses = ''
+				} else {
+					verses = '';
 				}
 			});
 		}
@@ -122,7 +122,9 @@
 				id="svg5"
 				xml:space="preserve"
 				xmlns="http://www.w3.org/2000/svg"
-				><defs id="defs2" /><g id="layer1" transform="translate(-53.644677,-127.79211)"
+				><defs id="defs2" /><g
+					id="layer1"
+					transform="translate(-53.644677,-127.79211)"
 					><path
 						class="fill-neutral-700"
 						d="m 59.906487,137.65245 -6.26181,-4.21622 v -2.82206 -2.82206 l 6.35,4.24282 6.35,4.24283 6.35,-4.24283 6.35,-4.24282 v 2.82222 2.82222 l -6.3429,4.23808 c -3.48859,2.33094 -6.38578,4.22817 -6.43819,4.21606 -0.0524,-0.0121 -2.91311,-1.91931 -6.3571,-4.23824 z"
@@ -137,12 +139,16 @@
 
 {#if showBookChapterPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey></BookChapterPopup>
+		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey
+		></BookChapterPopup>
 	</div>
 {/if}
 {#if showPlanReadingPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<PlanReadingsList bind:showPlanReadingPopup bind:plan={mode.plan} bind:chapterKey
+		<PlanReadingsList
+			bind:showPlanReadingPopup
+			bind:plan={mode.navReadings}
+			bind:chapterKey
 		></PlanReadingsList>
 	</div>
 {/if}
@@ -154,20 +160,25 @@
 
 {#if showActionsPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<ActionDropdown {paneId} bind:showCopyVersePopup bind:showActionsDropdown={showActionsPopup}
+		<ActionDropdown
+			{paneId}
+			bind:showCopyVersePopup
+			bind:showActionsDropdown={showActionsPopup}
 		></ActionDropdown>
 	</div>
 {/if}
 
 {#if mode.notePopup.show}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<NotesContainer containerHeight bind:mode allNotes={false} bind:annotations></NotesContainer>
+		<NotesContainer containerHeight bind:mode allNotes={false} bind:annotations
+		></NotesContainer>
 	</div>
 {/if}
 
 {#if showCopyVersePopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<CopyVersePopup bind:showCopyVersePopup chapterKey={bookIDChapter}></CopyVersePopup>
+		<CopyVersePopup bind:showCopyVersePopup chapterKey={bookIDChapter}
+		></CopyVersePopup>
 	</div>
 {/if}
 

@@ -5,7 +5,7 @@
 	import { PLANS_VIEWS } from '../models';
 	import Reading from '../components/reading.svelte';
 	import uuid4 from 'uuid4';
-	import type { NavPlan, Readings, Sub } from '$lib/models/plans.model';
+	import type { NavReadings, Readings, Sub } from '$lib/models/plans.model';
 	import type { BCV } from '$lib/models/bible.model';
 
 	let {
@@ -50,7 +50,7 @@
 			return r as BCV;
 		});
 
-		let np: NavPlan = {
+		let np: NavReadings = {
 			subID: selectedSub.id,
 			returnView: returnView,
 			readings: readings,
@@ -58,7 +58,7 @@
 			selectedReadingsIndex: idx
 		};
 
-		pane.buffer.bag.plan = np;
+		pane.buffer.bag.navReadings = np;
 
 		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
 		pane.updateBuffer('ChapterContainer');
