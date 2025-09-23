@@ -61,6 +61,10 @@ export interface Readings {
 	bcvs: BCV[];
 }
 
+/**
+ *
+ * @returns An zero value Readings
+ */
 export function NullReadings(): Readings {
 	return {
 		totalVerses: 0,
@@ -69,14 +73,13 @@ export function NullReadings(): Readings {
 }
 
 export interface NextReading {
-	reading: BCV[];
-	totalVerses: number;
-	planDateCreated: number;
+	subID: string;
+	readings: Readings;
+	planDateCreated: number; // This should be date subscribed
 	name: string;
 	percentCompleted: number;
 	readingIndex: number;
 	totalReadings: number;
-	subID: string;
 }
 
 /**

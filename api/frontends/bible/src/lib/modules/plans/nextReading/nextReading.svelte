@@ -35,8 +35,7 @@
 
 	function onSelectedNextReading(idx: number, returnView: string) {
 		let nextReading: NextReading = nextReadings[idx];
-		let readings: BCV[] = nextReading.reading;
-		let updReadings: BCV[] = readings.map((r: any) => {
+		let updReadings: BCV[] = nextReading.readings.bcvs.map((r: any) => {
 			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r;
 		});
@@ -62,8 +61,7 @@
 			let sub: Sub | undefined = subsMap.get(subKeys[i]);
 			if (sub && sub.nestedReadings.length - 1 > sub.nextReadingIndex) {
 				let nr: NextReading = {
-					reading: sub.nestedReadings[sub.nextReadingIndex].bcvs,
-					totalVerses: sub.nestedReadings[sub.nextReadingIndex].totalVerses, // TODO total verses was added to Array :P
+					readings: sub.nestedReadings[sub.nextReadingIndex],
 					planDateCreated: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
 					name: sub.name,
 					percentCompleted: sub.percentCompleted,
