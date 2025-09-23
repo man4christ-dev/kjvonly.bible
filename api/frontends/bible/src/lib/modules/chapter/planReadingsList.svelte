@@ -2,8 +2,8 @@
 	import type { NavReadings } from '../../models/plans.model';
 
 	let {
-		plan = $bindable(),
-		showPlanReadingPopup = $bindable(),
+		navReadings = $bindable(),
+		showNavReadingsPopup = $bindable(),
 		chapterKey = $bindable()
 	} = $props();
 
@@ -13,10 +13,10 @@
 
 	function rowClicked(e: any, r: any, idx: number) {
 		e.stopPropagation();
-		let p: NavReadings = plan;
-		p.currentReadingsIndex = idx;
+		let nr: NavReadings = navReadings;
+		nr.currentReadingsIndex = idx;
 		chapterKey = r.chapterKey;
-		showPlanReadingPopup = false;
+		showNavReadingsPopup = false;
 	}
 </script>
 
@@ -27,12 +27,12 @@
 			class="items-between sticky top-0 flex w-full border-b-2 bg-neutral-100 text-neutral-700"
 		>
 			<span class="flex w-full"></span>
-			<div class="flex w-full items-center justify-center">Plan Readings</div>
+			<div class="flex w-full items-center justify-center">Readings</div>
 			<div class="flex w-full justify-end">
 				<button
 					aria-label="close"
 					onclick={() => {
-						showPlanReadingPopup = false;
+						showNavReadingsPopup = false;
 					}}
 					class="h-12 w-12 px-2 text-neutral-700"
 				>
@@ -58,7 +58,7 @@
 		>
 			<table class="table-fixed">
 				<tbody>
-					{#each plan.readings.bcvs as r, idx}
+					{#each navReadings.readings.bcvs as r, idx}
 						<tr
 							class="h-16 hover:cursor-pointer hover:bg-neutral-100"
 							onclick={(event) => rowClicked(event, r, idx)}

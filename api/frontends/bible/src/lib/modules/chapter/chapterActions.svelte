@@ -19,7 +19,7 @@
 	} = $props();
 
 	let showBookChapterPopup: Boolean = $state(false);
-	let showPlanReadingPopup: Boolean = $state(false);
+	let showNavReadingsPopup: Boolean = $state(false);
 	let showSettingsPopup: Boolean = $state(false);
 	let showActionsPopup: Boolean = $state(false);
 	let showCopyVersePopup: boolean = $state(false);
@@ -29,7 +29,7 @@
 	function onBookChapterClick(event: Event) {
 		event.stopPropagation();
 		if (mode.navReadings) {
-			showPlanReadingPopup = !showPlanReadingPopup;
+			showNavReadingsPopup = !showNavReadingsPopup;
 		} else {
 			showBookChapterPopup = !showBookChapterPopup;
 		}
@@ -143,11 +143,11 @@
 		></BookChapterPopup>
 	</div>
 {/if}
-{#if showPlanReadingPopup}
+{#if showNavReadingsPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
 		<PlanReadingsList
-			bind:showPlanReadingPopup
-			bind:plan={mode.navReadings}
+			bind:showNavReadingsPopup
+			bind:navReadings={mode.navReadings}
 			bind:chapterKey
 		></PlanReadingsList>
 	</div>
