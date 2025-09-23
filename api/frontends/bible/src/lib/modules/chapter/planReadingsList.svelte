@@ -1,5 +1,5 @@
 <script lang="ts">
-	import type { NavPlan } from '../plans/models';
+	import type { NavPlan } from '../../models/plans.model';
 
 	let {
 		plan = $bindable(),

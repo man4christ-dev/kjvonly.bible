@@ -2,13 +2,18 @@
 	import { readingsApi } from '$lib/api/readings.api';
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
-	import type { CompletedReading, NavPlan, Sub } from '../models';
-	import { NullSub, PLANS_VIEWS } from '../models';
+	import { PLANS_VIEWS } from '../models';
 	import SubsAction from './subsAction.svelte';
 	import SubsDetails from './subsDetails.svelte';
 	import SubsList from './subsList.svelte';
 	import uuid4 from 'uuid4';
 	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
+	import {
+		NullSub,
+		type Sub,
+		type NavPlan,
+		type CompletedReading
+	} from '$lib/models/plans.model';
 
 	let {
 		plansDisplay = $bindable(),
@@ -26,8 +31,8 @@
 		let plan: NavPlan = pane.buffer.bag?.plan;
 		if (plan) {
 			let readingsData: CompletedReading = {
-				id: `${plan.subID}/${plan.readingIndex}`,
-				index: plan.readingIndex,
+				id: `${plan.subID}/${plan.readingIndexs}`,
+				index: plan.readingIndexs,
 				subID: plan.subID,
 				version: 0
 			};
@@ -40,7 +45,7 @@
 				return;
 			}
 
-			sub.completedReadings.set(plan.readingIndex, readingsData);
+			sub.completedReadings.set(plan.readingIndexs, readingsData);
 			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				Object.keys(sub.completedReadings).map((v) => parseInt(v))
 			);

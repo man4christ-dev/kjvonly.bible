@@ -1,4 +1,5 @@
-import type { BCV, CachedPlan, Readings } from '$lib/modules/plans/models';
+import type { BCV } from '$lib/models/bible.model';
+import type { Readings } from '$lib/models/plans.model';
 import { bookNamesByIDService } from '../bibleMetadata/bookNamesByID.service';
 
 /**

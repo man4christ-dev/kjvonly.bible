@@ -10,7 +10,7 @@ import {
 	type CompletedReading,
 	type Plan,
 	type Sub
-} from '$lib/modules/plans/models';
+} from '$lib/models/plans.model';
 import { encodedReadingsDecoderService } from '$lib/services/plans/encodedReadingsDecoder.service';
 import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 import FlexSearch from 'flexsearch';

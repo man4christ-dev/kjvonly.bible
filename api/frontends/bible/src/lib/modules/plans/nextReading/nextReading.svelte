@@ -8,11 +8,10 @@
 	import type {
 		Sub,
 		NextReading,
-		BCV,
-		NavPlan,
 		CompletedReading,
-		Readings
-	} from '../models';
+		Readings,
+		NavPlan
+	} from '../../../models/plans.model';
 	import { PLANS_VIEWS } from '../models';
 	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 
@@ -47,13 +46,13 @@
 			returnView: returnView,
 			readings: readings,
 			currentReadingsIndex: 0,
-			readingIndex: nrs.readingIndex
+			readingIndexs: nrs.readingIndex
 		};
 
 		pane.buffer.bag.plan = np;
 
 		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
-		pane.updateBuffer('ChapterContainer');
+		pane.updateBuffer('ChapterContainer'); // TODO Make this a variable
 	}
 
 	function updateNextReadings() {
@@ -83,8 +82,8 @@
 		let plan: NavPlan = pane.buffer.bag?.plan;
 		if (plan) {
 			let readingsData: CompletedReading = {
-				id: `${plan.subID}/${plan.readingIndex}`,
-				index: plan.readingIndex,
+				id: `${plan.subID}/${plan.readingIndexs}`,
+				index: plan.readingIndexs,
 				subID: plan.subID,
 				version: 0
 			};
@@ -95,7 +94,7 @@
 			if (!sub) {
 				return;
 			}
-			sub.completedReadings.set(plan.readingIndex, readingsData);
+			sub.completedReadings.set(plan.readingIndexs, readingsData);
 			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
 				sub.completedReadings.keys().toArray()
 			);

@@ -12,7 +12,7 @@
 	import EditOptions from './editOptions.svelte';
 	import { extractBookChapter } from '$lib/utils/chapter';
 	import { Buffer } from '$lib/models/buffer.model';
-	import type { NavPlan } from '../plans/models';
+	import type { NavPlan } from '../../models/plans.model';
 
 	type WordAnnots = {
 		class: string[];

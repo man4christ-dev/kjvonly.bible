@@ -1,7 +1,6 @@
 import { describe, it, assert, expect } from 'vitest';
-import { subsEnricherService } from './subsEnricher.service';
 import { encodedReadingsDecoderService } from './encodedReadingsDecoder.service';
-import type { Readings } from '$lib/modules/plans/models';
+import type { Readings } from '$lib/models/plans.model';
 
 describe('verse rng', () => {
 	interface tt {

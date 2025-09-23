@@ -2,15 +2,11 @@
 	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
 	import Header from '../components/header.svelte';
-	import {
-		PLANS_VIEWS,
-		type BCV,
-		type NavPlan,
-		type Readings,
-		type Sub
-	} from '../models';
+	import { PLANS_VIEWS } from '../models';
 	import Reading from '../components/reading.svelte';
 	import uuid4 from 'uuid4';
+	import type { NavPlan, Readings, Sub } from '$lib/models/plans.model';
+	import type { BCV } from '$lib/models/bible.model';
 
 	let {
 		plansDisplay = $bindable(),
@@ -59,7 +55,7 @@
 			returnView: returnView,
 			readings: readings,
 			currentReadingsIndex: 0,
-			readingIndex: idx
+			readingIndexs: idx
 		};
 
 		pane.buffer.bag.plan = np;
