@@ -4,7 +4,7 @@
 	import SettingsPopup from './settingsPopup.svelte';
 	import NotesContainer from '../notes/notesContainer.svelte';
 	import CopyVersePopup from './copyVersePopup.svelte';
-	import PlanReadingsList from './planReadingsList.svelte';
+	import NavReadingsList from './navReadingsList.svelte';
 	import { onMount, untrack } from 'svelte';
 	import { extractBookChapter, extractVerses } from '$lib/utils/chapter';
 
@@ -145,11 +145,11 @@
 {/if}
 {#if showNavReadingsPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<PlanReadingsList
+		<NavReadingsList
 			bind:showNavReadingsPopup
 			bind:navReadings={mode.navReadings}
 			bind:chapterKey
-		></PlanReadingsList>
+		></NavReadingsList>
 	</div>
 {/if}
 {#if showSettingsPopup}
