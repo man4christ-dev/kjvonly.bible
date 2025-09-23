@@ -1,6 +1,6 @@
 <script lang="ts">
 	import SubsView from './subscription/subsView.svelte';
-	import NextReading from './nextReading/nextReading.svelte';
+	import NextReadings from './nextReadings/nextReadings.svelte';
 	import { PLANS_VIEWS } from './models';
 	import Discover from './discover/discover.svelte';
 	import { onMount } from 'svelte';
@@ -38,8 +38,8 @@
 					<SubsView bind:plansDisplay bind:pane bind:paneId bind:clientHeight
 					></SubsView>
 				{:else if plansDisplay?.startsWith('NEXT')}
-					<NextReading bind:plansDisplay bind:pane bind:clientHeight
-					></NextReading>
+					<NextReadings bind:plansDisplay bind:pane bind:clientHeight
+					></NextReadings>
 				{/if}
 			</div>
 		</div>
