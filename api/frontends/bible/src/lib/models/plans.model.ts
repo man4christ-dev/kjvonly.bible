@@ -1,73 +1,25 @@
 import type { BCV } from './bible.model';
 
-/**
- * When a user selects a reading for a subscription, the app routes to the bible
- * module. The bible module will check the {@link Buffer.bag} for a plan
- * variable. If it exists the bible module restricts the module to only display
- * the {@link BCV}[] in the readings.
- */
-export interface NavReadings {
-	subID: string;
-	subNestedReadingsIndex: number;
-	readings: Readings;
-	currentNavReadingsIndex: number;
-	returnView: string;
-}
+// =================================== PLAN ====================================
 
-/**
- * Readings consist of the {@link BCV}[] (book, chapter, verses) to read. The
- * {@link BCV}s
- */
-export interface Readings {
-	// TODO move totalVerses to new interface
-	// TODO add a date field to track when the reading should be completed if
-	//      user desires a scheduled plan vs tracked reading.
-	totalVerses: number;
-	bcvs: BCV[];
-}
-
-/**
- * @returns An zero value Readings
- */
-export function NullReadings(): Readings {
-	return {
-		totalVerses: 0,
-		bcvs: []
-	};
-}
-
-export interface NextReadings {
-	subID: string;
-	name: string;
-	readings: Readings;
-	planDateCreated: number; // This should be date subscribed
-	percentCompleted: number;
-	subReadingsIndex: number;
-	totalReadings: number;
-}
-
-/**
- * Simple data structure that tracks completed subscription readings.
- * {@link CompletedReadings.id} is the {@link Sub.id}/{@link CompletedReadings.index}
- * eg. "00000000-0000-0000-0000-000000000000/0". The index is the {@link Sub.nestedReadings}
- * index.
- * subID: "00000000-0000-0000-0000-000000000000"
- * index: 0
- * version: 0
- */
-export interface CompletedReadings {
+export interface Plan {
 	id: string;
-	subID: string;
-	index: number;
+	userID: string;
+	name: string;
+	description: string[];
+	nestedReadings: Readings[];
+	dateCreated: number;
 	version: number;
-	// TODO date created/updated
 }
 
-export function NullCompletedReadings(): CompletedReadings {
+export function NullPlan(): Plan {
 	return {
 		id: '',
-		subID: '',
-		index: 0,
+		userID: '',
+		name: '',
+		description: [],
+		nestedReadings: [],
+		dateCreated: 0,
 		version: 0
 	};
 }
@@ -94,14 +46,39 @@ export function cachedPlanToPlan(cp: CachedPlan): Plan {
 	};
 }
 
-export interface Plan {
+// =================================== SUBS ====================================
+
+export interface Sub extends CachedSub {
 	id: string;
+	planID: string;
 	userID: string;
+	dateSubscribed: number;
+	version: number;
+
+	// VM
 	name: string;
 	description: string[];
 	nestedReadings: Readings[];
-	dateCreated: number;
-	version: number;
+	completedReadings: Map<number, CompletedReadings>;
+
+	nextReadingsIndex: number; // TODO update name to nextReadingsIndex
+	percentCompleted: number;
+}
+
+export function NullSub(): Sub {
+	return {
+		id: '',
+		planID: '',
+		userID: '',
+		dateSubscribed: 0,
+		version: 0,
+		name: '',
+		description: [],
+		nestedReadings: [],
+		completedReadings: new Map(),
+		nextReadingsIndex: 0,
+		percentCompleted: 0
+	};
 }
 
 export interface CachedSub {
@@ -128,47 +105,76 @@ export function cachedSubToSub(cs: CachedSub): Sub {
 	};
 }
 
-export interface Sub extends CachedSub {
-	id: string;
-	planID: string;
-	userID: string;
-	dateSubscribed: number;
-	version: number;
+// ================================= READINGS ==================================
 
-	// VM
-	name: string;
-	description: string[];
-	nestedReadings: Readings[];
-	completedReadings: Map<number, CompletedReadings>;
-
-	nextReadingsIndex: number; // TODO update name to nextReadingsIndex
-	percentCompleted: number;
+/**
+ * Readings consist of the {@link BCV}[] (book, chapter, verses) to read. The
+ * {@link BCV}s
+ */
+export interface Readings {
+	// TODO move totalVerses to new interface
+	// TODO add a date field to track when the reading should be completed if
+	//      user desires a scheduled plan vs tracked reading.
+	totalVerses: number;
+	bcvs: BCV[];
 }
 
-export function NullPlan(): Plan {
+/**
+ * @returns An zero value Readings
+ */
+export function NullReadings(): Readings {
+	return {
+		totalVerses: 0,
+		bcvs: []
+	};
+}
+
+/**
+ * Simple data structure that tracks completed subscription readings.
+ * {@link CompletedReadings.id} is the {@link Sub.id}/{@link CompletedReadings.index}
+ * eg. "00000000-0000-0000-0000-000000000000/0". The index is the {@link Sub.nestedReadings}
+ * index.
+ */
+export interface CompletedReadings {
+	id: string;
+	subID: string;
+	index: number;
+	version: number;
+	// TODO date created/updated
+}
+
+export function NullCompletedReadings(): CompletedReadings {
 	return {
 		id: '',
-		userID: '',
-		name: '',
-		description: [],
-		nestedReadings: [],
-		dateCreated: 0,
+		subID: '',
+		index: 0,
 		version: 0
 	};
 }
 
-export function NullSub(): Sub {
-	return {
-		id: '',
-		planID: '',
-		userID: '',
-		dateSubscribed: 0,
-		version: 0,
-		name: '',
-		description: [],
-		nestedReadings: [],
-		completedReadings: new Map(),
-		nextReadingsIndex: 0,
-		percentCompleted: 0
-	};
+/**
+ * The next readings in a plan.
+ */
+export interface NextReadings {
+	subID: string;
+	name: string;
+	readings: Readings;
+	planDateCreated: number; // This should be date subscribed
+	percentCompleted: number;
+	subReadingsIndex: number;
+	totalReadings: number;
+}
+
+/**
+ * When a user selects a reading for a subscription, the app routes to the bible
+ * module. The bible module will check the {@link Buffer.bag} for a plan
+ * variable. If it exists the bible module restricts the module to only display
+ * the {@link BCV}[] in the readings.
+ */
+export interface NavReadings {
+	subID: string;
+	subNestedReadingsIndex: number;
+	readings: Readings;
+	currentNavReadingsIndex: number;
+	returnView: string;
 }
