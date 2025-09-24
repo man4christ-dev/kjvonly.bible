@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
-	import Reading from '../components/reading.svelte';
+	import ReadingsComponent from '../components/readings.svelte';
 	import { readingsApi } from '$lib/api/readings.api';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
@@ -132,7 +132,7 @@
 		</div>
 		<div class="flex flex-row">
 			<div class="min-w-50">
-				<Reading bind:planReading={n.readings.bcvs}></Reading>
+				<ReadingsComponent bind:readings={n.readings.bcvs}></ReadingsComponent>
 			</div>
 
 			<div class="flex w-full min-w-50 flex-col">

@@ -3,7 +3,7 @@
 	import { onMount } from 'svelte';
 	import Header from '../components/header.svelte';
 	import { PLANS_VIEWS } from '../models';
-	import Reading from '../components/reading.svelte';
+	import ReadingsComponent from '../components/readings.svelte';
 	import uuid4 from 'uuid4';
 	import type { NavReadings, Readings, Sub } from '$lib/models/plans.model';
 	import type { BCV } from '$lib/models/bible.model';
@@ -143,8 +143,8 @@
 						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 					>
 						<div class="flex w-full min-w-50">
-							<Reading bind:planReading={sub.nestedReadings[idx].bcvs}
-							></Reading>
+							<ReadingsComponent bind:readings={sub.nestedReadings[idx].bcvs}
+							></ReadingsComponent>
 						</div>
 
 						<div class="flex w-full min-w-50 flex-col">
