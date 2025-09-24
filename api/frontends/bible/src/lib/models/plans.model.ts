@@ -27,7 +27,6 @@ export interface Readings {
 }
 
 /**
- *
  * @returns An zero value Readings
  */
 export function NullReadings(): Readings {
@@ -48,19 +47,23 @@ export interface NextReadings {
 }
 
 /**
- * id: "00000000-0000-0000-0000-000000000000/0"
+ * Simple data structure that tracks completed subscription readings.
+ * {@link CompletedReadings.id} is the {@link Sub.id}/{@link CompletedReadings.index}
+ * eg. "00000000-0000-0000-0000-000000000000/0". The index is the {@link Sub.nestedReadings}
+ * index.
  * subID: "00000000-0000-0000-0000-000000000000"
  * index: 0
  * version: 0
  */
-export interface CompletedReading {
+export interface CompletedReadings {
 	id: string;
 	subID: string;
 	index: number;
 	version: number;
+	// TODO date created/updated
 }
 
-export function NullCompletedReading(): CompletedReading {
+export function NullCompletedReadings(): CompletedReadings {
 	return {
 		id: '',
 		subID: '',
@@ -120,7 +123,7 @@ export function cachedSubToSub(cs: CachedSub): Sub {
 		description: [],
 		nestedReadings: [],
 		completedReadings: new Map(),
-		nextReadingIndex: 0,
+		nextReadingsIndex: 0,
 		percentCompleted: 0
 	};
 }
@@ -136,9 +139,9 @@ export interface Sub extends CachedSub {
 	name: string;
 	description: string[];
 	nestedReadings: Readings[];
-	completedReadings: Map<number, CompletedReading>;
-	//plan: Plan;
-	nextReadingIndex: number; // TODO update name to nextReadingsIndex
+	completedReadings: Map<number, CompletedReadings>;
+
+	nextReadingsIndex: number; // TODO update name to nextReadingsIndex
 	percentCompleted: number;
 }
 
@@ -165,7 +168,7 @@ export function NullSub(): Sub {
 		description: [],
 		nestedReadings: [],
 		completedReadings: new Map(),
-		nextReadingIndex: 0,
+		nextReadingsIndex: 0,
 		percentCompleted: 0
 	};
 }

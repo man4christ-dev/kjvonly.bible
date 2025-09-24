@@ -7,7 +7,7 @@ import {
 	NullPlan,
 	type CachedPlan,
 	type CachedSub,
-	type CompletedReading,
+	type CompletedReadings,
 	type Plan,
 	type Sub
 } from '$lib/models/plans.model';
@@ -21,7 +21,7 @@ let workerHasInitialized = false;
 
 let plans: Map<string, Plan> = new Map();
 let subs: Map<string, Sub> = new Map();
-let completedReadings: Map<string, CompletedReading> = new Map();
+let completedReadings: Map<string, CompletedReadings> = new Map();
 
 // ================================ FLEX DOCS ==================================
 
@@ -94,11 +94,11 @@ async function initializeCompletedReadings() {
  * User subs are stored normalized in the DB. The Sub readings data exists in
  * the initialized {@link plans} and can be looked up by the {@link Sub.planID}.
  *  Users progress on a subscription is determined by the
- * {@link completedReadings} for the subscription. {@link CompletedReading} are
+ * {@link completedReadings} for the subscription. {@link CompletedReadings} are
  * stored in the DB with an ID of <SubID/ReadingsIndex> and a SubID column.
  * Enriching the sub includes fetching the {@link completedReading} for the Sub
  * and assigning it to {@link Sub.completedReadings} field. Additionally, other
- * useful data is added to the Sub such as {@link Sub.nextReadingIndex} and
+ * useful data is added to the Sub such as {@link Sub.nextReadingsIndex} and
  *  {@link Sub.percentCompleted}.
  *
  * */
@@ -118,7 +118,7 @@ async function enrichSub(sub: Sub | undefined) {
 }
 
 async function setCompletedReadings(sub: Sub) {
-	sub.completedReadings = new Map<number, CompletedReading>();
+	sub.completedReadings = new Map<number, CompletedReadings>();
 	let result = await getCompletedReadings(sub.id, ['subID']);
 	result.forEach((r) => {
 		r.result.forEach((id) => {

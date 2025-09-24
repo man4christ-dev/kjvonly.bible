@@ -12,7 +12,7 @@
 		NullSub,
 		type Sub,
 		type NavReadings,
-		type CompletedReading
+		type CompletedReadings
 	} from '$lib/models/plans.model';
 
 	let {
@@ -30,7 +30,7 @@
 	async function onReturnPlan() {
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
-			let readingsData: CompletedReading = {
+			let readingsData: CompletedReadings = {
 				id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
 				index: nr.subNestedReadingsIndex,
 				subID: nr.subID,
@@ -46,7 +46,7 @@
 			}
 
 			sub.completedReadings.set(nr.subNestedReadingsIndex, readingsData);
-			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
+			sub.nextReadingsIndex = subsEnricherService.getNextReadingIndex(
 				Object.keys(sub.completedReadings).map((v) => parseInt(v))
 			);
 			console.log('before');

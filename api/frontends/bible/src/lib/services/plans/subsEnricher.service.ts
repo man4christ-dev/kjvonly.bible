@@ -37,7 +37,7 @@ export class SubsEnricherService {
 	 *
 	 */
 	setNextReadingIndex(sub: Sub) {
-		sub.nextReadingIndex = this.getNextReadingIndex(
+		sub.nextReadingsIndex = this.getNextReadingIndex(
 			sub.completedReadings.keys().toArray()
 		);
 	}

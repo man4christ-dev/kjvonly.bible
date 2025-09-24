@@ -8,7 +8,7 @@
 	import type {
 		Sub,
 		NextReadings,
-		CompletedReading,
+		CompletedReadings,
 		Readings,
 		NavReadings
 	} from '../../../models/plans.model';
@@ -60,13 +60,13 @@
 		let subKeys = subsMap.keys().toArray();
 		for (let i = 0; i < subKeys.length; i++) {
 			let sub: Sub | undefined = subsMap.get(subKeys[i]);
-			if (sub && sub.nestedReadings.length - 1 > sub.nextReadingIndex) {
+			if (sub && sub.nestedReadings.length - 1 > sub.nextReadingsIndex) {
 				let nr: NextReadings = {
-					readings: sub.nestedReadings[sub.nextReadingIndex],
+					readings: sub.nestedReadings[sub.nextReadingsIndex],
 					planDateCreated: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
 					name: sub.name,
 					percentCompleted: sub.percentCompleted,
-					subReadingsIndex: sub.nextReadingIndex,
+					subReadingsIndex: sub.nextReadingsIndex,
 					totalReadings: sub.nestedReadings.length,
 					subID: sub.id
 				};
@@ -81,7 +81,7 @@
 	async function onReturnPlan() {
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
-			let cr: CompletedReading = {
+			let cr: CompletedReadings = {
 				id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
 				index: nr.subNestedReadingsIndex,
 				subID: nr.subID,
@@ -95,7 +95,7 @@
 				return;
 			}
 			sub.completedReadings.set(nr.subNestedReadingsIndex, cr);
-			sub.nextReadingIndex = subsEnricherService.getNextReadingIndex(
+			sub.nextReadingsIndex = subsEnricherService.getNextReadingIndex(
 				sub.completedReadings.keys().toArray()
 			);
 		}
