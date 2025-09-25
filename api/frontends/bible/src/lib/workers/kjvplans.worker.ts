@@ -64,7 +64,7 @@ async function initializePlans() {
 	for (let cp of cachedPlans) {
 		let p = cachedPlanToPlan(cp);
 		p.nestedReadings = encodedReadingsDecoderService.parseEncodedReadings(
-			cp.readings
+			cp.encodedReadings
 		);
 		await plansDocument.addAsync(p.id, p);
 		plans.set(p.id, p);

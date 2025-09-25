@@ -29,7 +29,7 @@ export interface CachedPlan {
 	userID: string;
 	name: string;
 	description: string[];
-	readings: string[]; // TODO rename to encoded readings
+	encodedReadings: string[];
 	dateCreated: number;
 	version: number;
 }
@@ -61,7 +61,7 @@ export interface Sub extends CachedSub {
 	nestedReadings: Readings[];
 	completedReadings: Map<number, CompletedReadings>;
 
-	nextReadingsIndex: number; // TODO update name to nextReadingsIndex
+	nextReadingsIndex: number;
 	percentCompleted: number;
 }
 

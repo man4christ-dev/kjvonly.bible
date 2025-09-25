@@ -56,23 +56,20 @@
 	}
 
 	function updateNextReadings() {
-		let nrs: NextReadings[] = [];
-		let subKeys = subsMap.keys().toArray();
-		for (let i = 0; i < subKeys.length; i++) {
-			let sub: Sub | undefined = subsMap.get(subKeys[i]);
-			if (sub && sub.nestedReadings.length - 1 > sub.nextReadingsIndex) {
-				let nr: NextReadings = {
-					readings: sub.nestedReadings[sub.nextReadingsIndex],
-					dateSubscribed: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
-					name: sub.name,
-					percentCompleted: sub.percentCompleted,
-					subReadingsIndex: sub.nextReadingsIndex,
-					totalReadings: sub.nestedReadings.length,
-					subID: sub.id
+		let nrs: NextReadings[] = subsMap
+			.entries()
+			.filter(([_, s]) => s.nestedReadings.length - 1 > s.nextReadingsIndex)
+			.map(([_, s]) => {
+				return {
+					readings: s.nestedReadings[s.nextReadingsIndex],
+					dateSubscribed: s.dateSubscribed ? s.dateSubscribed : Date.now(),
+					name: s.name,
+					percentCompleted: s.percentCompleted,
+					subReadingsIndex: s.nextReadingsIndex,
+					totalReadings: s.nestedReadings.length,
+					subID: s.id
 				};
-				nrs.push(nr);
-			}
-		}
+			});
 
 		nextReadings.length = 0;
 		nextReadings.push(...nrs);
@@ -87,8 +84,8 @@
 				subID: nr.subID,
 				version: 0
 			};
-			await readingsApi.put(cr);
-			plansPubSubService.putReading(cr, nr.subID);
+			await readingsApi.put(cr); // TODO completedReadingsApi
+			plansPubSubService.putReading(cr, nr.subID); // TODO completedReadings
 
 			let sub = subsMap.get(nr.subID);
 			if (!sub) {
