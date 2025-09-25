@@ -1,6 +1,6 @@
 import IndexedDB from './idb.db';
 
-const DB_VERSION = 10
+const DB_VERSION = 11;
 
 export const enum STORES {
 	CHAPTERS,
@@ -16,7 +16,7 @@ export const enum STORES {
 	SUBSCRIPTIONS,
 	UNSYNCED_SUBSCRIPTIONS,
 	READINGS,
-	UNSYNCED_READINGS,
+	UNSYNCED_READINGS
 }
 
 export const DB_NAME = 'bible';
@@ -38,9 +38,8 @@ export const UNSYNCED_PLANS = 'unsynced_plans';
 export const SUBSCRIPTIONS = 'subscriptions';
 export const UNSYNCED_SUBSCRIPTIONS = 'unsynced_subscriptions';
 
-export const READINGS = 'readings';
-export const UNSYNCED_READINGS = 'unsynced_readings';
-
+export const COMPLETED_READINGS = 'completed_readings';
+export const UNSYNCED_COMPLETED_READINGS = 'unsynced_completed_readings';
 
 export class BibleDB extends IndexedDB {
 	constructor() {
@@ -49,27 +48,30 @@ export class BibleDB extends IndexedDB {
 
 	static instance: BibleDB = new BibleDB();
 	public static async CreateAsync(): Promise<BibleDB> {
-		await this.instance.createAndOrOpenObjectStores([
-			CHAPTERS,
-			BOOKNAMES,
-			STRONGS,
-			SEARCH,
+		await this.instance.createAndOrOpenObjectStores(
+			[
+				CHAPTERS,
+				BOOKNAMES,
+				STRONGS,
+				SEARCH,
 
-			ANNOTATIONS,
-			UNSYNCED_ANNOTATIONS,
-			
-			NOTES,
-			UNSYNCED_NOTES,
+				ANNOTATIONS,
+				UNSYNCED_ANNOTATIONS,
 
-			PLANS,
-			UNSYNCED_PLANS,
+				NOTES,
+				UNSYNCED_NOTES,
 
-			SUBSCRIPTIONS,
-			UNSYNCED_SUBSCRIPTIONS,
+				PLANS,
+				UNSYNCED_PLANS,
 
-			READINGS,
-			UNSYNCED_READINGS
-		], DB_VERSION);
+				SUBSCRIPTIONS,
+				UNSYNCED_SUBSCRIPTIONS,
+
+				COMPLETED_READINGS,
+				UNSYNCED_COMPLETED_READINGS
+			],
+			DB_VERSION
+		);
 		return this.instance;
 	}
 }

@@ -1,5 +1,5 @@
 import { plansApi } from '$lib/api/plans.api';
-import { readingsApi } from '$lib/api/readings.api';
+import { readingsApi } from '$lib/api/completedReadings';
 import { subsApi } from '$lib/api/subs.api';
 import {
 	cachedPlanToPlan,

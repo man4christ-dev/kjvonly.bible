@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { readingsApi } from '$lib/api/readings.api';
+	import { readingsApi } from '$lib/api/completedReadings';
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import { PLANS_VIEWS } from '../models';
