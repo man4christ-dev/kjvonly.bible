@@ -63,7 +63,7 @@
 			if (sub && sub.nestedReadings.length - 1 > sub.nextReadingsIndex) {
 				let nr: NextReadings = {
 					readings: sub.nestedReadings[sub.nextReadingsIndex],
-					planDateCreated: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
+					dateSubscribed: sub.dateSubscribed ? sub.dateSubscribed : Date.now(),
 					name: sub.name,
 					percentCompleted: sub.percentCompleted,
 					subReadingsIndex: sub.nextReadingsIndex,
