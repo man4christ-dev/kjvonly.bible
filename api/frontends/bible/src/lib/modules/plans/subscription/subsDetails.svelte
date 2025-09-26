@@ -7,20 +7,53 @@
 	import uuid4 from 'uuid4';
 	import type { NavReadings, Readings, Sub } from '$lib/models/plans.model';
 	import type { BCV } from '$lib/models/bible.model';
+	import Pane from '$lib/components/pane.svelte';
+
+	// =============================== BINDINGS ================================
 
 	let {
-		plansDisplay = $bindable(),
-		pane = $bindable(),
-		paneId,
+		plansDisplay = $bindable<string>(),
+		pane = $bindable<Pane>(),
+		paneId = $bindable<string>(),
 		clientHeight = $bindable(),
 		selectedSub = $bindable<Sub>()
 	} = $props();
 
+	// ================================== VARS =================================
+
 	let headerHeight = $state(0);
 	let showCompletedReadings: boolean = $state(false);
-
 	let subListReadingsToShow: number = $state(0);
 	let subListViewID = uuid4();
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		loadMoreSubReadings();
+		setTimeout(async () => {
+			let el = document.getElementById(`${subListViewID}-scroll-container`);
+			let retriesMax = 10;
+			let count = 0;
+			while (!el && count != retriesMax) {
+				el = document.getElementById(`${subListViewID}-scroll-container`);
+				await sleep(1000);
+				count++;
+			}
+
+			if (count === 10) {
+				return;
+			}
+
+			el?.addEventListener('scroll', handleScroll);
+		}, 1000);
+	});
+
+	$effect(() => {
+		selectedSub;
+		loadMoreSubReadings();
+	});
+
+	// ================================ FUNCS ==================================
 
 	function loadMoreSubReadings() {
 		let toShow = 0;
@@ -42,6 +75,23 @@
 
 		subListReadingsToShow += count;
 	}
+
+	function handleScroll() {
+		let el = document.getElementById(`${subListViewID}-scroll-container`);
+		if (el === null) {
+			return;
+		}
+
+		const threshold = 20; // Adjust this value as needed
+		const isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+
+		if (isReachBottom) {
+			loadMoreSubReadings();
+		}
+	}
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onSelectedSubReading(
 		subNestedReadingsIndex: number,
@@ -67,49 +117,9 @@
 		pane.updateBuffer('ChapterContainer');
 	}
 
-	function handleScroll() {
-		let el = document.getElementById(`${subListViewID}-scroll-container`);
-		if (el === null) {
-			return;
-		}
-
-		const threshold = 20; // Adjust this value as needed
-		const isReachBottom =
-			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
-
-		if (isReachBottom) {
-			loadMoreSubReadings();
-		}
-	}
-
 	function onCloseSubDetails() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
 	}
-
-	$effect(() => {
-		selectedSub;
-		loadMoreSubReadings();
-	});
-
-	onMount(() => {
-		loadMoreSubReadings();
-		setTimeout(async () => {
-			let el = document.getElementById(`${subListViewID}-scroll-container`);
-			let retriesMax = 10;
-			let count = 0;
-			while (!el && count != retriesMax) {
-				el = document.getElementById(`${subListViewID}-scroll-container`);
-				await sleep(1000);
-				count++;
-			}
-
-			if (count === 10) {
-				return;
-			}
-
-			el?.addEventListener('scroll', handleScroll);
-		}, 1000);
-	});
 </script>
 
 {#snippet subListView(sub: any)}

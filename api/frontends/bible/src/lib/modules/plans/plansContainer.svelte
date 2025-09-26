@@ -5,17 +5,23 @@
 	import Discover from './discover/discover.svelte';
 	import { onMount } from 'svelte';
 	import uuid4 from 'uuid4';
+	import type { Pane } from '$lib/models/pane.model';
 
-	let id = uuid4();
+	// =============================== BINDINGS ================================
 	let {
 		paneId = $bindable<string>(),
-		pane = $bindable(),
-		containerHeight = $bindable(),
-		containerWidth = $bindable()
+		pane = $bindable<Pane>(),
+		containerHeight = $bindable<string>(),
+		containerWidth = $bindable<string>()
 	} = $props();
 
+	// ================================== VARS =================================
+
+	let id = uuid4();
 	let plansDisplay: string = $state('');
 	let clientHeight = $state(0);
+
+	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
 		let plan = pane?.buffer?.bag?.navReadings;

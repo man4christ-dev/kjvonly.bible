@@ -4,6 +4,7 @@
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import type { Sub } from '$lib/models/plans.model';
 
+	// =============================== BINDINGS ================================
 	let {
 		plansDisplay = $bindable<string>(),
 		pane = $bindable(),
@@ -13,7 +14,11 @@
 		subsList = $bindable<Sub[]>()
 	} = $props();
 
+	// ================================== VARS =================================
+
 	let headerHeight = $state(0);
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onSubClicked(sub: any) {
 		selectedSub = sub;

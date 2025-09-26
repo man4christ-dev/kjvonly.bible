@@ -14,19 +14,94 @@
 	import { PLANS_VIEWS } from '../models';
 	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
 
+	// =============================== BINDINGS ================================
+
 	let {
 		pane = $bindable(),
 		plansDisplay = $bindable(),
 		clientHeight = $bindable()
 	} = $props();
 
-	let SUBSCRIBER_ID: string = uuid4();
-	let nextReadingViewID = uuid4();
+	// ================================== VARS =================================
 
+	let nextReadingViewID = uuid4();
 	let headerHeight = $state(0);
-	let nextReadings: NextReadings[] = $state([]);
+
+	let SUBSCRIBER_ID: string = uuid4();
 
 	let subsByID: Map<string, Sub> = new Map<string, Sub>();
+	let nextReadings: NextReadings[] = $state([]);
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, SUBSCRIBER_ID);
+		plansPubSubService.getAllSubs();
+	});
+
+	onDestroy(() => {
+		plansPubSubService.unsubscribe(SUBSCRIBER_ID);
+	});
+
+	// ================================ FUNCS ==================================
+
+	/**
+	 * Subscription func for getAllSubs. Anytime a sum is changed and published
+	 * this function will be called with the updated Subs data
+	 *
+	 * @param data
+	 */
+	async function onGetAllSubs(data: any) {
+		if (data) {
+			subsByID = data.subs;
+
+			await processNavReadings();
+			await updateNextReadings();
+		}
+	}
+
+	/**
+	 * Necessary steps after a user completes a {@link Readings}.
+	 */
+	async function processNavReadings() {
+		let nr: NavReadings = pane.buffer.bag?.navReadings;
+		if (nr) {
+			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
+			await completedReadingsService.save(cr);
+			completedReadingsService.updateSubMetadata(subsByID, nr, cr);
+			completedReadingsService.cleanup(pane);
+			completedReadingsService.notifyWorker(cr);
+		}
+	}
+
+	function updateNextReadings() {
+		let nrs: NextReadings[] = subsByID
+			.entries()
+			.filter(([_, s]) => filterSubsForNextReadings(s))
+			.map(([_, s]) => subToNextReadings(s))
+			.toArray();
+
+		nextReadings.length = 0;
+		nextReadings.push(...nrs);
+	}
+
+	function filterSubsForNextReadings(s: Sub): Boolean {
+		return s.nestedReadings.length - 1 > s.nextReadingsIndex;
+	}
+
+	function subToNextReadings(s: Sub): NextReadings {
+		return {
+			readings: s.nestedReadings[s.nextReadingsIndex],
+			dateSubscribed: s.dateSubscribed ? s.dateSubscribed : Date.now(),
+			name: s.name,
+			percentCompleted: s.percentCompleted,
+			subReadingsIndex: s.nextReadingsIndex,
+			totalReadings: s.nestedReadings.length,
+			subID: s.id
+		};
+	}
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onCloseNextReadings() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -53,62 +128,6 @@
 		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
 		pane.updateBuffer('ChapterContainer'); // TODO Make this a variable
 	}
-
-	function subToNextReadings(s: Sub): NextReadings {
-		return {
-			readings: s.nestedReadings[s.nextReadingsIndex],
-			dateSubscribed: s.dateSubscribed ? s.dateSubscribed : Date.now(),
-			name: s.name,
-			percentCompleted: s.percentCompleted,
-			subReadingsIndex: s.nextReadingsIndex,
-			totalReadings: s.nestedReadings.length,
-			subID: s.id
-		};
-	}
-
-	function filterSubsForNextReadings(s: Sub): Boolean {
-		return s.nestedReadings.length - 1 > s.nextReadingsIndex;
-	}
-
-	function updateNextReadings() {
-		let nrs: NextReadings[] = subsByID
-			.entries()
-			.filter(([_, s]) => filterSubsForNextReadings(s))
-			.map(([_, s]) => subToNextReadings(s))
-			.toArray();
-
-		nextReadings.length = 0;
-		nextReadings.push(...nrs);
-	}
-
-	async function processNavReadings() {
-		let nr: NavReadings = pane.buffer.bag?.navReadings;
-		if (nr) {
-			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
-			await completedReadingsService.save(cr);
-			completedReadingsService.updateSubMetadata(subsByID, nr, cr);
-			completedReadingsService.cleanup(pane);
-			completedReadingsService.notifyWorker(cr);
-		}
-	}
-
-	async function onGetAllSubs(data: any) {
-		if (data) {
-			subsByID = data.subs;
-
-			await processNavReadings();
-			await updateNextReadings();
-		}
-	}
-
-	onDestroy(() => {
-		plansPubSubService.unsubscribe(SUBSCRIBER_ID);
-	});
-
-	onMount(() => {
-		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, SUBSCRIBER_ID);
-		plansPubSubService.getAllSubs();
-	});
 </script>
 
 {#snippet nextReading(n: any, idx: any)}

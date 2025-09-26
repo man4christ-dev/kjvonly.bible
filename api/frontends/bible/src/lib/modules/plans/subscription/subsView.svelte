@@ -7,42 +7,42 @@
 	import SubsDetails from './subsDetails.svelte';
 	import SubsList from './subsList.svelte';
 	import uuid4 from 'uuid4';
-	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
-	import {
-		NullSub,
-		type Sub,
-		type NavReadings,
-		type CompletedReadings
-	} from '$lib/models/plans.model';
+	import { NullSub, type Sub, type NavReadings } from '$lib/models/plans.model';
 	import type { Pane } from '$lib/models/pane.model';
 	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
 
+	// =============================== BINDINGS ================================
+
 	let {
-		plansDisplay = $bindable(),
-		pane = $bindable(),
-		paneId = $bindable(),
-		clientHeight = $bindable()
+		plansDisplay = $bindable<string>(),
+		pane = $bindable<Pane>(),
+		paneId = $bindable<string>(),
+		clientHeight = $bindable<string>()
 	} = $props();
 
+	// ================================== VARS =================================
+
 	let selectedSub: Sub = $state(NullSub());
-	let PLAN_SUBSCRIBER_ID: string = uuid4();
+	let SUBSCRIBER_ID: string = uuid4();
 	let subsByID: Map<string, Sub> = new Map<string, Sub>();
 	let subs: Sub[] = $state([]);
 
-	async function processNavReadings() {
-		let nr: NavReadings = pane.buffer.bag?.navReadings;
-		if (nr) {
-			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
-			await completedReadingsService.save(cr);
-			selectedSub = completedReadingsService.updateSubMetadata(
-				subsByID,
-				nr,
-				cr
-			);
-			completedReadingsService.cleanup(pane);
-			completedReadingsService.notifyWorker(cr);
-		}
-	}
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		plansPubSubService.subscribe(
+			'getAllSubs', // TODO make an enum
+			onGetAllSubs,
+			SUBSCRIBER_ID
+		);
+		plansPubSubService.getAllSubs();
+	});
+
+	onDestroy(() => {
+		plansPubSubService.unsubscribe(SUBSCRIBER_ID);
+	});
+
+	// ================================ FUNCS ==================================
 
 	/**
 	 * Subscription func for getAllSubs. Anytime a sum is changed and published
@@ -65,18 +65,23 @@
 		}
 	}
 
-	onDestroy(() => {
-		plansPubSubService.unsubscribe(PLAN_SUBSCRIBER_ID);
-	});
-
-	onMount(() => {
-		plansPubSubService.subscribe(
-			'getAllSubs', // TODO make an enum
-			onGetAllSubs,
-			PLAN_SUBSCRIBER_ID
-		);
-		plansPubSubService.getAllSubs();
-	});
+	/**
+	 * Necessary steps after a user completes a {@link Readings}.
+	 */
+	async function processNavReadings() {
+		let nr: NavReadings = pane.buffer.bag?.navReadings;
+		if (nr) {
+			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
+			await completedReadingsService.save(cr);
+			selectedSub = completedReadingsService.updateSubMetadata(
+				subsByID,
+				nr,
+				cr
+			);
+			completedReadingsService.cleanup(pane);
+			completedReadingsService.notifyWorker(cr);
+		}
+	}
 </script>
 
 {#if plansDisplay === PLANS_VIEWS.SUBS_LIST}

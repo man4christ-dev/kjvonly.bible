@@ -1,14 +1,19 @@
 <script lang="ts">
+	import { type Pane } from '$lib/models/pane.model';
 	import ActionItemsList from '../components/actionItemsList.svelte';
 	import Header from '../components/header.svelte';
 	import { PLANS_VIEWS } from '../models';
 
+	// =============================== BINDINGS ================================
+
 	let {
-		plansDisplay = $bindable(),
-		pane = $bindable(),
-		paneId,
-		clientHeight = $bindable()
+		plansDisplay = $bindable<string>(),
+		pane = $bindable<Pane>(),
+		paneId = $bindable<string>(),
+		clientHeight = $bindable<string>()
 	} = $props();
+
+	// ================================== VARS =================================
 
 	let headerHeight = $state(0);
 
@@ -31,7 +36,8 @@
 ></Header>
 <div class="flex w-full max-w-lg">
 	<div
-		style="max-height: {clientHeight - headerHeight}px; min-height: {clientHeight - headerHeight}px"
+		style="max-height: {clientHeight -
+			headerHeight}px; min-height: {clientHeight - headerHeight}px"
 		class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
 	>
 		<ActionItemsList actionItems={subsActionItems}></ActionItemsList>
