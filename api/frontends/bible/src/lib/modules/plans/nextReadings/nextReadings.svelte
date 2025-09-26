@@ -8,12 +8,10 @@
 	import type {
 		Sub,
 		NextReadings,
-		CompletedReadings,
 		Readings,
 		NavReadings
 	} from '../../../models/plans.model';
 	import { PLANS_VIEWS } from '../models';
-	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
 	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
 
 	let {
@@ -22,7 +20,7 @@
 		clientHeight = $bindable()
 	} = $props();
 
-	let NEXT_READING_ID: string = uuid4();
+	let SUBSCRIBER_ID: string = uuid4();
 	let nextReadingViewID = uuid4();
 
 	let headerHeight = $state(0);
@@ -83,13 +81,14 @@
 		nextReadings.push(...nrs);
 	}
 
-	async function onReturnPlan() {
+	async function processNavReadings() {
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
 			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
-			await completedReadingsService.recordCompletedReading(cr);
-			completedReadingsService.updateSelectedSub(subsByID, nr, cr);
-			completedReadingsService.onReturnPlanCleanup(pane);
+			await completedReadingsService.save(cr);
+			completedReadingsService.updateSubMetadata(subsByID, nr, cr);
+			completedReadingsService.cleanup(pane);
+			completedReadingsService.notifyWorker(cr);
 		}
 	}
 
@@ -97,17 +96,17 @@
 		if (data) {
 			subsByID = data.subs;
 
-			await onReturnPlan();
+			await processNavReadings();
 			await updateNextReadings();
 		}
 	}
 
 	onDestroy(() => {
-		plansPubSubService.unsubscribe(NEXT_READING_ID);
+		plansPubSubService.unsubscribe(SUBSCRIBER_ID);
 	});
 
 	onMount(() => {
-		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, NEXT_READING_ID);
+		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, SUBSCRIBER_ID);
 		plansPubSubService.getAllSubs();
 	});
 </script>

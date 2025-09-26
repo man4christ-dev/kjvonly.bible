@@ -29,20 +29,27 @@
 	let subsByID: Map<string, Sub> = new Map<string, Sub>();
 	let subs: Sub[] = $state([]);
 
-	async function onReturnPlan() {
+	async function processNavReadings() {
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
 			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
-			await completedReadingsService.recordCompletedReading(cr);
-			selectedSub = completedReadingsService.updateSelectedSub(
+			await completedReadingsService.save(cr);
+			selectedSub = completedReadingsService.updateSubMetadata(
 				subsByID,
 				nr,
 				cr
 			);
-			completedReadingsService.onReturnPlanCleanup(pane);
+			completedReadingsService.cleanup(pane);
+			completedReadingsService.notifyWorker(cr);
 		}
 	}
 
+	/**
+	 * Subscription func for getAllSubs. Anytime a sum is changed and published
+	 * this function will be called with the updated Subs data
+	 *
+	 * @param data
+	 */
 	async function onGetAllSubs(data: any) {
 		// TODO add type
 		if (data) {
@@ -54,7 +61,7 @@
 				.sort((a: any, b: any) => a.dateCreated - b.dateCreated)
 				.forEach((s: any) => subs.push(s));
 
-			await onReturnPlan();
+			await processNavReadings();
 		}
 	}
 
