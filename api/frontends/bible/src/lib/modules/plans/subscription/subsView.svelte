@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { readingsApi } from '$lib/api/completedReadings';
+	import { completedReadingsApi } from '$lib/api/completedReadings';
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import { PLANS_VIEWS } from '../models';
@@ -14,6 +14,8 @@
 		type NavReadings,
 		type CompletedReadings
 	} from '$lib/models/plans.model';
+	import type { Pane } from '$lib/models/pane.model';
+	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
 
 	let {
 		plansDisplay = $bindable(),
@@ -24,59 +26,33 @@
 
 	let selectedSub: Sub = $state(NullSub());
 	let PLAN_SUBSCRIBER_ID: string = uuid4();
-	let subsMap: Map<string, Sub> = new Map<string, Sub>();
-	let subsList: Sub[] = $state([]);
-
-	function onReturnPlanCleanup() {
-		delete pane.buffer.bag.navReadings;
-	}
-
-	function navReadingsToCompletedReadings(nr: NavReadings): CompletedReadings {
-		return {
-			id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
-			index: nr.subNestedReadingsIndex,
-			subID: nr.subID,
-			version: 0
-		};
-	}
-
-	async function recordCompletedReading(cr: CompletedReadings) {
-		await readingsApi.put(cr);
-		plansPubSubService.putReading(cr, cr.subID);
-	}
-
-	function updateSelectedSub(nr: NavReadings, cr: CompletedReadings) {
-		let sub = subsMap.get(nr.subID);
-		if (!sub) {
-			return;
-		}
-
-		sub.completedReadings.set(nr.subNestedReadingsIndex, cr);
-		sub.nextReadingsIndex = subsEnricherService.getNextReadingIndex(
-			Object.keys(sub.completedReadings).map((v) => parseInt(v))
-		);
-		selectedSub = sub;
-	}
+	let subsByID: Map<string, Sub> = new Map<string, Sub>();
+	let subs: Sub[] = $state([]);
 
 	async function onReturnPlan() {
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
-			let cr = navReadingsToCompletedReadings(nr);
-			await recordCompletedReading(cr);
-			updateSelectedSub(nr, cr);
-			onReturnPlanCleanup();
+			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
+			await completedReadingsService.recordCompletedReading(cr);
+			selectedSub = completedReadingsService.updateSelectedSub(
+				subsByID,
+				nr,
+				cr
+			);
+			completedReadingsService.onReturnPlanCleanup(pane);
 		}
 	}
 
 	async function onGetAllSubs(data: any) {
+		// TODO add type
 		if (data) {
-			subsMap = data.subs;
-			subsList.length = 0;
-			subsMap
+			subsByID = data.subs;
+			subs.length = 0;
+			subsByID
 				.values()
 				.toArray()
 				.sort((a: any, b: any) => a.dateCreated - b.dateCreated)
-				.forEach((s: any) => subsList.push(s));
+				.forEach((s: any) => subs.push(s));
 
 			await onReturnPlan();
 		}
@@ -88,7 +64,7 @@
 
 	onMount(() => {
 		plansPubSubService.subscribe(
-			'getAllSubs',
+			'getAllSubs', // TODO make an enum
 			onGetAllSubs,
 			PLAN_SUBSCRIBER_ID
 		);
@@ -103,7 +79,7 @@
 		bind:pane
 		bind:plansDisplay
 		bind:selectedSub
-		bind:subsList
+		bind:subsList={subs}
 	></SubsList>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
 	<SubsAction bind:plansDisplay bind:pane bind:clientHeight paneId></SubsAction>

@@ -1,5 +1,5 @@
 import { plansApi } from '$lib/api/plans.api';
-import { readingsApi } from '$lib/api/completedReadings';
+import { completedReadingsApi } from '$lib/api/completedReadings';
 import { subsApi } from '$lib/api/subs.api';
 import {
 	cachedPlanToPlan,
@@ -81,7 +81,7 @@ async function initializeSubs() {
 }
 
 async function initializeCompletedReadings() {
-	let cachedReadings = await readingsApi.gets();
+	let cachedReadings = await completedReadingsApi.gets();
 	for (let r of cachedReadings) {
 		await completedReadingsDocument.addAsync(r.id, r);
 		completedReadings.set(r.id, r);

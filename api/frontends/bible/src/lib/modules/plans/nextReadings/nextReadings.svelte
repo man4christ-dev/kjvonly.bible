@@ -2,7 +2,7 @@
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import ReadingsComponent from '../components/readings.svelte';
-	import { readingsApi } from '$lib/api/completedReadings';
+	import { completedReadingsApi } from '$lib/api/completedReadings';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
 	import type {
@@ -14,6 +14,7 @@
 	} from '../../../models/plans.model';
 	import { PLANS_VIEWS } from '../models';
 	import { subsEnricherService } from '$lib/services/plans/subsEnricher.service';
+	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
 
 	let {
 		pane = $bindable(),
@@ -27,7 +28,7 @@
 	let headerHeight = $state(0);
 	let nextReadings: NextReadings[] = $state([]);
 
-	let subsMap: Map<string, Sub> = new Map<string, Sub>();
+	let subsByID: Map<string, Sub> = new Map<string, Sub>();
 
 	function onCloseNextReadings() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -55,21 +56,28 @@
 		pane.updateBuffer('ChapterContainer'); // TODO Make this a variable
 	}
 
+	function subToNextReadings(s: Sub): NextReadings {
+		return {
+			readings: s.nestedReadings[s.nextReadingsIndex],
+			dateSubscribed: s.dateSubscribed ? s.dateSubscribed : Date.now(),
+			name: s.name,
+			percentCompleted: s.percentCompleted,
+			subReadingsIndex: s.nextReadingsIndex,
+			totalReadings: s.nestedReadings.length,
+			subID: s.id
+		};
+	}
+
+	function filterSubsForNextReadings(s: Sub): Boolean {
+		return s.nestedReadings.length - 1 > s.nextReadingsIndex;
+	}
+
 	function updateNextReadings() {
-		let nrs: NextReadings[] = subsMap
+		let nrs: NextReadings[] = subsByID
 			.entries()
-			.filter(([_, s]) => s.nestedReadings.length - 1 > s.nextReadingsIndex)
-			.map(([_, s]) => {
-				return {
-					readings: s.nestedReadings[s.nextReadingsIndex],
-					dateSubscribed: s.dateSubscribed ? s.dateSubscribed : Date.now(),
-					name: s.name,
-					percentCompleted: s.percentCompleted,
-					subReadingsIndex: s.nextReadingsIndex,
-					totalReadings: s.nestedReadings.length,
-					subID: s.id
-				};
-			});
+			.filter(([_, s]) => filterSubsForNextReadings(s))
+			.map(([_, s]) => subToNextReadings(s))
+			.toArray();
 
 		nextReadings.length = 0;
 		nextReadings.push(...nrs);
@@ -78,29 +86,16 @@
 	async function onReturnPlan() {
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
-			let cr: CompletedReadings = {
-				id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
-				index: nr.subNestedReadingsIndex,
-				subID: nr.subID,
-				version: 0
-			};
-			await readingsApi.put(cr); // TODO completedReadingsApi
-			plansPubSubService.putReading(cr, nr.subID); // TODO completedReadings
-
-			let sub = subsMap.get(nr.subID);
-			if (!sub) {
-				return;
-			}
-			sub.completedReadings.set(nr.subNestedReadingsIndex, cr);
-			sub.nextReadingsIndex = subsEnricherService.getNextReadingIndex(
-				sub.completedReadings.keys().toArray()
-			);
+			let cr = completedReadingsService.navReadingsToCompletedReadings(nr);
+			await completedReadingsService.recordCompletedReading(cr);
+			completedReadingsService.updateSelectedSub(subsByID, nr, cr);
+			completedReadingsService.onReturnPlanCleanup(pane);
 		}
 	}
 
 	async function onGetAllSubs(data: any) {
 		if (data) {
-			subsMap = data.subs;
+			subsByID = data.subs;
 
 			await onReturnPlan();
 			await updateNextReadings();

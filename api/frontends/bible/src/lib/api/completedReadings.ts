@@ -53,4 +53,4 @@ export class CompletedReadingsApi {
 	}
 }
 
-export let readingsApi = new CompletedReadingsApi();
+export let completedReadingsApi = new CompletedReadingsApi();
