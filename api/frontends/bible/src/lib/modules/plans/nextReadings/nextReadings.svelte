@@ -2,7 +2,6 @@
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import ReadingsComponent from '../components/readings.svelte';
-	import { completedReadingsApi } from '$lib/api/completedReadings';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
 	import type {
@@ -85,6 +84,11 @@
 		nextReadings.push(...nrs);
 	}
 
+	/**
+	 * skip completed subscriptions.
+	 *
+	 * @param s
+	 */
 	function filterSubsForNextReadings(s: Sub): Boolean {
 		return s.nestedReadings.length - 1 > s.nextReadingsIndex;
 	}
