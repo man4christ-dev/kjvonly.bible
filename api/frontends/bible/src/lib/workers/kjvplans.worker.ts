@@ -180,6 +180,7 @@ async function putReading(data: any, subID: any) {
 	if (sub) {
 		sub.completedReadings.set(data.index, data);
 		await enrichSub(sub);
+		publishSubs();
 	}
 }
 

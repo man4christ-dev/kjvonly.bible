@@ -27,31 +27,44 @@
 	let subsMap: Map<string, Sub> = new Map<string, Sub>();
 	let subsList: Sub[] = $state([]);
 
+	function onReturnPlanCleanup() {
+		delete pane.buffer.bag.navReadings;
+	}
+
+	function navReadingsToCompletedReadings(nr: NavReadings): CompletedReadings {
+		return {
+			id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
+			index: nr.subNestedReadingsIndex,
+			subID: nr.subID,
+			version: 0
+		};
+	}
+
+	async function recordCompletedReading(cr: CompletedReadings) {
+		await readingsApi.put(cr);
+		plansPubSubService.putReading(cr, cr.subID);
+	}
+
+	function updateSelectedSub(nr: NavReadings, cr: CompletedReadings) {
+		let sub = subsMap.get(nr.subID);
+		if (!sub) {
+			return;
+		}
+
+		sub.completedReadings.set(nr.subNestedReadingsIndex, cr);
+		sub.nextReadingsIndex = subsEnricherService.getNextReadingIndex(
+			Object.keys(sub.completedReadings).map((v) => parseInt(v))
+		);
+		selectedSub = sub;
+	}
+
 	async function onReturnPlan() {
 		let nr: NavReadings = pane.buffer.bag?.navReadings;
 		if (nr) {
-			let readingsData: CompletedReadings = {
-				id: `${nr.subID}/${nr.subNestedReadingsIndex}`,
-				index: nr.subNestedReadingsIndex,
-				subID: nr.subID,
-				version: 0
-			};
-			await readingsApi.put(readingsData);
-			plansPubSubService.putReading(readingsData, nr.subID);
-
-			let sub = subsMap.get(nr.subID);
-			// SHOULD ALWAYS EXIST. MAKE COMPILER HAPPY
-			if (!sub) {
-				return;
-			}
-
-			sub.completedReadings.set(nr.subNestedReadingsIndex, readingsData);
-			sub.nextReadingsIndex = subsEnricherService.getNextReadingIndex(
-				Object.keys(sub.completedReadings).map((v) => parseInt(v))
-			);
-			console.log('before');
-			selectedSub = sub;
-			console.log('after');
+			let cr = navReadingsToCompletedReadings(nr);
+			await recordCompletedReading(cr);
+			updateSelectedSub(nr, cr);
+			onReturnPlanCleanup();
 		}
 	}
 
