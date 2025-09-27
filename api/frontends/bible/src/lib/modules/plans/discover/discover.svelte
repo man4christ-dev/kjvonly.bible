@@ -98,7 +98,7 @@
 		]}
 	></Header>
 
-	<div class="w-full max-w-lg">
+	<div class="relative w-full max-w-lg">
 		<div
 			style="height: {clientHeight - headerHeight}px"
 			class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
@@ -106,12 +106,21 @@
 			<!-- {@render today()} -->
 			{@render plansListView()}
 		</div>
+
+		<!-- Your parent container content -->
+		<div class="absolute right-0 bottom-0 p-4">
+			<button
+				class="bg-primary-200 z-10 flex h-12 w-12 items-center justify-center rounded-full text-neutral-200"
+			>
+				+
+			</button>
+		</div>
 	</div>
 {:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}
 	<Header
 		bind:headerHeight
 		title="Discover Plans"
-		onClose={() => {}}
+		onClose={undefined}
 		bind:plansDisplay
 		menuDropdownToggleViews={[
 			PLANS_VIEWS.PLANS_LIST,

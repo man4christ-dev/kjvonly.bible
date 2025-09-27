@@ -112,7 +112,6 @@ async function enrichSubs() {
 async function enrichSub(sub: Sub | undefined) {
 	if (sub) {
 		await setCompletedReadings(sub);
-		setSubPlanData(sub);
 		subsEnricherService.setNextReadingIndex(sub);
 		subsEnricherService.setPercentComplete(sub);
 	}
@@ -138,13 +137,6 @@ async function getCompletedReadings(
 	return completedReadingsDocument.searchAsync(search, {
 		index: index
 	});
-}
-
-function setSubPlanData(sub: Sub) {
-	let plan = plans.get(sub.planID) || NullPlan();
-	sub.nestedReadings = plan.nestedReadings;
-	sub.description = plan.description;
-	sub.name = plan.name;
 }
 
 // ================================== PUB SUB ==================================

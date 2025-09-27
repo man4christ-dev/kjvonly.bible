@@ -1,3 +1,4 @@
+import { encodedReadingsDecoderService } from '$lib/services/plans/encodedReadingsDecoder.service';
 import type { BCV } from './bible.model';
 
 // =================================== PLAN ====================================
@@ -48,14 +49,13 @@ export function cachedPlanToPlan(cp: CachedPlan): Plan {
 
 // =================================== SUBS ====================================
 
-export interface Sub extends CachedSub {
+export interface Sub {
 	id: string;
 	planID: string;
 	userID: string;
 	dateSubscribed: number;
 	version: number;
 
-	// VM
 	name: string;
 	description: string[];
 	nestedReadings: Readings[];
@@ -85,20 +85,27 @@ export interface CachedSub {
 	id: string;
 	planID: string;
 	userID: string;
+	name: '';
+	description: [];
+	encodedReadings: string[];
 	dateSubscribed: number;
 	version: number;
 }
 
 export function cachedSubToSub(cs: CachedSub): Sub {
+	let nestedReadings = encodedReadingsDecoderService.parseEncodedReadings(
+		cs.encodedReadings
+	);
+
 	return {
 		id: cs.id,
 		planID: cs.planID,
 		userID: cs.userID,
 		dateSubscribed: cs.dateSubscribed,
 		version: cs.version,
-		name: '',
-		description: [],
-		nestedReadings: [],
+		name: cs.name,
+		description: cs.description,
+		nestedReadings: nestedReadings,
 		completedReadings: new Map(),
 		nextReadingsIndex: 0,
 		percentCompleted: 0
