@@ -8,6 +8,7 @@
 	import { PLANS_VIEWS } from '../models';
 	import type { Plan } from '$lib/models/plans.model';
 
+	// =============================== BINDINGS ================================
 	let {
 		plansDisplay = $bindable(),
 		clientHeight = $bindable(),
@@ -15,11 +16,11 @@
 		pane = $bindable()
 	} = $props();
 
+	// ================================== VARS =================================
 	let PLAN_SUBSCRIBER_ID: string = uuid4();
-
 	let plansMap: Map<string, Plan> = $state(new Map());
 	let planList: Plan[] = $state([]);
-
+	let headerHeight = $state(0);
 	let planActionItems: any = {
 		'my plans': () => {
 			plansDisplay = PLANS_VIEWS.SUBS_LIST;
@@ -28,6 +29,23 @@
 			plansDisplay = PLANS_VIEWS.NEXT_LIST;
 		}
 	};
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		plansPubSubService.subscribe(
+			'getAllPlans',
+			onGetAllPlans,
+			PLAN_SUBSCRIBER_ID
+		);
+		plansPubSubService.getAllPlans();
+	});
+
+	onDestroy(() => {
+		plansPubSubService.unsubscribe(PLAN_SUBSCRIBER_ID);
+	});
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onClosePlansList() {
 		paneService.onDeletePane(paneService.rootPane, paneId);
@@ -42,21 +60,6 @@
 				.sort((a: Plan, b: Plan) => a.dateCreated - b.dateCreated);
 		}
 	}
-
-	onDestroy(() => {
-		plansPubSubService.unsubscribe(PLAN_SUBSCRIBER_ID);
-	});
-
-	onMount(() => {
-		plansPubSubService.subscribe(
-			'getAllPlans',
-			onGetAllPlans,
-			PLAN_SUBSCRIBER_ID
-		);
-		plansPubSubService.getAllPlans();
-	});
-
-	let headerHeight = $state(0);
 </script>
 
 {#snippet plansListView()}
