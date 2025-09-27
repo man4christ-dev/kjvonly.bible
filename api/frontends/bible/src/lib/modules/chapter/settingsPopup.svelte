@@ -59,14 +59,11 @@
 	}
 </script>
 
-<div
-	bind:clientHeight
-	class="flex h-full w-full justify-center overflow-y-scroll bg-neutral-50 text-neutral-700"
->
+<div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
 	<div class="w-full max-w-lg">
 		<header
 			bind:clientHeight={headerHeight}
-			class="items w-full flex-col border-b-2 bg-neutral-100"
+			class="sticky top-0 w-full flex-col border-b-2 bg-neutral-100 text-neutral-700"
 		>
 			<div
 				class="sticky top-0 flex w-full justify-between px-2 pt-2 text-neutral-700"
@@ -99,7 +96,7 @@
 
 		<div
 			style="height: {clientHeight - headerHeight}px"
-			class="flex flex-col justify-center border bg-neutral-50"
+			class="flex w-full flex-col overflow-y-scroll border"
 		>
 			<div class="flex flex-row p-4">
 				<button
