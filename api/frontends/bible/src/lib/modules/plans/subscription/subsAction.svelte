@@ -1,8 +1,8 @@
 <script lang="ts">
 	import { type Pane } from '$lib/models/pane.model';
+	import { PLANS_VIEWS } from '$lib/models/plans.model';
 	import ActionItemsList from '../components/actionItemsList.svelte';
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS } from '../models';
 
 	// =============================== BINDINGS ================================
 

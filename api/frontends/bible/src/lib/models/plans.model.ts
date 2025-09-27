@@ -176,5 +176,25 @@ export interface NavReadings {
 	subNestedReadingsIndex: number;
 	readings: Readings;
 	currentNavReadingsIndex: number;
-	returnView: string;
+	returnView: PLANS_VIEWS;
+}
+
+export const PLANS_MAX_VIEW_ID = 19;
+export const SUBS_MAX_VIEW_ID = 39;
+export const NEXT_MAX_VIEW_ID = 59;
+
+export enum PLANS_VIEWS {
+	// PLAN
+
+	PLANS_LIST = 1,
+	PLANS_ACTIONS = 2,
+	PLANS_DETAILS = 3,
+
+	// SUB
+	SUBS_LIST = 20,
+	SUBS_ACTIONS = 21,
+	SUBS_DETAILS = 22,
+
+	// NEXT READINGS
+	NEXT_LIST = 40
 }

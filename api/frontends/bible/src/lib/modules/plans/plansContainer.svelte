@@ -1,11 +1,16 @@
 <script lang="ts">
 	import SubsView from './subscription/subsView.svelte';
 	import NextReadings from './nextReadings/nextReadings.svelte';
-	import { PLANS_VIEWS } from './models';
 	import Discover from './discover/discover.svelte';
 	import { onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 	import type { Pane } from '$lib/models/pane.model';
+	import {
+		NEXT_MAX_VIEW_ID,
+		PLANS_MAX_VIEW_ID,
+		PLANS_VIEWS,
+		SUBS_MAX_VIEW_ID
+	} from '$lib/models/plans.model';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -18,7 +23,7 @@
 	// ================================== VARS =================================
 
 	let id = uuid4();
-	let plansDisplay: string = $state('');
+	let plansDisplay: PLANS_VIEWS = $state(PLANS_VIEWS.SUBS_LIST);
 	let clientHeight = $state(0);
 
 	// =============================== LIFECYCLE ===============================
@@ -37,13 +42,13 @@
 	<div {id} style="{containerHeight} {containerWidth}">
 		<div bind:clientHeight style={containerHeight} class="overflow-hidden">
 			<div class="flex flex-col items-center">
-				{#if plansDisplay?.startsWith('PLANS')}
+				{#if plansDisplay < PLANS_MAX_VIEW_ID}
 					<Discover bind:plansDisplay bind:pane bind:paneId bind:clientHeight
 					></Discover>
-				{:else if plansDisplay?.startsWith('SUBS')}
+				{:else if plansDisplay < SUBS_MAX_VIEW_ID}
 					<SubsView bind:plansDisplay bind:pane bind:paneId bind:clientHeight
 					></SubsView>
-				{:else if plansDisplay?.startsWith('NEXT')}
+				{:else if plansDisplay < NEXT_MAX_VIEW_ID}
 					<NextReadings bind:plansDisplay bind:pane bind:clientHeight
 					></NextReadings>
 				{/if}

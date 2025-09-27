@@ -2,10 +2,14 @@
 	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS } from '../models';
 	import ReadingsComponent from '../components/readings.svelte';
 	import uuid4 from 'uuid4';
-	import type { NavReadings, Readings, Sub } from '$lib/models/plans.model';
+	import {
+		PLANS_VIEWS,
+		type NavReadings,
+		type Readings,
+		type Sub
+	} from '$lib/models/plans.model';
 	import type { BCV } from '$lib/models/bible.model';
 	import Pane from '$lib/components/pane.svelte';
 	import { Modules } from '$lib/models/modules.model';
@@ -96,7 +100,7 @@
 
 	function onSelectedSubReading(
 		subNestedReadingsIndex: number,
-		returnView: string
+		returnView: PLANS_VIEWS
 	) {
 		let readings: Readings = selectedSub.nestedReadings[subNestedReadingsIndex];
 		readings.bcvs = readings.bcvs.map((r: any) => {

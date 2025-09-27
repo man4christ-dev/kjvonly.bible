@@ -2,12 +2,16 @@
 	import { completedReadingsApi } from '$lib/api/completedReadings';
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
-	import { PLANS_VIEWS } from '../models';
 	import SubsAction from './subsAction.svelte';
 	import SubsDetails from './subsDetails.svelte';
 	import SubsList from './subsList.svelte';
 	import uuid4 from 'uuid4';
-	import { NullSub, type Sub, type NavReadings } from '$lib/models/plans.model';
+	import {
+		NullSub,
+		type Sub,
+		type NavReadings,
+		PLANS_VIEWS
+	} from '$lib/models/plans.model';
 	import type { Pane } from '$lib/models/pane.model';
 	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
 

@@ -1,8 +1,7 @@
 <script lang="ts">
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS } from '../models';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import type { Sub } from '$lib/models/plans.model';
+	import { PLANS_VIEWS, type Sub } from '$lib/models/plans.model';
 
 	// =============================== BINDINGS ================================
 	let {

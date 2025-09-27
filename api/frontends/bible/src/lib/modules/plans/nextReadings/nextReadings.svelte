@@ -4,13 +4,14 @@
 	import ReadingsComponent from '../components/readings.svelte';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
-	import { PLANS_VIEWS } from '../models';
+
 	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
-	import type {
-		Sub,
-		NextReadings,
-		Readings,
-		NavReadings
+	import {
+		type Sub,
+		type NextReadings,
+		type Readings,
+		type NavReadings,
+		PLANS_VIEWS
 	} from '../../../models/plans.model';
 	import { Modules } from '$lib/models/modules.model';
 
@@ -112,7 +113,7 @@
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
 	}
 
-	function onSelectedNextReading(idx: number, returnView: string) {
+	function onSelectedNextReading(idx: number, returnView: PLANS_VIEWS) {
 		let nrs: NextReadings = nextReadings[idx];
 		let readings: Readings = nrs.readings;
 		readings.bcvs = readings.bcvs.map((r: any) => {

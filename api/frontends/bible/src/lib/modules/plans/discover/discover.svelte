@@ -5,8 +5,7 @@
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
 	import ActionItemsList from '../components/actionItemsList.svelte';
-	import { PLANS_VIEWS } from '../models';
-	import type { Plan } from '$lib/models/plans.model';
+	import { PLANS_VIEWS, type Plan } from '$lib/models/plans.model';
 
 	// =============================== BINDINGS ================================
 	let {
