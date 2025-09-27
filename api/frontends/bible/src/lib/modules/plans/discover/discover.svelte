@@ -76,11 +76,7 @@
 			</div>
 
 			<div class="truncate text-start text-sm">
-				{#each p.description as d}
-					<span>
-						{d}
-					</span>
-				{/each}
+				<p>{p.description}</p>
 			</div>
 		</button>
 	{/each}

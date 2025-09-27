@@ -57,7 +57,7 @@ export interface Sub {
 	version: number;
 
 	name: string;
-	description: string[];
+	description: string;
 	nestedReadings: Readings[];
 	completedReadings: Map<number, CompletedReadings>;
 
@@ -73,7 +73,7 @@ export function NullSub(): Sub {
 		dateSubscribed: 0,
 		version: 0,
 		name: '',
-		description: [],
+		description: '',
 		nestedReadings: [],
 		completedReadings: new Map(),
 		nextReadingsIndex: 0,
@@ -86,7 +86,7 @@ export interface CachedSub {
 	planID: string;
 	userID: string;
 	name: '';
-	description: [];
+	description: string;
 	encodedReadings: string[];
 	dateSubscribed: number;
 	version: number;

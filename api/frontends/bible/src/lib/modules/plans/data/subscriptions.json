@@ -5,9 +5,7 @@
 		"planID": "00000000-0000-0000-0000-000000000000",
 		"name": "M'Cheyne Reading Plan",
 		"description": [
-			"The M'Cheyne Reading Plan is a daily Bible reading schedule developed by 19th-century Scottish minister Robert Murray M’Cheyne, designed to guide readers through the entire Bible in one year.",
-			"The plan involves reading approximately four passages per day, with the goal of completing the Old Testament once, the New Testament twice, and the Psalms twice within the year.",
-			"This structure ensures a comprehensive and balanced exposure to Scripture."
+			"The M'Cheyne Reading Plan is a daily Bible reading schedule developed by 19th-century Scottish minister Robert Murray M’Cheyne, designed to guide readers through the entire Bible in one year.\nThe plan involves reading approximately four passages per day, with the goal of completing the Old Testament once, the New Testament twice, and the Psalms twice within the year.\nThis structure ensures a comprehensive and balanced exposure to Scripture.\n"
 		],
 		"encodedReadings": [
 			"1/1/1-31;47/1/1-25;15/1/1-11;51/1/1-26",
@@ -384,9 +382,7 @@
 		"id": "00000000-0000-0000-0000-000000000001",
 		"planID": "00000000-0000-0000-0000-000000000001",
 		"name": "Proverbs Plan",
-		"description": [
-			"Read through the book of proverbs in 1 month. 1 Chapter a day."
-		],
+		"description": "Read through the book of proverbs in 1 month. 1 Chapter a day.",
 		"encodedReadings": [
 			"24/1/1-33",
 			"24/2/1-22",
@@ -428,9 +424,7 @@
 		"id": "00000000-0000-0000-0000-000000000002",
 		"planID": "00000000-0000-0000-0000-000000000002",
 		"name": "Wisdom Book Plan",
-		"description": [
-			"Read through the wisdom books of the Bible. Job, Proverbs, Ecclesiastes."
-		],
+		"description": "Read through the wisdom books of the Bible. Job, Proverbs, Ecclesiastes.",
 		"encodedReadings": [
 			"22/1/1-22",
 			"22/2/1-13",
