@@ -13,6 +13,7 @@
 	import { extractBookChapter } from '$lib/utils/chapter';
 	import { Buffer } from '$lib/models/buffer.model';
 	import type { NavReadings } from '../../models/plans.model';
+	import { Modules } from '$lib/models/modules.model';
 
 	type WordAnnots = {
 		class: string[];
@@ -71,7 +72,7 @@
 		let ci = plan.currentNavReadingsIndex;
 		let nextIndex = ci + 1;
 		if (nextIndex > plan.readings.bcvs.length - 1) {
-			pane.updateBuffer('Plans');
+			pane.updateBuffer(Modules.PLANS);
 		} else {
 			plan.currentNavReadingsIndex = nextIndex;
 			chapterKey = plan.readings.bcvs[nextIndex].chapterKey;

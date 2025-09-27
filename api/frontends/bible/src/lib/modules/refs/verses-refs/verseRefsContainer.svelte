@@ -3,6 +3,8 @@
 	import { bibleDB } from '$lib/storer/bible.db';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { onMount } from 'svelte';
+	import { Module } from 'quill';
+	import { Modules } from '$lib/models/modules.model';
 
 	let { paneId, verseRefs } = $props();
 
@@ -109,7 +111,7 @@
 		<button
 			aria-label="horizontal split"
 			onclick={() => {
-				paneService.onSplitPane(paneId, 'h', 'ChapterComponent', {
+				paneService.onSplitPane(paneId, 'h', Modules.BIBLE, {
 					chapterKey: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
 				});
 			}}
@@ -149,7 +151,7 @@
 		<button
 			aria-label="horizontal split"
 			onclick={() => {
-				paneService.onSplitPane(paneId, 'v', 'ChapterComponent', {
+				paneService.onSplitPane(paneId, 'v', Modules.BIBLE, {
 					chapterKey: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
 				});
 			}}

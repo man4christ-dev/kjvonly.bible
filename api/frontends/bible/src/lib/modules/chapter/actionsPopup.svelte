@@ -1,12 +1,17 @@
 <script lang="ts">
 	import { annotsApi } from '$lib/api/annots.api';
+	import { Modules } from '$lib/models/modules.model';
 	import { notesService } from '$lib/services/notes.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { searchService } from '$lib/services/search.service';
 	import { toastService } from '$lib/services/toast.service';
 	import { deepMerge } from '$lib/utils/deepmerge';
 
-	let { showActionsDropdown = $bindable(), showCopyVersePopup = $bindable(), paneId } = $props();
+	let {
+		showActionsDropdown = $bindable(),
+		showCopyVersePopup = $bindable(),
+		paneId
+	} = $props();
 
 	let actions: any = {
 		'copy verses': () => {
@@ -15,11 +20,11 @@
 		},
 		search: () => {
 			let p = paneService.findNode(paneService.rootPane, paneId);
-			p?.updateBuffer('Search');
+			p?.updateBuffer(Modules.SEARCH);
 		},
 		notes: () => {
 			let p = paneService.findNode(paneService.rootPane, paneId);
-			p?.updateBuffer('Notes');
+			p?.updateBuffer(Modules.NOTES);
 		},
 		'split vertical': () => {
 			onSplitVertical();
@@ -41,12 +46,12 @@
 	let actionsOrder = [];
 
 	function onSplitVertical(): void {
-		paneService.onSplitPane(paneId, 'v', 'Modules', {});
+		paneService.onSplitPane(paneId, 'v', Modules.MODULES, {});
 		showActionsDropdown = false;
 	}
 
 	function onSplitHorizontal() {
-		paneService.onSplitPane(paneId, 'h', 'Modules', {});
+		paneService.onSplitPane(paneId, 'h', Modules.MODULES, {});
 		showActionsDropdown = false;
 	}
 
@@ -61,7 +66,8 @@
 		var element = document.createElement('a');
 		element.setAttribute(
 			'href',
-			'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(data))
+			'data:application/json;charset=utf-8,' +
+				encodeURIComponent(JSON.stringify(data))
 		);
 		element.setAttribute('download', 'annotations');
 
@@ -134,7 +140,9 @@
 
 					// order of params mater, (target, source) source will update target.
 					//const merged = mergeDeep(annotationsMap, newAnnotations);
-					const merged = deepMerge(annotationsMap, newAnnotationsMap, { arrays: 'replace' });
+					const merged = deepMerge(annotationsMap, newAnnotationsMap, {
+						arrays: 'replace'
+					});
 					let mergedList: any[] = [];
 					Object.keys(merged).forEach((k) => {
 						mergedList.push(merged[k]);
@@ -170,7 +178,10 @@
 	let headerHeight = $state(0);
 </script>
 
-<div bind:clientHeight={containerHeight} class="flex h-full w-full justify-center bg-neutral-50">
+<div
+	bind:clientHeight={containerHeight}
+	class="flex h-full w-full justify-center bg-neutral-50"
+>
 	<div class="w-full justify-center md:max-w-lg">
 		<header
 			bind:clientHeight={headerHeight}
@@ -184,7 +195,12 @@
 					}}
 					class="h-12 w-12 px-2 pt-2 text-neutral-700"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						width="100%"
+						height="100%"
+					>
 						<path
 							class="fill-neutral-700"
 							d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
@@ -202,7 +218,8 @@
 				<div class="w-full">
 					<button
 						onclick={(event) => actions[a]()}
-						class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize">{a}</button
+						class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize"
+						>{a}</button
 					>
 				</div>
 			{/each}

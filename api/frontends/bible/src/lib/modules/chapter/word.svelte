@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { Modules } from '$lib/models/modules.model';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { searchService } from '$lib/services/search.service';
 	import { onMount, untrack } from 'svelte';
@@ -122,14 +123,14 @@
 				}
 			});
 
-			paneService.onSplitPane(pane.id, 'h', 'StrongsVersesRefs', {
+			paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
 				footnotes: footnotes,
 				currentVerseRef: ref,
 				refs: refs,
 				strongsWords: strongsWords
 			});
 		} else {
-			paneService.onSplitPane(pane.id, 'h', 'StrongsVersesRefs', {
+			paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
 				word: word,
 				footnotes: footnotes,
 				currentVerseRef: ref
@@ -284,7 +285,8 @@
 			ontouchend={onMouseUpTouchEnd}
 			onmousedown={onMouseDownTouchStart}
 			onmouseup={onMouseUpTouchEnd}
-			class="{word.class?.join(' ')} {hasVerseReferences && word.class.includes('vno')
+			class="{word.class?.join(' ')} {hasVerseReferences &&
+			word.class.includes('vno')
 				? 'vno-refs'
 				: ''} ">{word.text}</span
 		></span

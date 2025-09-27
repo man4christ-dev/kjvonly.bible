@@ -1,10 +1,11 @@
 import uuid4 from 'uuid4';
+import { Modules } from './modules.model';
 
 export class Buffer {
 	key: string = uuid4();
 	name: string = '';
 	component: any;
-	componentName: string = '';
+	componentName: Modules = Modules.NULL;
 	keyboardBindings: Map<string, Function> = new Map<string, Function>();
 	selected: boolean = false;
 	bag: any = {}; // for persistence
@@ -12,7 +13,7 @@ export class Buffer {
 }
 
 export class NullBuffer extends Buffer {
-	componentName: string = 'NullBuffer';
+	componentName: Modules = Modules.NULL;
 }
 
 class AddBufferError extends Error {}

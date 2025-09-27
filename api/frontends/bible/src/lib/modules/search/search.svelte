@@ -6,6 +6,7 @@
 	import { toastService } from '$lib/services/toast.service';
 	import { bibleDB } from '$lib/storer/bible.db';
 	import { on } from 'svelte/events';
+	import { Modules } from '$lib/models/modules.model';
 
 	let searchID = uuid4();
 	let searchInputHeight: number = $state(0);
@@ -37,7 +38,9 @@
 	}
 
 	function match(word: string) {
-		let stripWord = word.toLowerCase().replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+		let stripWord = word
+			.toLowerCase()
+			.replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
 		let matchText = searchText.replaceAll('OR', '');
 		return new RegExp('\\b' + stripWord + '\\b').test(matchText.toLowerCase());
 	}
@@ -85,7 +88,8 @@
 		}
 
 		const threshold = 20; // Adjust this value as needed
-		const isReachBottom = el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+		const isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
 
 		if (isReachBottom) {
 			loadMoreVerses();
@@ -148,7 +152,7 @@
 			aria-label="horizontal split"
 			onclick={(e) => {
 				e.stopPropagation();
-				paneService.onSplitPane(paneId, 'h', 'ChapterComponent', {
+				paneService.onSplitPane(paneId, 'h', Modules.BIBLE, {
 					chapterKey: v.key
 				});
 			}}
@@ -189,7 +193,7 @@
 			aria-label="vertical split"
 			onclick={(e) => {
 				e.stopPropagation();
-				paneService.onSplitPane(paneId, 'v', 'ChapterComponent', {
+				paneService.onSplitPane(paneId, 'v', Modules.BIBLE, {
 					chapterKey: v.key
 				});
 			}}
@@ -242,11 +246,13 @@
 					pane.buffer.bag = {
 						chapterKey: v.key
 					};
-					pane?.updateBuffer('ChapterContainer');
+					pane?.updateBuffer(Modules.BIBLE);
 				}
 			}}
 		>
-			<span class="py-2 text-left font-bold">{v.bookName} {v.number}:{v.verseNumber}</span><br />
+			<span class="py-2 text-left font-bold"
+				>{v.bookName} {v.number}:{v.verseNumber}</span
+			><br />
 			{#each v.text.split(' ') as w}
 				{#if match(w)}
 					<span class="text-redtxt inline-block">{w}</span>&nbsp;
@@ -262,7 +268,10 @@
 {#if showInput}
 	<div bind:clientHeight style={containerHeight} class="overflow-hidden">
 		<div class="flex flex-col items-center justify-center">
-			<div bind:clientHeight={headerHeight} class="flex w-full flex-col items-center">
+			<div
+				bind:clientHeight={headerHeight}
+				class="flex w-full flex-col items-center"
+			>
 				<div class="flex w-full max-w-lg justify-end bg-neutral-100">
 					<button
 						aria-label="close"
@@ -275,7 +284,12 @@
 						}}
 						class="h-12 w-12 px-2 pt-2 text-neutral-700"
 					>
-						<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+						<svg
+							xmlns="http://www.w3.org/2000/svg"
+							viewBox="0 0 24 24"
+							width="100%"
+							height="100%"
+						>
 							<path
 								class="fill-neutral-700"
 								d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"

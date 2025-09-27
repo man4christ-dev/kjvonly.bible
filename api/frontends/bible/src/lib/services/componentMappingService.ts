@@ -1,3 +1,4 @@
+import { Modules as modules } from '$lib/models/modules.model';
 import ChapterContainer from '$lib/modules/chapter/chapterContainer.svelte';
 import UserGuide from '$lib/modules/guide/userGuide.svelte';
 import Login from '$lib/modules/login/login.svelte';
@@ -15,26 +16,26 @@ import Search from '../modules/search/search.svelte';
 export class ComponentMapping {
 	/**
 	 *
-	 * @param componentName string of class to be returned
+	 * @param module string of class to be returned
 	 * @returns component class
 	 */
-	getComponent(componentName: string): any {
-		switch (componentName) {
-			case 'ChapterContainer':
+	getComponent(module: modules): any {
+		switch (module) {
+			case modules.BIBLE:
 				return ChapterContainer;
-			case 'StrongsVersesRefs':
+			case modules.STRONGS:
 				return StrongsVersesRefs;
-			case 'Search':
+			case modules.SEARCH:
 				return Search;
-			case 'Modules':
+			case modules.MODULES:
 				return Modules;
-			case 'Notes':
+			case modules.NOTES:
 				return Notes;
-			case 'UserGuide':
+			case modules.USER_GUIDE:
 				return UserGuide;
-			case 'Login':
-				return Login;				
-			case 'Plans':
+			case modules.LOGIN:
+				return Login;
+			case modules.PLANS:
 				return PlansContainer;
 		}
 

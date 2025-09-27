@@ -11,6 +11,7 @@
 	import PaneContainer from '$lib/components/pane.svelte';
 	import { type Pane } from '$lib/models/pane.model';
 	import { toastService } from '$lib/services/toast.service';
+	import { Modules } from '$lib/models/modules.model';
 
 	let template = $state();
 	let paneIds: string[] = $state([]);
@@ -95,7 +96,12 @@
 		return found;
 	}
 
-	function splitPane(paneId: string, split: string, componentName: string, bag: any) {
+	function splitPane(
+		paneId: string,
+		split: string,
+		componentName: Modules,
+		bag: any
+	) {
 		let p = findPane(paneService.rootPane, paneId);
 
 		/** p should never be undefined */
@@ -117,7 +123,7 @@
 
 		let buffer = new Buffer();
 		buffer.componentName = componentName;
-		buffer.name = componentName;
+		buffer.name = `${componentName}`;
 		buffer.bag = bag;
 
 		p.right = {
@@ -136,10 +142,14 @@
 	}
 
 	function deletePane(n: Pane, key: string) {
-		if (n.id === paneService.rootPane.id && n.left === undefined && n.right === undefined) {
-			n.buffer.componentName = 'Modules';
+		if (
+			n.id === paneService.rootPane.id &&
+			n.left === undefined &&
+			n.right === undefined
+		) {
+			n.buffer.componentName = Modules.MODULES;
 			n.buffer.bag = {};
-			n.updateBuffer('Modules');
+			n.updateBuffer(Modules.MODULES);
 		}
 
 		if (n.id === key) {
@@ -210,10 +220,10 @@
 
 		// DEV NOTE: Update the component to w/e you are working on
 		// Save you a few clicks on reload.
-//		paneService.rootPane.buffer.componentName = 'ChapterContainer';
-//		paneService.rootPane.buffer.name = 'ChapterContainer';
-		paneService.rootPane.buffer.componentName = 'Plans';
-		paneService.rootPane.buffer.name = 'Plans';
+		//		paneService.rootPane.buffer.componentName = 'ChapterContainer';
+		//		paneService.rootPane.buffer.name = 'ChapterContainer';
+		paneService.rootPane.buffer.componentName = Modules.PLANS;
+		paneService.rootPane.buffer.name = `${Modules.PLANS}`;
 
 		paneService.onDeletePane = deletePane;
 		paneService.onSplitPane = splitPane;

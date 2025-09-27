@@ -3,3 +3,4 @@
 ◊ update Sub field name to nextReadingsIndex
 ◊ move BCV interface to common models
 ◊ percent complete not updated on subs list
+◊ show completed subscription

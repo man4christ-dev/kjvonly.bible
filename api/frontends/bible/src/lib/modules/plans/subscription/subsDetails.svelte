@@ -8,6 +8,7 @@
 	import type { NavReadings, Readings, Sub } from '$lib/models/plans.model';
 	import type { BCV } from '$lib/models/bible.model';
 	import Pane from '$lib/components/pane.svelte';
+	import { Modules } from '$lib/models/modules.model';
 
 	// =============================== BINDINGS ================================
 
@@ -114,7 +115,7 @@
 		pane.buffer.bag.navReadings = np;
 
 		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
-		pane.updateBuffer('ChapterContainer');
+		pane.updateBuffer(Modules.BIBLE);
 	}
 
 	function onCloseSubDetails() {

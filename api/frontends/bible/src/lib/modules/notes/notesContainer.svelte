@@ -19,6 +19,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 <script lang="ts">
 	import { chapterApi } from '$lib/api/chapters.api';
 	import { notesApi } from '$lib/api/notes.api';
+	import { Modules } from '$lib/models/modules.model';
 	import { notesService } from '$lib/services/notes.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { toastService } from '$lib/services/toast.service';
@@ -157,12 +158,12 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			showConfirmDelete = true;
 		},
 		'split vertical': () => {
-			paneService.onSplitPane(mode.paneId, 'v', 'Modules', {});
+			paneService.onSplitPane(mode.paneId, 'v', Modules.MODULES, {});
 			showNoteActions = false;
 		},
 
 		'split horizontal': () => {
-			paneService.onSplitPane(mode.paneId, 'h', 'Modules', {});
+			paneService.onSplitPane(mode.paneId, 'h', Modules.MODULES, {});
 			showNoteActions = false;
 		}
 	};
@@ -207,7 +208,8 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		var element = document.createElement('a');
 		element.setAttribute(
 			'href',
-			'data:application/json;charset=utf-8,' + encodeURIComponent(JSON.stringify(dataList))
+			'data:application/json;charset=utf-8,' +
+				encodeURIComponent(JSON.stringify(dataList))
 		);
 		element.setAttribute('download', 'annotations');
 
@@ -366,12 +368,12 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			onExport();
 		},
 		'split vertical': () => {
-			paneService.onSplitPane(mode.paneId, 'v', 'Modules', {});
+			paneService.onSplitPane(mode.paneId, 'v', Modules.MODULES, {});
 			showNoteListActions = false;
 		},
 
 		'split horizontal': () => {
-			paneService.onSplitPane(mode.paneId, 'h', 'Modules', {});
+			paneService.onSplitPane(mode.paneId, 'h', Modules.MODULES, {});
 			showNoteListActions = false;
 		}
 	};
@@ -479,7 +481,12 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			}}
 			class="h-12 w-12 px-2 pt-2 text-neutral-700"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				width="100%"
+				height="100%"
+			>
 				<path
 					class="fill-neutral-700"
 					d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
@@ -520,14 +527,16 @@ note icon in the Bible only the notes associated to that word will be displayed 
 					onConfirmDelete();
 				}}
 				aria-label="delete button"
-				class="hover:bg-primary-50 rounded-lg bg-neutral-100 p-4 capitalize">delete</button
+				class="hover:bg-primary-50 rounded-lg bg-neutral-100 p-4 capitalize"
+				>delete</button
 			>
 			<button
 				onclick={() => {
 					showConfirmDelete = false;
 				}}
 				aria-label="cancel button"
-				class="hover:bg-primary-50 rounded-lg bg-neutral-100 p-4 capitalize">cancel</button
+				class="hover:bg-primary-50 rounded-lg bg-neutral-100 p-4 capitalize"
+				>cancel</button
 			>
 		</div>
 	</div>
@@ -581,7 +590,9 @@ note icon in the Bible only the notes associated to that word will be displayed 
 
 {#snippet noteTagsSnippet()}
 	<div style="width: {clientWidth}px" class="max-w-lg overflow-hidden">
-		<div class="flex flex-row items-end space-y-2 space-x-2 overflow-x-scroll p-2">
+		<div
+			class="flex flex-row items-end space-y-2 space-x-2 overflow-x-scroll p-2"
+		>
 			{#each [...note.tags].reverse() as t}
 				<span
 					class="border-support-a-500 text-support-a-700 inline-flex h-8 items-center justify-center rounded-full border px-2.5 py-0.5"
@@ -603,7 +614,11 @@ note icon in the Bible only the notes associated to that word will be displayed 
 							stroke="currentColor"
 							class="size-3"
 						>
-							<path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+							<path
+								stroke-linecap="round"
+								stroke-linejoin="round"
+								d="M6 18L18 6M6 6l12 12"
+							/>
 						</svg>
 					</button>
 				</span>
@@ -686,7 +701,12 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			}}
 			class="h-12 w-12 px-2 pt-2 text-neutral-700"
 		>
-			<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+			<svg
+				xmlns="http://www.w3.org/2000/svg"
+				viewBox="0 0 24 24"
+				width="100%"
+				height="100%"
+			>
 				<path
 					class="fill-neutral-700"
 					d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
@@ -749,7 +769,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 				aria-label="bible"
 				onclick={(e) => {
 					e.stopPropagation();
-					paneService.onSplitPane(mode.paneId, 'h', 'ChapterComponent', {
+					paneService.onSplitPane(mode.paneId, 'h', Modules.BIBLE, {
 						chapterKey: note.chapterKey
 					});
 				}}
@@ -780,7 +800,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			aria-label="horizontal split"
 			onclick={(e) => {
 				e.stopPropagation();
-				paneService.onSplitPane(mode.paneId, 'h', 'Notes', {
+				paneService.onSplitPane(mode.paneId, 'h', Modules.NOTES, {
 					noteID: nk
 				});
 			}}
@@ -821,7 +841,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			aria-label="vertical split"
 			onclick={(e) => {
 				e.stopPropagation();
-				paneService.onSplitPane(mode.paneId, 'v', 'Notes', {
+				paneService.onSplitPane(mode.paneId, 'v', Modules.NOTES, {
 					noteID: nk
 				});
 			}}
@@ -873,7 +893,9 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			class="flex w-full flex-nowrap p-2 text-left hover:cursor-pointer hover:bg-neutral-100"
 		>
 			<div class="flex w-full flex-col">
-				<span>{notes[nk].title}{notes[nk].title.length === 20 ? '...' : ''}</span>
+				<span
+					>{notes[nk].title}{notes[nk].title.length === 20 ? '...' : ''}</span
+				>
 				<span class="text-neutral-400"
 					>{new Date(notes[nk].dateUpdated * 1000).toLocaleDateString()}
 					{new Date(notes[nk].dateUpdated * 1000).toLocaleTimeString()}</span

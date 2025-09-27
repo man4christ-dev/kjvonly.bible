@@ -4,14 +4,15 @@
 	import ReadingsComponent from '../components/readings.svelte';
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
+	import { PLANS_VIEWS } from '../models';
+	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
 	import type {
 		Sub,
 		NextReadings,
 		Readings,
 		NavReadings
 	} from '../../../models/plans.model';
-	import { PLANS_VIEWS } from '../models';
-	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
+	import { Modules } from '$lib/models/modules.model';
 
 	// =============================== BINDINGS ================================
 
@@ -130,7 +131,7 @@
 		pane.buffer.bag.navReadings = nr;
 
 		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
-		pane.updateBuffer('ChapterContainer'); // TODO Make this a variable
+		pane.updateBuffer(Modules.BIBLE);
 	}
 </script>
 
