@@ -42,8 +42,8 @@
 				<span class="text-support-a-500">{s.percentCompleted}%</span>
 			</div>
 
-			<div class="text-md truncate text-left">
-				<p>{s.description}</p>
+			<div class="text-md">
+				<p class="truncate text-left">{s.description}</p>
 			</div>
 		</button>
 	{/each}

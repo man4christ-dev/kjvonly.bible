@@ -75,8 +75,8 @@
 				<span class="pb-2 text-2xl">{p.name}</span>
 			</div>
 
-			<div class="truncate text-start text-sm">
-				<p>{p.description}</p>
+			<div class="text-md truncate text-start">
+				<p class="truncate text-start">{p.description}</p>
 			</div>
 		</button>
 	{/each}
