@@ -11,7 +11,8 @@
 		type NextReadings,
 		type Readings,
 		type NavReadings,
-		PLANS_VIEWS
+		PLANS_VIEWS,
+		PLAN_PUBSUB_SUBSCRIPTIONS
 	} from '../../../models/plans.model';
 	import { Modules } from '$lib/models/modules.model';
 
@@ -36,7 +37,11 @@
 	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
-		plansPubSubService.subscribe('getAllSubs', onGetAllSubs, SUBSCRIBER_ID);
+		plansPubSubService.subscribe(
+			PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_SUBS,
+			onGetAllSubs,
+			SUBSCRIBER_ID
+		);
 		plansPubSubService.getAllSubs();
 	});
 

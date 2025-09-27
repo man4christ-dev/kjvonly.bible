@@ -5,7 +5,11 @@
 	import uuid4 from 'uuid4';
 	import Header from '../components/header.svelte';
 	import ActionItemsList from '../components/actionItemsList.svelte';
-	import { PLANS_VIEWS, type Plan } from '$lib/models/plans.model';
+	import {
+		PLAN_PUBSUB_SUBSCRIPTIONS,
+		PLANS_VIEWS,
+		type Plan
+	} from '$lib/models/plans.model';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -16,7 +20,7 @@
 	} = $props();
 
 	// ================================== VARS =================================
-	let PLAN_SUBSCRIBER_ID: string = uuid4();
+	let SUBSCRIBER_ID: string = uuid4();
 	let plansMap: Map<string, Plan> = $state(new Map());
 	let planList: Plan[] = $state([]);
 	let headerHeight = $state(0);
@@ -33,15 +37,15 @@
 
 	onMount(() => {
 		plansPubSubService.subscribe(
-			'getAllPlans',
+			PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_PLANS,
 			onGetAllPlans,
-			PLAN_SUBSCRIBER_ID
+			SUBSCRIBER_ID
 		);
 		plansPubSubService.getAllPlans();
 	});
 
 	onDestroy(() => {
-		plansPubSubService.unsubscribe(PLAN_SUBSCRIBER_ID);
+		plansPubSubService.unsubscribe(SUBSCRIBER_ID);
 	});
 
 	// ============================== CLICK FUNCS ==============================
@@ -71,7 +75,7 @@
 				<span class="pb-2 text-2xl">{p.name}</span>
 			</div>
 
-			<div class="truncate text-sm">
+			<div class="truncate text-start text-sm">
 				{#each p.description as d}
 					<span>
 						{d}

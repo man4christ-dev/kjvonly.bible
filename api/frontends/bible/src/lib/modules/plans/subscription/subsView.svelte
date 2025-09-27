@@ -10,7 +10,8 @@
 		NullSub,
 		type Sub,
 		type NavReadings,
-		PLANS_VIEWS
+		PLANS_VIEWS,
+		PLAN_PUBSUB_SUBSCRIPTIONS
 	} from '$lib/models/plans.model';
 	import type { Pane } from '$lib/models/pane.model';
 	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
@@ -35,7 +36,7 @@
 
 	onMount(() => {
 		plansPubSubService.subscribe(
-			'getAllSubs', // TODO make an enum
+			PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_SUBS,
 			onGetAllSubs,
 			SUBSCRIBER_ID
 		);
