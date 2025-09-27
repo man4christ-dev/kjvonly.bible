@@ -6,19 +6,12 @@
 	let { showSettingsPopup = $bindable() } = $props();
 	let headerHeight = $state(0);
 	let clientHeight = $state(0);
+	let settings: any = $state();
 
+	let fontSize = $state(12);
 	let fontSizes = [
 		{
-			height: 'h-8 w-8',
-			fontSize: 'text-xs'
-		},
-		{
-			height: 'h-10 w-10',
-			fontSize: 'text-base'
-		},
-		{
-			height: 'h-12 w-12',
-			fontSize: 'text-2xl'
+			height: 'h-10 w-10'
 		}
 	];
 
@@ -48,13 +41,16 @@
 		}
 	});
 
-	let settings: any = $state();
-
 	onMount(async () => {
 		settings = settingsService.getSettings();
+
+		if (settings.fontSize) {
+			fontSize = settings.fontSize;
+		}
 	});
 
-	function onSizeSelected(fontSize: string) {
+	function onSizeSelected(newFontSize: number) {
+		fontSize = newFontSize;
 		settings.fontSize = fontSize;
 	}
 
@@ -181,37 +177,47 @@
 				{/if}
 			</div>
 
-			<div class="flex w-full flex-row p-4">
-				{#each fontSizes as fs}
+			<div class="p-4">
+				<div class="flex w-full flex-row">
+					<input
+						bind:value={fontSize}
+						class="flex w-full text-center outline-none"
+						type="number"
+					/>
 					<button
-						onclick={() => onSizeSelected(fs.fontSize)}
-						class=" {settings?.fontSize === fs.fontSize
-							? 'bg-primary-500 '
-							: ' '} flex h-16 w-1/3 items-center justify-center border"
-						aria-label="font-size button"
+						aria-label="close"
+						onclick={() => {
+							onSizeSelected(fontSize);
+						}}
+						class="h-12 w-12 px-2 pt-2 text-neutral-700 hover:cursor-pointer"
 					>
 						<svg
-							class="{fs.height} py-2 text-center"
 							version="1.1"
-							id="svg415"
-							width="117.02834"
-							height="85.458069"
-							viewBox="0 0 117.02834 85.458069"
+							id="svg2"
+							width="100%"
+							height="100%"
+							viewBox="0 0 96.130432 96"
 							xmlns="http://www.w3.org/2000/svg"
 						>
-							<g id="g421" transform="translate(-59.92657,-22.570134)">
+							<g id="g8" transform="translate(-16,-16)">
 								<path
-									class={settings?.fontSize === fs.fontSize
-										? 'fill-neutral-100'
-										: 'fill-neutral-700'}
-									d="m 61.047083,105.83428 c -0.909677,-1.0961 -1.357219,-3.0461 -0.994538,-4.33334 2.723837,-9.667518 29.593018,-76.022427 31.317565,-77.34043 2.77458,-2.120501 5.875231,-2.120501 8.7698,0 2.5769,1.887787 31.90842,76.27342 31.29752,79.37145 -0.21793,1.10517 -1.39595,2.63891 -2.61781,3.40832 -3.31477,2.08732 -5.48086,-0.3959 -9.67888,-11.095958 L 115.4722,86.493843 H 95.74451 76.016817 l -3.573574,9.64098 C 68.099949,107.8524 64.948231,110.53488 61.047083,105.83428 Z M 103.87929,56.556127 C 99.75649,45.95705 95.977646,37.70705 95.481862,38.222794 c -0.98388,1.023491 -14.440673,35.219485 -14.440673,36.696201 0,0.4995 6.825174,0.908182 15.167056,0.908182 H 111.3753 Z m 44.91746,48.980683 c -1.96777,-1.22067 -4.31916,-3.6047 -5.2253,-5.29785 -0.90615,-1.693147 -2.14615,-3.07845 -2.75557,-3.07845 -1.75137,0 -1.25012,-18.974832 0.59772,-22.626647 0.91654,-1.811321 3.7577,-4.71296 6.31368,-6.448084 6.26244,-4.251241 13.47828,-3.376285 19.18026,2.325703 3.81485,3.814845 4.15174,4.916232 4.61341,15.082295 0.40279,8.869677 0.97824,11.303272 3.00914,12.725766 3.04066,2.129767 3.25362,5.998207 0.45792,8.318427 -1.51607,1.25823 -3.18403,1.35691 -6.37612,0.37723 -2.37763,-0.72971 -5.5037,-0.86521 -6.94683,-0.3011 -4.30028,1.68094 -9.06494,1.28206 -12.86831,-1.07729 z m 10.81774,-10.263803 c 2.45221,-2.954737 1.27956,-16.843718 -1.5733,-18.634332 -4.30358,-2.701161 -6.95208,0.556379 -7.40323,9.105679 -0.4255,8.063173 1.06356,11.416156 5.06989,11.416156 1.28708,0 3.04507,-0.849376 3.90664,-1.887503 z"
-									id="path425"
+									class="fill-neutral-700"
+									style="stroke-width:1.33333"
+									d="M 19.272727,108.72727 16,105.45455 V 64 22.545455 L 19.272727,19.272727 22.545455,16 h 33.641558 33.641559 l 11.150928,11.150928 11.15093,11.150928 -0.39855,34.302125 c -0.3976,34.220589 -0.40603,34.308179 -3.54626,36.849069 C 105.2389,111.83737 102.4042,112 63.791681,112 H 22.545455 Z m 55.9361,-12.654045 c 3.502058,-3.50206 4.124506,-5.122865 4.124506,-10.739892 0,-5.693716 -0.607301,-7.222686 -4.358974,-10.974358 C 71.222687,70.607301 69.693716,70 64,70 c -5.693716,0 -7.222687,0.607301 -10.974359,4.358975 -3.737012,3.73701 -4.358974,5.291226 -4.358974,10.892581 0,6.853933 3.398442,12.271284 9.333333,14.877974 4.985283,2.1896 12.806448,0.34607 17.208827,-4.056305 z M 78.4,46.4 c 2.077387,-2.077387 2.077387,-16.055947 0,-18.133333 -2.250848,-2.250848 -47.882485,-2.250848 -50.133333,0 -2.077387,2.077386 -2.077387,16.055946 0,18.133333 2.250848,2.250848 47.882485,2.250848 50.133333,0 z"
+									id="path293"
 								/>
 							</g>
 						</svg>
 					</button>
-				{/each}
+				</div>
+				<div class="mt-4 outline">
+					<p class="p-4" style="font-size: {fontSize}px">
+						Ephesians 2:8 <br />For by grace are ye saved through faith; and
+						that not of yourselves: it is the gift of God:
+					</p>
+				</div>
 			</div>
+
 			<div class="flex w-full flex-row pt-4">
 				{#each fontFamilies as ff}
 					<button

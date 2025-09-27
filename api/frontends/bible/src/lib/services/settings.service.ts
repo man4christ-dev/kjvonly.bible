@@ -1,6 +1,7 @@
 import { type Settings, newSettings } from '../models/settings.model';
 
 class SettingsService {
+	// TODO make this an enum
 	VALID_COLOR_THEMES = ['red', 'light-blue', 'purple', 'cyan', 'pink'];
 
 	setTheme(theme: string) {
@@ -22,23 +23,26 @@ class SettingsService {
 
 		html?.setAttribute('font-theme', cs.fontTheme);
 
-		let classes = [];
-		classes.push(cs.fontSize);
+		html?.setAttribute('style', `font-size: ${cs.fontSize}px;`);
 
-		let currentClasses: string[] = [];
-		html?.classList.forEach((c) => {
-			currentClasses.push(c);
-		});
+		// TODO intentionally left this here for now
+		// will delete if not needed.
 
-		if (html) {
-			currentClasses.forEach((c: string) => {
-				html?.classList.remove(c);
-			});
+		// let classes = [];
+		// let currentClasses: string[] = [];
+		// html?.classList.forEach((c) => {
+		// 	currentClasses.push(c);
+		// });
 
-			classes.forEach((c) => {
-				html?.classList.add(c);
-			});
-		}
+		// if (html) {
+		// 	currentClasses.forEach((c: string) => {
+		// 		html?.classList.remove(c);
+		// 	});
+
+		// 	classes.forEach((c) => {
+		// 		html?.classList.add(c);
+		// 	});
+		//}
 	}
 
 	getSettings(): Settings {
