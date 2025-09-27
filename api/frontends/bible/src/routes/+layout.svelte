@@ -33,9 +33,9 @@
 		/* This pulls the chapter and strongs data from api and stores in indexdb for offline use. */
 		await syncService.init();
 
-		for (let p of JSON.parse(JSON.stringify(j))) {
-			subsApi.put(p);
-		}
+		// for (let p of JSON.parse(JSON.stringify(j))) {
+		// 	subsApi.put(p);
+		// }
 
 		if (authService.isLoggedIn()) {
 			register();

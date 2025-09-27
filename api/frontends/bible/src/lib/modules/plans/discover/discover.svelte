@@ -106,7 +106,7 @@
 		<!-- Your parent container content -->
 		<div class="absolute right-0 bottom-0 p-4">
 			<button
-				class="bg-primary-200 z-10 flex h-12 w-12 items-center justify-center rounded-full text-neutral-200"
+				class="bg-primary-200 z-10 flex h-12 w-12 items-center justify-center rounded-full text-neutral-200 hover:cursor-pointer"
 			>
 				+
 			</button>
