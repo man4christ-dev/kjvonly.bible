@@ -5,6 +5,7 @@ import {
 	cachedPlanToPlan,
 	cachedSubToSub,
 	NullPlan,
+	PLAN_PUBSUB_SUBSCRIPTIONS,
 	type CachedPlan,
 	type CachedSub,
 	type CompletedReadings,
@@ -209,19 +210,13 @@ async function search(
 
 function publishPlans() {
 	if (workerHasInitialized) {
-		postMessage({ id: 'getAllPlans', plans: plans });
+		postMessage({ id: PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_PLANS, plans: plans });
 	}
 }
 
 function publishSubs() {
 	if (workerHasInitialized) {
-		postMessage({ id: 'getAllSubs', subs: subs });
-	}
-}
-
-function getAllReadings() {
-	if (workerHasInitialized) {
-		postMessage({ id: 'getAllReadings', readings: completedReadings });
+		postMessage({ id: PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_SUBS, subs: subs });
 	}
 }
 
@@ -229,43 +224,13 @@ function getAllReadings() {
 
 onmessage = async (e) => {
 	switch (e.data.action) {
-		case 'init':
-			await init();
-			break;
-		case 'addPlan':
-			addPlan(e.data.planID, e.data.plan);
-			break;
-		case 'deletePlan':
-			deletePlan(e.data.planID);
-			break;
-		case 'searchPlans':
-			await search(
-				e.data.id,
-				e.data.text,
-				e.data.indexes,
-				plansDocument,
-				plans
-			);
-			break;
-		case 'searchSubs':
-			await search(e.data.id, e.data.text, e.data.indexes, subsDocument, subs);
-			break;
-		case 'searchReadings':
-			await search(
-				e.data.id,
-				e.data.text,
-				e.data.indexes,
-				completedReadingsDocument,
-				completedReadings
-			);
-			break;
-		case 'getAllPlans':
+		case PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_PLANS:
 			publishPlans();
 			break;
-		case 'getAllSubs':
+		case PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_SUBS:
 			publishSubs();
 			break;
-		case 'putReading':
+		case PLAN_PUBSUB_SUBSCRIPTIONS.PUT_READING:
 			putReading(e.data.data, e.data.subID);
 			break;
 	}

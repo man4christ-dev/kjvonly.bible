@@ -1,3 +1,5 @@
+import { PLAN_PUBSUB_SUBSCRIPTIONS } from '$lib/models/plans.model';
+
 const isBrowser = typeof window !== 'undefined';
 let plansWorker: any;
 
@@ -46,29 +48,27 @@ export class PlansPubSubService {
 		this.subscribers = tmpSubscribers;
 	}
 
-	init() {
-		plansWorker.postMessage({ action: 'init' });
-	}
-
-	getAllReadings() {
-		plansWorker.postMessage({ action: 'getAllPlans', id: 'getAllReadings' });
-	}
-
-	putReading(data: any, subID: string) {
+	getAllPlans() {
 		plansWorker.postMessage({
-			action: 'putReading',
-			id: 'putReading',
-			data: data,
-			subID: subID
+			action: PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_PLANS,
+			id: PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_PLANS
 		});
 	}
 
 	getAllSubs() {
-		plansWorker.postMessage({ action: 'getAllSubs', id: 'getAllSubs' });
+		plansWorker.postMessage({
+			action: PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_SUBS,
+			id: PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_SUBS
+		});
 	}
 
-	getAllPlans() {
-		plansWorker.postMessage({ action: 'getAllPlans', id: 'getAllPlans' });
+	putReading(data: any, subID: string) {
+		plansWorker.postMessage({
+			action: PLAN_PUBSUB_SUBSCRIPTIONS.PUT_READING,
+			id: PLAN_PUBSUB_SUBSCRIPTIONS.PUT_READING,
+			data: data,
+			subID: subID
+		});
 	}
 }
 
