@@ -5,6 +5,8 @@
 	import '../../node_modules/quill/dist/quill.snow.css';
 	import { syncService } from '$lib/services/sync.service';
 	import { authService } from '$lib/services/auth.service';
+	import { subsApi } from '$lib/api/subs.api';
+	import j from '../lib/modules/plans/data/subscriptions.json';
 
 	function register() {
 		// Listen for connection coming online
@@ -31,9 +33,9 @@
 		/* This pulls the chapter and strongs data from api and stores in indexdb for offline use. */
 		await syncService.init();
 
-		// for (let p of JSON.parse(JSON.stringify(j))) {
-		// 	plansApi.put(p);
-		// }
+		for (let p of JSON.parse(JSON.stringify(j))) {
+			subsApi.put(p);
+		}
 
 		if (authService.isLoggedIn()) {
 			register();
