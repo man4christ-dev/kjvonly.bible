@@ -6,9 +6,27 @@
 	src: url('/fonts/KJV1611.woff') format('woff');
 }
 
+@font-face {
+	font-family: 'Roboto Mono';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('/fonts/RobotoMono-Regular.ttf') format('truetype');
+}
+
+@font-face {
+	font-family: 'JetBrains Mono';
+	font-style: normal;
+	font-weight: 500;
+	font-display: swap;
+	src: url('/fonts/JetBrainsMono-Regular.woff2') format('woff');
+}
+
 @theme {
-	--font-kjv: KJV1611;
-	--font-primary: sans;
+	--font-kjv: 'KJV1611';
+	--font-primary: monospace;
+	--font-roboto-mono: 'Roboto-Mono';
+	--font-jetbrains-mono: 'JetBrains Mono';
 
 	/* default color scheme */
 	--color-primary-surface: hsl(0 0% 100%);
@@ -117,7 +135,7 @@
 
 @layer base {
 	body {
-		@apply font-primary selection:bg-primary-100 bg-neutral-50 text-neutral-700;
+		@apply selection:bg-primary-100 font-primary bg-neutral-50 text-neutral-700;
 	}
 }
 
@@ -127,7 +145,23 @@
 	}
 
 	[font-theme='sans'] {
-		--font-primary: sans;
+		--font-primary: sans-serif;
+	}
+
+	[font-theme='mono'] {
+		--font-primary: monospace;
+	}
+
+	[font-theme='serif'] {
+		--font-primary: serif;
+	}
+
+	[font-theme='roboto-mono'] {
+		--font-primary: 'Roboto Mono';
+	}
+
+	[font-theme='jetbrains-mono'] {
+		--font-primary: 'JetBrains Mono';
 	}
 
 	[data-theme='color-theme-red'] {

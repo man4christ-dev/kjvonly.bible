@@ -9,6 +9,7 @@
 	let settings: any = $state();
 
 	let fontSize = $state(12);
+	let selectedFontFamily = $state('sans');
 	let fontSizes = [
 		{
 			height: 'h-10 w-10'
@@ -17,14 +18,40 @@
 
 	let fontFamilies = [
 		{
-			name: 'sans',
-			fontFamily: 'font-sans',
-			fontTheme: 'sans'
+			name: 'sans-serif',
+			fontFamily: 'sans-serif',
+			fontTheme: 'sans',
+			class: 'font-sans'
+		},
+		{
+			name: 'serif',
+			fontFamily: 'serif',
+			fontTheme: 'serif',
+			class: 'font-serif'
+		},
+		{
+			name: 'monospace',
+			fontFamily: 'monospace',
+			fontTheme: 'mono',
+			class: 'font-mono'
 		},
 		{
 			name: 'KJV1611',
 			fontFamily: 'font-kjv',
-			fontTheme: 'kjv'
+			fontTheme: 'kjv',
+			class: 'font-kjv'
+		},
+		{
+			name: 'Roboto Mono',
+			fontFamily: 'monospace',
+			fontTheme: 'roboto-mono',
+			class: 'font-roboto-mono'
+		},
+		{
+			name: 'JetBrains Mono',
+			fontFamily: 'monospace',
+			fontTheme: 'jetbrains-mono',
+			class: 'font-jetbrains-mono'
 		}
 	];
 
@@ -38,6 +65,9 @@
 		/* update color theme */
 		if (settings && settings.colorTheme) {
 			settingsService.setTheme(settings?.colorTheme);
+		}
+		if (settings && settings.fontTheme) {
+			selectedFontFamily = settings.fontTheme;
 		}
 	});
 
@@ -55,6 +85,7 @@
 	}
 
 	function onFontThemeSelected(fontTheme: string) {
+		selectedFontFamily = fontTheme;
 		settings.fontTheme = fontTheme;
 	}
 </script>
@@ -215,14 +246,11 @@
 				</div>
 			</div>
 
-			<div class="flex w-full flex-row pt-4">
+			<div class="flex w-full flex-col pt-4">
 				{#each fontFamilies as ff}
 					<button
+						class="{ff.class} p-2 hover:cursor-pointer"
 						onclick={() => onFontThemeSelected(ff.fontTheme)}
-						class="{settings?.fontTheme === ff.fontTheme
-							? 'bg-primary-500 text-neutral-100 '
-							: ' '} {ff.fontFamily} flex h-16 w-1/2 items-center justify-center border text-lg font-bold"
-						aria-label="font-size button"
 					>
 						{ff.name}
 					</button>

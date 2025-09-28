@@ -222,8 +222,8 @@
 		// Save you a few clicks on reload.
 		//		paneService.rootPane.buffer.componentName = 'ChapterContainer';
 		//		paneService.rootPane.buffer.name = 'ChapterContainer';
-		paneService.rootPane.buffer.componentName = Modules.PLANS;
-		paneService.rootPane.buffer.name = `${Modules.PLANS}`;
+		paneService.rootPane.buffer.componentName = Modules.BIBLE;
+		paneService.rootPane.buffer.name = `${Modules.BIBLE}`;
 
 		paneService.onDeletePane = deletePane;
 		paneService.onSplitPane = splitPane;
