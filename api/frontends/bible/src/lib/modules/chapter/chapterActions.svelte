@@ -7,6 +7,7 @@
 	import NavReadingsList from './navReadingsList.svelte';
 	import { onMount, untrack } from 'svelte';
 	import { extractBookChapter, extractVerses } from '$lib/utils/chapter';
+	import Settings from '../settings/settings.svelte';
 
 	let {
 		mode = $bindable(),
@@ -154,7 +155,11 @@
 {/if}
 {#if showSettingsPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<SettingsPopup bind:showSettingsPopup></SettingsPopup>
+		<Settings
+			onClose={() => {
+				showSettingsPopup = false;
+			}}
+		></Settings>
 	</div>
 {/if}
 

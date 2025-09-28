@@ -7,5 +7,6 @@ export enum Modules {
 	PLANS,
 	USER_GUIDE,
 	LOGIN,
+	SETTINGS,
 	NULL
 }

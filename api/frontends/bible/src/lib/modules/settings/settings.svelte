@@ -1,20 +1,14 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
-	import type { Settings } from '../../models/settings.model';
 	import { settingsService } from '$lib/services/settings.service';
 
-	let { showSettingsPopup = $bindable() } = $props();
+	let { onClose } = $props();
 	let headerHeight = $state(0);
 	let clientHeight = $state(0);
 	let settings: any = $state();
 
 	let fontSize = $state(12);
 	let selectedFontFamily = $state('sans');
-	let fontSizes = [
-		{
-			height: 'h-10 w-10'
-		}
-	];
 
 	let fontFamilies = [
 		{
@@ -106,7 +100,7 @@
 				<button
 					aria-label="close"
 					onclick={() => {
-						showSettingsPopup = false;
+						onClose();
 					}}
 					class="h-12 w-12 px-2 text-neutral-700"
 				>
