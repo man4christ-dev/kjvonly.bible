@@ -1,13 +1,14 @@
 <script lang="ts">
 	import BookChapterPopup from './bookChapterPopup.svelte';
 	import ActionDropdown from './actionsPopup.svelte';
-	import SettingsPopup from './settingsPopup.svelte';
 	import NotesContainer from '../notes/notesContainer.svelte';
 	import CopyVersePopup from './copyVersePopup.svelte';
 	import NavReadingsList from './navReadingsList.svelte';
 	import { onMount, untrack } from 'svelte';
 	import { extractBookChapter, extractVerses } from '$lib/utils/chapter';
 	import Settings from '../settings/settings.svelte';
+
+	// =============================== BINDINGS ================================
 
 	let {
 		mode = $bindable(),
@@ -19,6 +20,8 @@
 		paneId
 	} = $props();
 
+	// ================================== VARS =================================
+
 	let showBookChapterPopup: Boolean = $state(false);
 	let showNavReadingsPopup: Boolean = $state(false);
 	let showSettingsPopup: Boolean = $state(false);
@@ -26,6 +29,29 @@
 	let showCopyVersePopup: boolean = $state(false);
 	let verses: string = $state('');
 	let bookIDChapter = $state('');
+	let clientWidth: number = $state(0);
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		bookIDChapter = extractBookChapter(chapterKey);
+	});
+
+	$effect(() => {
+		if (chapterKey) {
+			bookIDChapter = extractBookChapter(chapterKey);
+			untrack(() => {
+				let [start, end] = extractVerses(chapterKey);
+				if (start + end > 0) {
+					verses = `:${start + 1}-${end}`;
+				} else {
+					verses = '';
+				}
+			});
+		}
+	});
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onBookChapterClick(event: Event) {
 		event.stopPropagation();
@@ -45,25 +71,6 @@
 		e.stopPropagation();
 		showActionsPopup = !showActionsPopup;
 	}
-
-	$effect(() => {
-		if (chapterKey) {
-			untrack(() => {
-				let [start, end] = extractVerses(chapterKey);
-				if (start + end > 0) {
-					verses = `:${start + 1}-${end}`;
-				} else {
-					verses = '';
-				}
-			});
-		}
-	});
-
-	onMount(() => {
-		bookIDChapter = extractBookChapter(chapterKey);
-	});
-
-	let clientWidth: number = $state(0);
 </script>
 
 <!-- book chapter selection -->
@@ -182,7 +189,7 @@
 
 {#if showCopyVersePopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<CopyVersePopup bind:showCopyVersePopup chapterKey={bookIDChapter}
+		<CopyVersePopup bind:showCopyVersePopup bind:chapterKey={bookIDChapter}
 		></CopyVersePopup>
 	</div>
 {/if}

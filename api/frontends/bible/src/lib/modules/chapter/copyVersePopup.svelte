@@ -3,7 +3,7 @@
 	import { toastService } from '$lib/services/toast.service';
 	import { onMount } from 'svelte';
 
-	let { chapterKey, showCopyVersePopup = $bindable() } = $props();
+	let { chapterKey = $bindable(), showCopyVersePopup = $bindable() } = $props();
 
 	let verseKeys: string[] = $state([]);
 	let verses: any = $state({});

@@ -6,4 +6,4 @@
 ◊ show completed subscription
 ◊ edit subscription
 ◊ add next reading button to sub list
-◊ copy verses holding stale state stale chapter
+◊ make bufferContainer, header, and body component for all buffers.
