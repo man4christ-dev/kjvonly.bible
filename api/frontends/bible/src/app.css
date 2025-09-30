@@ -1,6 +1,8 @@
 @import 'tailwindcss';
 @import 'tailwindcss/utilities';
 
+/* ================================== FONTS ================================= */
+
 @font-face {
 	font-family: 'KJV1611';
 	src: url('/fonts/KJV1611.woff2') format('woff2');
@@ -23,11 +25,17 @@
 	src: url('/fonts/JetBrainsMono[wght].woff2') format('woff2-variations');
 }
 
+/* ================================== THEME ================================= */
+
 @theme {
+	/* ================================ FONTS =============================== */
+
 	--font-kjv: 'KJV1611';
 	--font-primary: monospace;
-	--font-roboto-mono: 'Roboto-Mono';
+	--font-roboto-mono: 'Roboto Mono';
 	--font-jetbrains-mono: 'JetBrains Mono';
+
+	/* ============================ COLOR THEME ============================= */
 
 	/* default color scheme */
 	--color-primary-surface: hsl(0 0% 100%);
@@ -96,9 +104,9 @@
 	/* neutral 100 */
 	--color-header-title: hsl(360deg 82% 89%);
 
-	/**
-        * colored groups for chapter select light mode
-        */
+	/*
+	 * colored groups for chapter select light mode
+     */
 
 	/* primary 700 */
 	--color-bg-law: hsl(360deg 67% 44%);
