@@ -1,9 +1,8 @@
 ◊ replace all booknames references with bible metadata service
-◊ create enums for PlansPubSubService actions and ids
-◊ update Sub field name to nextReadingsIndex
 ◊ move BCV interface to common models
-◊ percent complete not updated on subs list
 ◊ show completed subscription
 ◊ edit subscription
 ◊ add next reading button to sub list
 ◊ make bufferContainer, header, and body component for all buffers.
+◊ extract all buttons to common component
+◊ copy verse - extra space after chapter number

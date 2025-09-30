@@ -8,7 +8,9 @@
 	let settings: any = $state();
 
 	let fontSize = $state(12);
+	let fontWeight = $state(400);
 	let selectedFontFamily = $state('sans');
+	let selectedFontWeight = $state(400);
 
 	let fontFamilies = [
 		{
@@ -49,6 +51,8 @@
 		}
 	];
 
+	let fontWeights = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+
 	$effect(() => {
 		settings;
 
@@ -62,6 +66,10 @@
 		}
 		if (settings && settings.fontTheme) {
 			selectedFontFamily = settings.fontTheme;
+		}
+
+		if (settings && settings.fontWeight) {
+			selectedFontWeight = settings.fontWeight;
 		}
 	});
 
@@ -81,6 +89,10 @@
 	function onFontThemeSelected(fontTheme: string) {
 		selectedFontFamily = fontTheme;
 		settings.fontTheme = fontTheme;
+	}
+
+	function onFontWeightSelected(fontWeight: number) {
+		settings.fontWeight = fontWeight;
 	}
 </script>
 
@@ -224,37 +236,42 @@
 			</div>
 
 			<div class="p-4">
-				<div class="flex w-full flex-row">
-					<input
-						bind:value={fontSize}
-						class="flex w-full text-center outline-none"
-						type="number"
-					/>
-					<button
-						aria-label="close"
-						onclick={() => {
-							onSizeSelected(fontSize);
-						}}
-						class="h-12 w-12 px-2 pt-2 text-neutral-700 hover:cursor-pointer"
-					>
-						<svg
-							version="1.1"
-							id="svg2"
-							width="100%"
-							height="100%"
-							viewBox="0 0 96.130432 96"
-							xmlns="http://www.w3.org/2000/svg"
+				<div class="flex w-full flex-col">
+					<p class="flex w-full items-center text-nowrap capitalize">
+						font size
+					</p>
+					<div class="flex flex-row pt-4">
+						<input
+							bind:value={fontSize}
+							class="flex w-full border border-2 p-2 text-center"
+							type="number"
+						/>
+						<button
+							aria-label="close"
+							onclick={() => {
+								onSizeSelected(fontSize);
+							}}
+							class="h-12 w-12 px-2 pt-2 text-neutral-700 hover:cursor-pointer"
 						>
-							<g id="g8" transform="translate(-16,-16)">
-								<path
-									class="fill-neutral-700"
-									style="stroke-width:1.33333"
-									d="M 19.272727,108.72727 16,105.45455 V 64 22.545455 L 19.272727,19.272727 22.545455,16 h 33.641558 33.641559 l 11.150928,11.150928 11.15093,11.150928 -0.39855,34.302125 c -0.3976,34.220589 -0.40603,34.308179 -3.54626,36.849069 C 105.2389,111.83737 102.4042,112 63.791681,112 H 22.545455 Z m 55.9361,-12.654045 c 3.502058,-3.50206 4.124506,-5.122865 4.124506,-10.739892 0,-5.693716 -0.607301,-7.222686 -4.358974,-10.974358 C 71.222687,70.607301 69.693716,70 64,70 c -5.693716,0 -7.222687,0.607301 -10.974359,4.358975 -3.737012,3.73701 -4.358974,5.291226 -4.358974,10.892581 0,6.853933 3.398442,12.271284 9.333333,14.877974 4.985283,2.1896 12.806448,0.34607 17.208827,-4.056305 z M 78.4,46.4 c 2.077387,-2.077387 2.077387,-16.055947 0,-18.133333 -2.250848,-2.250848 -47.882485,-2.250848 -50.133333,0 -2.077387,2.077386 -2.077387,16.055946 0,18.133333 2.250848,2.250848 47.882485,2.250848 50.133333,0 z"
-									id="path293"
-								/>
-							</g>
-						</svg>
-					</button>
+							<svg
+								version="1.1"
+								id="svg2"
+								width="100%"
+								height="100%"
+								viewBox="0 0 96.130432 96"
+								xmlns="http://www.w3.org/2000/svg"
+							>
+								<g id="g8" transform="translate(-16,-16)">
+									<path
+										class="fill-neutral-700"
+										style="stroke-width:1.33333"
+										d="M 19.272727,108.72727 16,105.45455 V 64 22.545455 L 19.272727,19.272727 22.545455,16 h 33.641558 33.641559 l 11.150928,11.150928 11.15093,11.150928 -0.39855,34.302125 c -0.3976,34.220589 -0.40603,34.308179 -3.54626,36.849069 C 105.2389,111.83737 102.4042,112 63.791681,112 H 22.545455 Z m 55.9361,-12.654045 c 3.502058,-3.50206 4.124506,-5.122865 4.124506,-10.739892 0,-5.693716 -0.607301,-7.222686 -4.358974,-10.974358 C 71.222687,70.607301 69.693716,70 64,70 c -5.693716,0 -7.222687,0.607301 -10.974359,4.358975 -3.737012,3.73701 -4.358974,5.291226 -4.358974,10.892581 0,6.853933 3.398442,12.271284 9.333333,14.877974 4.985283,2.1896 12.806448,0.34607 17.208827,-4.056305 z M 78.4,46.4 c 2.077387,-2.077387 2.077387,-16.055947 0,-18.133333 -2.250848,-2.250848 -47.882485,-2.250848 -50.133333,0 -2.077387,2.077386 -2.077387,16.055946 0,18.133333 2.250848,2.250848 47.882485,2.250848 50.133333,0 z"
+										id="path293"
+									/>
+								</g>
+							</svg>
+						</button>
+					</div>
 				</div>
 				<div class="mt-4 outline">
 					<p class="p-4" style="font-size: {fontSize}px">
@@ -264,16 +281,31 @@
 				</div>
 			</div>
 
-			<div class="flex w-full flex-col pt-4">
+			<div class="ps-4">Font Family</div>
+			<div class="grid grid-cols-3 gap-4 p-4">
 				{#each fontFamilies as ff}
 					<button
-						class="{ff.class} p-2 hover:cursor-pointer"
+						class="{ff.class} border border-1 p-2 hover:cursor-pointer"
 						onclick={() => onFontThemeSelected(ff.fontTheme)}
 					>
 						{ff.name}
 					</button>
 				{/each}
 			</div>
+
+			<div class="ps-4">Font Weight</div>
+			<div class="grid grid-cols-3 gap-4 p-4">
+				{#each fontWeights as fw}
+					<button
+						style="font-weight: {fw}"
+						class="border border-1 p-2 hover:cursor-pointer"
+						onclick={() => onFontWeightSelected(fw)}
+					>
+						{fw}
+					</button>
+				{/each}
+			</div>
+
 			<span class="h-full flex-1"></span>
 		</div>
 	</div>

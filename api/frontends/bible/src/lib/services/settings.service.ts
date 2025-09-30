@@ -23,7 +23,10 @@ class SettingsService {
 
 		html?.setAttribute('font-theme', cs.fontTheme);
 
-		html?.setAttribute('style', `font-size: ${cs.fontSize}px;`);
+		html?.setAttribute(
+			'style',
+			`font-size: ${cs.fontSize}px; font-weight: ${cs.fontWeight};`
+		);
 
 		// TODO intentionally left this here for now
 		// will delete if not needed.
