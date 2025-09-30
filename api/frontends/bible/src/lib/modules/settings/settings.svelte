@@ -11,7 +11,6 @@
 	let settings: any = $state();
 
 	let fontSize = $state(12);
-	let fontWeight = $state(400);
 	let selectedFontFamily = $state('sans');
 	let selectedFontWeight = $state(400);
 
@@ -231,7 +230,9 @@
 			<div class="grid grid-cols-3 gap-4 p-4">
 				{#each fontFamilies as ff}
 					<button
-						class="{ff.class} border border-1 p-2 hover:cursor-pointer"
+						class="{ff.class} {ff.fontTheme === settings?.fontTheme
+							? 'bg-primary-500 text-neutral-100'
+							: ''} border border-1 p-2 hover:cursor-pointer"
 						onclick={() => onFontThemeSelected(ff.fontTheme)}
 					>
 						{ff.name}
@@ -244,7 +245,9 @@
 				{#each fontWeights as fw}
 					<button
 						style="font-weight: {fw}"
-						class="border border-1 p-2 hover:cursor-pointer"
+						class="{fw === selectedFontWeight
+							? 'bg-primary-500 text-neutral-100'
+							: ''} border border-1 p-2 hover:cursor-pointer"
 						onclick={() => onFontWeightSelected(fw)}
 					>
 						{fw}
