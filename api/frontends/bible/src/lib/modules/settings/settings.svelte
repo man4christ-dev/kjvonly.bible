@@ -8,9 +8,9 @@
 	import LightDarkMode from './lightDarkMode.svelte';
 	import Close from '$lib/components/buttons/close.svelte';
 	import { newSettings, type Settings } from '$lib/models/settings.model';
-	import Header from './bufferHeader.svelte';
-	import BufferBody from './bufferBody.svelte';
-	import BufferContainer from './bufferContainer.svelte';
+	import Header from '../../components/bufferHeader.svelte';
+	import BufferBody from '../../components/bufferBody.svelte';
+	import BufferContainer from '../../components/bufferContainer.svelte';
 
 	// =============================== BINDINGS ================================
 
