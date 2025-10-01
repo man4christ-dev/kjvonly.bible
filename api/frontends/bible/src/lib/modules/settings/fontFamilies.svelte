@@ -7,50 +7,36 @@
 
 	// ================================== VARS =================================
 
-	let selectedFontFamily = $state('sans');
 	let fontFamilies = [
 		{
-			name: 'sans-serif',
-			fontFamily: 'sans-serif',
-			fontTheme: 'sans',
-			class: 'font-sans'
+			name: 'sans',
+			fontTheme: 'sans'
 		},
 		{
 			name: 'serif',
-			fontFamily: 'serif',
-			fontTheme: 'serif',
-			class: 'font-serif'
+			fontTheme: 'serif'
 		},
 		{
 			name: 'monospace',
-			fontFamily: 'monospace',
-			fontTheme: 'mono',
-			class: 'font-mono'
+			fontTheme: 'mono'
 		},
 		{
-			name: 'KJV1611',
-			fontFamily: 'font-kjv',
-			fontTheme: 'kjv',
-			class: 'font-kjv'
+			name: 'KJV 1611',
+			fontTheme: 'kjv'
 		},
 		{
 			name: 'Roboto Mono',
-			fontFamily: 'monospace',
-			fontTheme: 'roboto-mono',
-			class: 'font-roboto-mono'
+			fontTheme: 'roboto-mono'
 		},
 		{
 			name: 'JetBrains Mono',
-			fontFamily: 'monospace',
-			fontTheme: 'jetbrains-mono',
-			class: 'font-jetbrains-mono'
+			fontTheme: 'jetbrains-mono'
 		}
 	];
 
 	// ============================== CLICK FUNCS ==============================
 
 	function onFontThemeSelected(fontTheme: string) {
-		selectedFontFamily = fontTheme;
 		settings.fontTheme = fontTheme;
 	}
 </script>
@@ -59,7 +45,7 @@
 <div class="grid grid-cols-3 gap-4 p-4">
 	{#each fontFamilies as ff}
 		<button
-			class="{ff.class} {ff.fontTheme === settings?.fontTheme
+			class="font-{ff.fontTheme} {ff.fontTheme === settings?.fontTheme
 				? 'bg-primary-500 text-neutral-100'
 				: ''} border border-1 p-2 hover:cursor-pointer"
 			onclick={() => onFontThemeSelected(ff.fontTheme)}

@@ -55,7 +55,7 @@
 
 		/* update color theme */
 		if (chapterSettings && chapterSettings.colorTheme) {
-			settingsService.setTheme(chapterSettings?.colorTheme);
+			settingsService.applySettings(chapterSettings?.colorTheme);
 		}
 	});
 
@@ -151,7 +151,7 @@
 			chapterSettings = JSON.parse(cs);
 
 			if (chapterSettings && chapterSettings.colorTheme) {
-				settingsService.setTheme(chapterSettings?.colorTheme);
+				settingsService.applySettings(chapterSettings?.colorTheme);
 			}
 		} else {
 			chapterSettings = newSettings();

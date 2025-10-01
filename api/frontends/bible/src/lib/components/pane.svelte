@@ -59,7 +59,7 @@
 			chapterSettings = JSON.parse(cs);
 
 			if (chapterSettings && chapterSettings.colorTheme) {
-				settingsService.setTheme(chapterSettings?.colorTheme);
+				settingsService.applySettings(chapterSettings?.colorTheme);
 			}
 		} else {
 			chapterSettings = newSettings();
@@ -95,15 +95,21 @@
 			     We accomplish this with the toggle. -->
 	{#if pane?.toggle}
 		{#if pane?.buffer?.componentName}
-			{@const Component = componentMapping.getComponent(pane?.buffer?.componentName)}
-			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}></Component>
+			{@const Component = componentMapping.getComponent(
+				pane?.buffer?.componentName
+			)}
+			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}
+			></Component>
 		{/if}
 	{/if}
 
 	{#if pane && !pane.toggle}
 		{#if pane?.buffer?.componentName}
-			{@const Component = componentMapping.getComponent(pane?.buffer?.componentName)}
-			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}></Component>
+			{@const Component = componentMapping.getComponent(
+				pane?.buffer?.componentName
+			)}
+			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}
+			></Component>
 		{/if}
 	{/if}
 </div>

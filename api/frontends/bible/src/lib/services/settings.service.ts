@@ -1,14 +1,11 @@
 import { type Settings, newSettings } from '../models/settings.model';
 
+/**
+ * Settings apply users settings to DOM. On update the settings module will
+ * call this service to update the DOM with desired settings e.g. color, font
+ */
 class SettingsService {
-	// TODO make this an enum
-	VALID_COLOR_THEMES = ['red', 'light-blue', 'purple', 'cyan', 'pink'];
-
-	setTheme(theme: string) {
-		if (!this.VALID_COLOR_THEMES.includes(theme)) {
-			theme = this.VALID_COLOR_THEMES[0];
-		}
-
+	applySettings() {
 		let cs = this.getSettings();
 		if (!cs) {
 			return;
@@ -16,9 +13,9 @@ class SettingsService {
 
 		let html = document.getElementById('kjvonly-html');
 		if (cs.isDarkTheme) {
-			html?.setAttribute('data-theme', `color-theme-dark-${theme}`);
+			html?.setAttribute('data-theme', `color-theme-dark-${cs.colorTheme}`);
 		} else {
-			html?.setAttribute('data-theme', `color-theme-${theme}`);
+			html?.setAttribute('data-theme', `color-theme-${cs.colorTheme}`);
 		}
 
 		html?.setAttribute('font-theme', cs.fontTheme);
@@ -27,25 +24,6 @@ class SettingsService {
 			'style',
 			`font-size: ${cs.fontSize}px; font-weight: ${cs.fontWeight};`
 		);
-
-		// TODO intentionally left this here for now
-		// will delete if not needed.
-
-		// let classes = [];
-		// let currentClasses: string[] = [];
-		// html?.classList.forEach((c) => {
-		// 	currentClasses.push(c);
-		// });
-
-		// if (html) {
-		// 	currentClasses.forEach((c: string) => {
-		// 		html?.classList.remove(c);
-		// 	});
-
-		// 	classes.forEach((c) => {
-		// 		html?.classList.add(c);
-		// 	});
-		//}
 	}
 
 	getSettings(): Settings {

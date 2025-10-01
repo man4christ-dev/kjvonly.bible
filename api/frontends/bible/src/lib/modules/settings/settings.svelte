@@ -35,9 +35,8 @@
 			localStorage.setItem('settings', JSON.stringify(settings));
 		}
 
-		/* update color theme */
 		if (settings && settings.colorTheme) {
-			settingsService.setTheme(settings?.colorTheme);
+			settingsService.applySettings();
 		}
 	});
 </script>
@@ -51,7 +50,7 @@
 	<Close {onClose}></Close>
 {/snippet}
 
-<!-- ================================ BODY =============================== -->
+<!-- ================================= BODY =============================+== -->
 
 {#snippet body()}
 	<LightDarkMode bind:settings></LightDarkMode>

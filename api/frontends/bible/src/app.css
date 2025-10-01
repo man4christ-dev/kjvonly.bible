@@ -36,7 +36,6 @@
 	--font-jetbrains-mono: 'JetBrains Mono';
 
 	/* ============================ COLOR THEME ============================= */
-
 	/* default color scheme */
 	--color-primary-surface: hsl(0 0% 100%);
 
@@ -154,15 +153,19 @@
 	}
 
 	[font-theme='sans'] {
-		--font-primary: sans-serif;
+		--font-primary:
+			ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
+			'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 	}
 
 	[font-theme='mono'] {
-		--font-primary: monospace;
+		--font-primary:
+			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
+			'Courier New', monospace;
 	}
 
 	[font-theme='serif'] {
-		--font-primary: serif;
+		--font-primary: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 	}
 
 	[font-theme='roboto-mono'] {
