@@ -8,6 +8,9 @@
 	import LightDarkMode from './lightDarkMode.svelte';
 	import Close from '$lib/components/buttons/close.svelte';
 	import { newSettings, type Settings } from '$lib/models/settings.model';
+	import Header from './bufferHeader.svelte';
+	import BufferBody from './bufferBody.svelte';
+	import BufferContainer from './bufferContainer.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -39,38 +42,37 @@
 	});
 </script>
 
-<div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
-	<div class="w-full max-w-lg">
-		<header
-			bind:clientHeight={headerHeight}
-			class="sticky top-0 w-full flex-col border-b-2 bg-neutral-100 text-neutral-700"
-		>
-			<div
-				class="sticky top-0 flex w-full justify-between px-2 pt-2 text-neutral-700"
-			>
-				<div class="flex items-center justify-center">
-					<h1 class="text-start">Settings</h1>
-				</div>
+<!-- ================================ HEADER =============================== -->
 
-				<Close {onClose}></Close>
-			</div>
-		</header>
-
-		<div
-			style="height: {clientHeight - headerHeight}px"
-			class="flex w-full flex-col overflow-y-scroll border"
-		>
-			<LightDarkMode bind:settings></LightDarkMode>
-
-			<ColorTheme bind:settings></ColorTheme>
-
-			<FontSize bind:settings></FontSize>
-
-			<FontFamilies bind:settings></FontFamilies>
-
-			<FontWeights bind:settings></FontWeights>
-
-			<span class="h-full flex-1"></span>
-		</div>
+{#snippet header()}
+	<div class="flex items-center justify-center">
+		<h1 class="text-start">Settings</h1>
 	</div>
-</div>
+	<Close {onClose}></Close>
+{/snippet}
+
+<!-- ================================ BODY =============================== -->
+
+{#snippet body()}
+	<LightDarkMode bind:settings></LightDarkMode>
+
+	<ColorTheme bind:settings></ColorTheme>
+
+	<FontSize bind:settings></FontSize>
+
+	<FontFamilies bind:settings></FontFamilies>
+
+	<FontWeights bind:settings></FontWeights>
+{/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
+
+<BufferContainer bind:clientHeight>
+	<Header bind:headerHeight>
+		{@render header()}
+	</Header>
+
+	<BufferBody bind:headerHeight bind:clientHeight>
+		{@render body()}
+	</BufferBody>
+</BufferContainer>
