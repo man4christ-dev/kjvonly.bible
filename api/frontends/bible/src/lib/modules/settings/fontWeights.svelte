@@ -1,7 +1,15 @@
 <script lang="ts">
-	let { settings = $bindable() } = $props();
+	import type { Settings } from '$lib/models/settings.model';
+
+	// =============================== BINDINGS ================================
+
+	let { settings = $bindable<Settings>() } = $props();
+
+	// ================================== VARS =================================
 
 	let fontWeights = [100, 200, 300, 400, 500, 600, 700, 800, 900];
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onFontWeightSelected(fontWeight: number) {
 		settings.fontWeight = fontWeight;

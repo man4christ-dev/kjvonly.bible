@@ -1,5 +1,11 @@
 <script lang="ts">
-	let { settings = $bindable() } = $props();
+	import { type Settings } from '$lib/models/settings.model';
+
+	// =============================== BINDINGS ================================
+
+	let { settings = $bindable<Settings>() } = $props();
+
+	// ================================== VARS =================================
 
 	let selectedFontFamily = $state('sans');
 	let fontFamilies = [
@@ -40,6 +46,8 @@
 			class: 'font-jetbrains-mono'
 		}
 	];
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onFontThemeSelected(fontTheme: string) {
 		selectedFontFamily = fontTheme;

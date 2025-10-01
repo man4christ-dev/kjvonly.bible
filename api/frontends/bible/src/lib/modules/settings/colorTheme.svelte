@@ -1,5 +1,7 @@
 <script lang="ts">
-	let { settings = $bindable() } = $props();
+	import { type Settings } from '$lib/models/settings.model';
+
+	let { settings = $bindable<Settings>() } = $props();
 </script>
 
 <div class="flex w-full flex-col bg-neutral-50 p-4 font-bold">

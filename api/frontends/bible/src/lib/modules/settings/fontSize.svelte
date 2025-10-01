@@ -1,15 +1,16 @@
 <script lang="ts">
 	import Save from '$lib/components/buttons/save.svelte';
-	import { onMount } from 'svelte';
+	import type { Settings } from '$lib/models/settings.model';
 
-	let { settings = $bindable() } = $props();
+	// =============================== BINDINGS ================================
+
+	let { settings = $bindable<Settings>() } = $props();
+
+	// ================================== VARS =================================
 
 	let fontSize = $state(12);
 
-	function onSizeSelected(newFontSize: number) {
-		fontSize = newFontSize;
-		settings.fontSize = fontSize;
-	}
+	// =============================== LIFECYCLE ===============================
 
 	$effect(() => {
 		settings;
@@ -20,6 +21,13 @@
 			fontSize = fs;
 		}
 	});
+
+	// ============================== CLICK FUNCS ==============================
+
+	function onSizeSelected(newFontSize: number) {
+		fontSize = newFontSize;
+		settings.fontSize = fontSize;
+	}
 </script>
 
 <div class="p-4">

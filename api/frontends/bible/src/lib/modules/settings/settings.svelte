@@ -7,11 +7,23 @@
 	import ColorTheme from './colorTheme.svelte';
 	import LightDarkMode from './lightDarkMode.svelte';
 	import Close from '$lib/components/buttons/close.svelte';
+	import { newSettings, type Settings } from '$lib/models/settings.model';
+
+	// =============================== BINDINGS ================================
 
 	let { onClose } = $props();
+
+	// ================================== VARS =================================
+
 	let headerHeight = $state(0);
 	let clientHeight = $state(0);
-	let settings: any = $state();
+	let settings: Settings = $state(newSettings());
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(async () => {
+		settings = settingsService.getSettings();
+	});
 
 	$effect(() => {
 		settings;
@@ -24,10 +36,6 @@
 		if (settings && settings.colorTheme) {
 			settingsService.setTheme(settings?.colorTheme);
 		}
-	});
-
-	onMount(async () => {
-		settings = settingsService.getSettings();
 	});
 </script>
 

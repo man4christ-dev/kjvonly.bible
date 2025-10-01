@@ -1,8 +1,9 @@
 <script lang="ts">
 	import Moon from '$lib/components/buttons/moon.svelte';
 	import Sun from '$lib/components/buttons/sun.svelte';
+	import { type Settings } from '$lib/models/settings.model';
 
-	let { settings = $bindable() } = $props();
+	let { settings = $bindable<Settings>() } = $props();
 </script>
 
 <div class="flex flex-row p-4">
