@@ -18,7 +18,7 @@ class SettingsService {
 			html?.setAttribute('data-theme', `color-theme-${cs.colorTheme}`);
 		}
 
-		html?.setAttribute('font-theme', cs.fontTheme);
+		html?.setAttribute('font-family', cs.fontFamily);
 
 		html?.setAttribute(
 			'style',

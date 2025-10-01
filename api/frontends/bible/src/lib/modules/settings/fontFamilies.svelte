@@ -10,34 +10,34 @@
 	let fontFamilies = [
 		{
 			name: 'sans',
-			fontTheme: 'sans'
+			fontFamily: 'sans'
 		},
 		{
 			name: 'serif',
-			fontTheme: 'serif'
+			fontFamily: 'serif'
 		},
 		{
 			name: 'monospace',
-			fontTheme: 'mono'
+			fontFamily: 'mono'
 		},
 		{
 			name: 'KJV 1611',
-			fontTheme: 'kjv'
+			fontFamily: 'kjv'
 		},
 		{
 			name: 'Roboto Mono',
-			fontTheme: 'roboto-mono'
+			fontFamily: 'roboto-mono'
 		},
 		{
 			name: 'JetBrains Mono',
-			fontTheme: 'jetbrains-mono'
+			fontFamily: 'jetbrains-mono'
 		}
 	];
 
 	// ============================== CLICK FUNCS ==============================
 
-	function onFontThemeSelected(fontTheme: string) {
-		settings.fontTheme = fontTheme;
+	function onFontFamilySelected(fontFamily: string) {
+		settings.fontFamily = fontFamily;
 	}
 </script>
 
@@ -45,10 +45,10 @@
 <div class="grid grid-cols-3 gap-4 p-4">
 	{#each fontFamilies as ff}
 		<button
-			class="font-{ff.fontTheme} {ff.fontTheme === settings?.fontTheme
+			class="font-{ff.fontFamily} {ff.fontFamily === settings?.fontFamily
 				? 'bg-primary-500 text-neutral-100'
 				: ''} border border-1 p-2 hover:cursor-pointer"
-			onclick={() => onFontThemeSelected(ff.fontTheme)}
+			onclick={() => onFontFamilySelected(ff.fontFamily)}
 		>
 			{ff.name}
 		</button>

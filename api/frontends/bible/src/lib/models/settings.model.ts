@@ -1,7 +1,7 @@
 export interface Settings {
 	fontSize: string;
 	fontWeight: number;
-	fontTheme: string;
+	fontFamily: string;
 	colorTheme?: string;
 	isDarkTheme?: boolean;
 }
@@ -10,7 +10,7 @@ export function newSettings(): Settings {
 	return {
 		fontSize: 'text-base',
 		fontWeight: 400,
-		fontTheme: 'sans',
+		fontFamily: 'sans',
 		colorTheme: 'red',
 		isDarkTheme: false
 	};

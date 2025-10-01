@@ -148,31 +148,31 @@
 }
 
 @layer theme {
-	[font-theme='kjv'] {
+	[font-family='kjv'] {
 		--font-primary: KJV1611;
 	}
 
-	[font-theme='sans'] {
+	[font-family='sans'] {
 		--font-primary:
 			ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji',
 			'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
 	}
 
-	[font-theme='mono'] {
+	[font-family='mono'] {
 		--font-primary:
 			ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, 'Liberation Mono',
 			'Courier New', monospace;
 	}
 
-	[font-theme='serif'] {
+	[font-family='serif'] {
 		--font-primary: ui-serif, Georgia, Cambria, 'Times New Roman', Times, serif;
 	}
 
-	[font-theme='roboto-mono'] {
+	[font-family='roboto-mono'] {
 		--font-primary: 'Roboto Mono';
 	}
 
-	[font-theme='jetbrains-mono'] {
+	[font-family='jetbrains-mono'] {
 		--font-primary: 'JetBrains Mono';
 	}
 
