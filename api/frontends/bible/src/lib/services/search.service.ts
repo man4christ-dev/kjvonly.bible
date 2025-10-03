@@ -1,9 +1,11 @@
-const searchWorker = new Worker(new URL('../workers/kjvsearch.worker?worker', import.meta.url), {
-	type: 'module'
-});
+const searchWorker = new Worker(
+	new URL('../workers/kjvsearch.worker?worker', import.meta.url),
+	{
+		type: 'module'
+	}
+);
 
 class SearchService {
-	// TODO: unsubscribe
 	subscribers: any[] = [];
 	constructor() {
 		searchWorker.onmessage = (e) => {
@@ -17,6 +19,16 @@ class SearchService {
 
 	subscribe(id: any, fn: any) {
 		this.subscribers.push({ id: id, fn: fn });
+	}
+
+	unsubscribe(searchID: any) {
+		let tmpSubscribers: any = [];
+		this.subscribers.forEach((s) => {
+			if (s.subID !== searchID) {
+				tmpSubscribers.push();
+			}
+		});
+		this.subscribers = tmpSubscribers;
 	}
 
 	init() {
