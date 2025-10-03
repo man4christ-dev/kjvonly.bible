@@ -5,7 +5,6 @@
 	import uuid4 from 'uuid4';
 	import { toastService } from '$lib/services/toast.service';
 	import { bibleDB } from '$lib/storer/bible.db';
-	import { on } from 'svelte/events';
 	import { Modules } from '$lib/models/modules.model';
 
 	let searchID = uuid4();
