@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { paneService } from '$lib/services/pane.service.svelte';
 
-	let { paneID, module, data, classes = 'h-8 w-8' } = $props();
+	let { paneID = $bindable(), module, data, classes = 'h-8 w-8' } = $props();
 </script>
 
 <button

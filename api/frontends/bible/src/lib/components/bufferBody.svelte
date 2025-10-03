@@ -8,7 +8,7 @@
 
 <div
 	style="height: {clientHeight - headerHeight}px"
-	class="flex w-full max-w-lg flex-col overflow-y-scroll border"
+	class="flex w-full max-w-lg flex-col overflow-y-scroll border border-neutral-400"
 >
 	{@render children?.()}
 

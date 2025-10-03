@@ -6,3 +6,4 @@
 ◊ make bufferContainer, header, and body component for all buffers.
 ◊ extract all buttons to common component
 ◊ copy verse - extra space after chapter number
+◊ does paneId need to be bindable?

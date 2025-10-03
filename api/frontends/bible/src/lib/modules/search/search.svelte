@@ -9,10 +9,16 @@
 	import Copy from '$lib/components/buttons/copy.svelte';
 	import HorizontalSplit from '$lib/components/buttons/horizontalSplit.svelte';
 	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
+	import Close from '$lib/components/buttons/close.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import SearchResultActions from './searchResultActions.svelte';
+
 	// =============================== BINDINGS ================================
 
 	let {
-		paneId,
+		paneId = $bindable(),
 		pane = $bindable(),
 		containerHeight = $bindable(),
 		containerWidth = $bindable(),
@@ -120,6 +126,14 @@
 		await loadMoreVerses();
 	}
 
+	function applyOnClose() {
+		if (onClose) {
+			onClose();
+		} else {
+			paneService.onDeletePane(paneService.rootPane, paneId);
+		}
+	}
+
 	// ============================== CLICK FUNCS ==============================
 
 	function onCopyToClipboard(v: any) {
@@ -139,46 +153,29 @@
 	}
 </script>
 
-{#snippet actions(v: any)}
-	<div class="flex flex-row justify-end space-x-4">
-		<Copy
-			onCopy={() => {
-				onCopyToClipboard(v);
-			}}
-		></Copy>
+{#snippet actions(v: any)}{/snippet}
 
-		<HorizontalSplit
-			paneID={paneId}
-			module={Modules.BIBLE}
-			data={{ chapterKey: v.key }}
-		></HorizontalSplit>
-
-		<VerticalSplit
-			paneID={paneId}
-			module={Modules.BIBLE}
-			data={{ chapterKey: v.key }}
-		></VerticalSplit>
-	</div>
-{/snippet}
 {#snippet searchResultsSnippet()}
-	{#each searchResults as v}
+	{#each searchResults as sr}
 		<div
 			tabindex="0"
 			role="button"
 			class="leading-loose"
 			onclick={() => {
-				onSearchResultClicked(v);
+				onSearchResultClicked(sr);
 			}}
-			onkeydown={() => {
-				onSearchResultClicked(v);
+			onkeydown={(e: KeyboardEvent) => {
+				if (e.key === 'Enter') {
+					onSearchResultClicked(sr);
+				}
 			}}
 		>
 			<div class="text-left whitespace-normal hover:cursor-pointer">
 				<span class="py-2 text-left font-bold"
-					>{v.bookName} {v.number}:{v.verseNumber}</span
+					>{sr.bookName} {sr.number}:{sr.verseNumber}</span
 				>
 				<span class="flex-fill flex"></span>
-				{#each v.text.split(' ') as w, idx}
+				{#each sr.text.split(' ') as w, idx}
 					{#if match(w)}
 						<span>
 							{#if idx !== 0}<span>&nbsp;</span>{/if}
@@ -191,76 +188,66 @@
 						</span>
 					{/if}
 				{/each}
-				{@render actions(v)}
+				<SearchResultActions bind:paneID={paneId} searchResult={sr}
+				></SearchResultActions>
 			</div>
 		</div>
 	{/each}
 {/snippet}
 
-{#if showInput}
-	<div bind:clientHeight style={containerHeight} class="overflow-hidden">
-		<div class="flex flex-col items-center justify-center">
+<!-- ================================ HEADER =============================== -->
+{#snippet header()}
+	<div class="flex w-full items-center justify-between">
+		<span class="w-12"></span>
+		<span class="flex-1 text-center">Search</span>
+		<Close classes="h-12 w-12" onClose={() => applyOnClose()}></Close>
+	</div>
+{/snippet}
+
+<!-- ================================= BODY =============================+== -->
+{#snippet body()}
+	{#if showInput}
+		<div class="flex w-full max-w-lg justify-center px-2 pt-2">
+			<input
+				bind:clientHeight={searchInputHeight}
+				class="border-primary-500 w-full max-w-3xl border-b bg-neutral-50 outline-none"
+				oninput={onSearchTextChanged}
+				bind:value={searchText}
+				placeholder="search"
+			/>
+		</div>
+		{#if searchResultsObj?.indexes && searchResultsObj?.indexes.length > 0}
+			<p class="text-center">
+				Showing {loadedVerses} of {searchResultsObj?.indexes.length}
+			</p>
+		{/if}
+		<div class="p-4">
 			<div
-				bind:clientHeight={headerHeight}
-				class="flex w-full flex-col items-center"
-			>
-				<div class="flex w-full max-w-lg justify-end bg-neutral-100">
-					<button
-						aria-label="close"
-						onclick={() => {
-							if (onClose) {
-								onClose();
-							} else {
-								paneService.onDeletePane(paneService.rootPane, paneId);
-							}
-						}}
-						class="h-12 w-12 px-2 pt-2 text-neutral-700"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							width="100%"
-							height="100%"
-						>
-							<path
-								class="fill-neutral-700"
-								d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
-							/>
-						</svg>
-					</button>
-				</div>
-				<div class="flex w-full max-w-lg justify-center px-2 pt-2">
-					<input
-						bind:clientHeight={searchInputHeight}
-						class=" border-primary-500 w-full max-w-3xl border-b bg-neutral-50 outline-none"
-						oninput={onSearchTextChanged}
-						bind:value={searchText}
-						placeholder="search"
-					/>
-				</div>
-				{#if searchResultsObj?.indexes && searchResultsObj?.indexes.length > 0}
-					<p>Showing {loadedVerses} of {searchResultsObj?.indexes.length}</p>
-				{/if}
-			</div>
-			<div class="p-4">
-				<div
-					id="{searchID}-scroll-container"
-					style="height: {clientHeight - headerHeight}px"
-					class="{searchResults?.length > 0 ? '' : 'hidden'}
+				id="{searchID}-scroll-container"
+				style="height: {clientHeight - headerHeight}px"
+				class="{searchResults?.length > 0 ? '' : 'hidden'}
                   -m-1 max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50
                   "
-				>
-					{@render searchResultsSnippet()}
+			>
+				{@render searchResultsSnippet()}
 
-					<div class="h-6"></div>
-				</div>
+				<div class="h-6"></div>
 			</div>
 		</div>
-	</div>
-{:else}
-	{@render searchResultsSnippet()}
-{/if}
+	{:else}
+		<!-- for bible references -->
+		{@render searchResultsSnippet()}
+	{/if}
+{/snippet}
 
-<style>
-	@reference "../../../app.css";
-</style>
+<!-- ============================== CONTAINER ============================== -->
+
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		{@render header()}
+	</BufferHeader>
+
+	<BufferBody bind:headerHeight bind:clientHeight>
+		{@render body()}
+	</BufferBody>
+</BufferContainer>

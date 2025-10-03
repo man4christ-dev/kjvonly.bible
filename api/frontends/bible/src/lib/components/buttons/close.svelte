@@ -1,5 +1,5 @@
 <script lang="ts">
-	let { onClose } = $props();
+	let { onClose, classes = 'h-12 w-12' } = $props();
 </script>
 
 <button
@@ -7,7 +7,7 @@
 	onclick={() => {
 		onClose();
 	}}
-	class="h-12 w-12 px-2 text-neutral-700 hover:cursor-pointer"
+	class="{classes} px-2 text-neutral-700 hover:cursor-pointer"
 >
 	<svg
 		xmlns="http://www.w3.org/2000/svg"

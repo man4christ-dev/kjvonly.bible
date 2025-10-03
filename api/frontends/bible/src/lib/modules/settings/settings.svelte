@@ -8,7 +8,7 @@
 	import LightDarkMode from './lightDarkMode.svelte';
 	import Close from '$lib/components/buttons/close.svelte';
 	import { newSettings, type Settings } from '$lib/models/settings.model';
-	import Header from '../../components/bufferHeader.svelte';
+	import BufferHeader from '../../components/bufferHeader.svelte';
 	import BufferBody from '../../components/bufferBody.svelte';
 	import BufferContainer from '../../components/bufferContainer.svelte';
 
@@ -67,9 +67,9 @@
 <!-- ============================== CONTAINER ============================== -->
 
 <BufferContainer bind:clientHeight>
-	<Header bind:headerHeight>
+	<BufferHeader bind:headerHeight>
 		{@render header()}
-	</Header>
+	</BufferHeader>
 
 	<BufferBody bind:headerHeight bind:clientHeight>
 		{@render body()}
