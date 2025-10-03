@@ -6,6 +6,8 @@
 	import SearchResultActions from './searchResultActions.svelte';
 	import { bibleDB } from '$lib/storer/bible.db';
 
+	// =============================== BINDINGS ================================
+
 	let {
 		paneID = $bindable(),
 		searchText = $bindable(),
@@ -18,9 +20,12 @@
 		onFilterIndex: any;
 	} = $props();
 
+	// ================================== VARS =================================
+
 	let searchResults: any[] = $state([]);
 	let searchResultsObj: any = $state({});
 	let loadedVerses: number = $state(0);
+
 	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
@@ -31,6 +36,10 @@
 		el?.addEventListener('scroll', handleScroll);
 	});
 
+	onDestroy(() => {
+		searchService.unsubscribe(searchID);
+	});
+
 	function match(word: string) {
 		let stripWord = word
 			.toLowerCase()
@@ -39,28 +48,15 @@
 		return new RegExp('\\b' + stripWord + '\\b').test(matchText.toLowerCase());
 	}
 
-	function onSearchResultClicked(v: any) {
-		let pane = paneService.findNode(paneService.rootPane, paneID);
-		if (pane) {
-			pane.buffer.bag = {
-				chapterKey: v.key
-			};
-			pane?.updateBuffer(Modules.BIBLE);
-		}
-	}
-
 	// ================================ FUNCS ==================================
+
 	async function onSearchResult(data: any) {
-		console.log(data, 'on search result2');
 		if (onFilterIndex) {
 			data.indexes = onFilterIndex(data.indexes);
 		}
-		console.log('before load');
-
 		searchResultsObj = data;
 		loadedVerses = 0;
-		searchResults.length = 0;
-		console.log('before load');
+		searchResults = [];
 		await loadMoreVerses();
 	}
 
@@ -80,17 +76,16 @@
 	}
 
 	async function loadMoreVerses() {
-		console.log('load');
 		for (
-			let j = 0;
-			j < 10 && loadedVerses !== searchResultsObj.indexes?.length;
-			j++, loadedVerses++
+			let i = 0;
+			i < 10 && loadedVerses !== searchResultsObj.indexes?.length;
+			i++, loadedVerses++
 		) {
 			let bcvKey = searchResultsObj.indexes[loadedVerses];
 
-			let chatperKeyIndex = bcvKey.lastIndexOf('_');
-			let chapterKey = bcvKey.substring(0, chatperKeyIndex);
-			let verseNumber = bcvKey.substring(chatperKeyIndex + 1, bcvKey.length);
+			let chapterKeyIndex = bcvKey.lastIndexOf('_');
+			let chapterKey = bcvKey.substring(0, chapterKeyIndex);
+			let verseNumber = bcvKey.substring(chapterKeyIndex + 1, bcvKey.length);
 			let chapter = await bibleDB.getValue('chapters', chapterKey);
 			let verse = chapter['verseMap'][verseNumber];
 
@@ -102,18 +97,25 @@
 				text: verse
 			};
 
-			console.log('push');
 			searchResults.push(data);
 		}
 	}
 
-	onDestroy(() => {
-		searchService.unsubscribe(searchID);
-	});
+	// ============================== CLICK FUNCS ==============================
+
+	function onSearchResultClicked(v: any) {
+		let pane = paneService.findNode(paneService.rootPane, paneID);
+		if (pane) {
+			pane.buffer.bag = {
+				chapterKey: v.key
+			};
+			pane?.updateBuffer(Modules.BIBLE);
+		}
+	}
 </script>
 
 {#if searchResultsObj?.indexes && searchResultsObj?.indexes.length > 0}
-	<p class="text-center">
+	<p class="sticky top-10 bg-neutral-50 text-center">
 		Showing {loadedVerses} of {searchResultsObj?.indexes.length}
 	</p>
 {/if}
@@ -156,4 +158,5 @@
 			</div>
 		</div>
 	{/each}
+	<div class="h-6"></div>
 </div>
