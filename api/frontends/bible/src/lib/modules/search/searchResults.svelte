@@ -4,8 +4,11 @@
 	import { searchService } from '$lib/services/search.service';
 	import { onDestroy, onMount } from 'svelte';
 	import SearchResultActions from './searchResultActions.svelte';
-	import { bibleDB, CHAPTERS } from '$lib/storer/bible.db';
-	import type { SearchResult } from '$lib/models/search.model';
+	import { CHAPTERS } from '$lib/storer/bible.db';
+	import type {
+		SearchResult,
+		SearchResultResponse
+	} from '$lib/models/search.model';
 	import { bibleStorer } from '$lib/storer/bible.storer';
 	import { extractBookChapter, extractVerse } from '$lib/utils/chapter';
 	import { jsonToChapter, type Chapter } from '$lib/models/bible.model';
@@ -26,17 +29,15 @@
 
 	// ================================== VARS =================================
 
-	let searchResults: any[] = $state([]);
-	let searchResultsObj: any = $state({});
-	let loadedVerses: number = $state(0);
+	let searchResults: SearchResult[] = $state([]);
+	let searchResultsResponse: any = $state({});
+	let loadedVersesCount: number = $state(0);
 
 	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
 		searchService.subscribe(searchID, onSearchResult);
-
 		let el = document.getElementById(`${searchID}-scroll-container`);
-
 		el?.addEventListener('scroll', handleScroll);
 	});
 
@@ -54,12 +55,12 @@
 
 	// ================================ FUNCS ==================================
 
-	async function onSearchResult(data: any) {
+	async function onSearchResult(srr: SearchResultResponse) {
 		if (onFilterIndex) {
-			data.indexes = onFilterIndex(data.indexes);
+			srr.indexes = onFilterIndex(srr.indexes);
 		}
-		searchResultsObj = data;
-		loadedVerses = 0;
+		searchResultsResponse = srr;
+		loadedVersesCount = 0;
 		searchResults = [];
 		await loadMoreVerses();
 	}
@@ -82,49 +83,59 @@
 	async function loadMoreVerses() {
 		for (
 			let i = 0;
-			i < 10 && loadedVerses !== searchResultsObj.indexes?.length;
-			i++, loadedVerses++
+			i < 10 && loadedVersesCount !== searchResultsResponse.indexes?.length;
+			i++, loadedVersesCount++
 		) {
-			let bcvKey = searchResultsObj.indexes[loadedVerses];
-
-			let chapterKey = extractBookChapter(bcvKey);
-			let verseNumber = extractVerse(bcvKey);
-			let chapter: Chapter = await jsonToChapter(
-				bibleStorer.getValue(CHAPTERS, chapterKey)
+			let sr = await searchResultIndexToSearchResult(
+				searchResultsResponse.indexes[loadedVersesCount]
 			);
-			let verse = chapter.verseMap.get(String(verseNumber));
-			if (!verse) {
+			if (!sr) {
 				continue;
 			}
-
-			let data: SearchResult = {
-				key: bcvKey,
-				bookName: chapter['bookName'],
-				number: chapter['number'],
-				verseNumber: verseNumber,
-				text: verse
-			};
-
-			searchResults.push(data);
+			searchResults.push(sr);
 		}
+	}
+
+	async function searchResultIndexToSearchResult(
+		bcvKey: string
+	): Promise<SearchResult | undefined> {
+		let chapterKey = extractBookChapter(bcvKey);
+		let verseNumber = extractVerse(bcvKey);
+		let chapter: Chapter = await jsonToChapter(
+			bibleStorer.getValue(CHAPTERS, chapterKey)
+		);
+		let verse = chapter.verseMap.get(String(verseNumber));
+		if (!verse) {
+			return;
+		}
+
+		let sr: SearchResult = {
+			key: bcvKey,
+			bookName: chapter.bookName,
+			number: chapter.number,
+			verseNumber: verseNumber,
+			text: verse
+		};
+
+		return sr;
 	}
 
 	// ============================== CLICK FUNCS ==============================
 
-	function onSearchResultClicked(v: any) {
+	function onSearchResultClicked(sr: SearchResult) {
 		let pane = paneService.findNode(paneService.rootPane, paneID);
 		if (pane) {
 			pane.buffer.bag = {
-				chapterKey: v.key
+				chapterKey: sr.key
 			};
 			pane?.updateBuffer(Modules.BIBLE);
 		}
 	}
 </script>
 
-{#if searchResultsObj?.indexes && searchResultsObj?.indexes.length > 0}
+{#if searchResultsResponse?.indexes && searchResultsResponse?.indexes.length > 0}
 	<p class="sticky top-10 bg-neutral-50 text-center">
-		Showing {loadedVerses} of {searchResultsObj?.indexes.length}
+		Showing {loadedVersesCount} of {searchResultsResponse?.indexes.length}
 	</p>
 {/if}
 
