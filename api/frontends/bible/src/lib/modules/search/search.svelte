@@ -8,6 +8,7 @@
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import SearchResults from './searchResults.svelte';
+	import SearchInput from './searchInput.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -28,7 +29,7 @@
 	let headerHeight = $state(0);
 
 	let searchID: string = uuid4();
-	let searchInputHeight: number = $state(0);
+
 	let searchText = $state('');
 
 	// =============================== LIFECYCLE ===============================
@@ -40,14 +41,6 @@
 		}
 	});
 
-	function onSearchTextChanged() {
-		onFilterIndex = undefined;
-		if (searchText.length > 2) {
-			console.log(searchText);
-			searchService.search(searchID, searchText);
-		}
-	}
-
 	function applyOnClose() {
 		if (onClose) {
 			onClose();
@@ -58,6 +51,7 @@
 </script>
 
 <!-- ================================ HEADER =============================== -->
+
 {#snippet header()}
 	<div class="flex w-full items-center justify-between">
 		<span class="w-12"></span>
@@ -66,38 +60,16 @@
 	</div>
 {/snippet}
 
-<!-- ================================= BODY =============================+== -->
+<!-- ================================= BODY ================================ -->
+
 {#snippet body()}
 	{#if showInput}
-		<div
-			class="sticky top-0 flex w-full max-w-lg justify-center bg-neutral-50 py-2"
-		>
-			<input
-				bind:clientHeight={searchInputHeight}
-				class="border-primary-500 w-full max-w-3xl border-b bg-neutral-50 outline-none"
-				oninput={onSearchTextChanged}
-				bind:value={searchText}
-				placeholder="search"
-			/>
-		</div>
-
-		<SearchResults
-			bind:paneID={paneId}
-			bind:searchText
-			{searchID}
-			{onFilterIndex}
-		></SearchResults>
-
-		<div class="h-6"></div>
-	{:else}
-		<!-- for bible references -->
-		<SearchResults
-			bind:paneID={paneId}
-			bind:searchText
-			{searchID}
-			{onFilterIndex}
-		></SearchResults>
+		<SearchInput bind:searchText ID={searchID} {onFilterIndex}></SearchInput>
 	{/if}
+	<SearchResults bind:paneID={paneId} bind:searchText {searchID} {onFilterIndex}
+	></SearchResults>
+
+	<div class="h-6"></div>
 {/snippet}
 
 <!-- ============================== CONTAINER ============================== -->

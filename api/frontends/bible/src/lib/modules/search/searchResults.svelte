@@ -4,7 +4,10 @@
 	import { searchService } from '$lib/services/search.service';
 	import { onDestroy, onMount } from 'svelte';
 	import SearchResultActions from './searchResultActions.svelte';
-	import { bibleDB } from '$lib/storer/bible.db';
+	import { bibleDB, CHAPTERS } from '$lib/storer/bible.db';
+	import type { SearchResult } from '$lib/models/search.model';
+	import { bibleStorer } from '$lib/storer/bible.storer';
+	import { extractBookChapter, extractVerse } from '$lib/utils/chapter';
 
 	// =============================== BINDINGS ================================
 
@@ -83,13 +86,12 @@
 		) {
 			let bcvKey = searchResultsObj.indexes[loadedVerses];
 
-			let chapterKeyIndex = bcvKey.lastIndexOf('_');
-			let chapterKey = bcvKey.substring(0, chapterKeyIndex);
-			let verseNumber = bcvKey.substring(chapterKeyIndex + 1, bcvKey.length);
-			let chapter = await bibleDB.getValue('chapters', chapterKey);
+			let chapterKey = extractBookChapter(bcvKey);
+			let verseNumber = extractVerse(bcvKey);
+			let chapter = await bibleStorer.getValue(CHAPTERS, chapterKey);
 			let verse = chapter['verseMap'][verseNumber];
 
-			let data = {
+			let data: SearchResult = {
 				key: bcvKey,
 				bookName: chapter['bookName'],
 				number: chapter['number'],
