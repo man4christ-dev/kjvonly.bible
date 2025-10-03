@@ -99,8 +99,6 @@
 		}
 	}
 
-	// ============================== CLICK FUNCS ==============================
-
 	function onSearchTextChanged() {
 		onFilterIndex = undefined;
 		if (searchText.length < 3) {
@@ -122,10 +120,22 @@
 		await loadMoreVerses();
 	}
 
+	// ============================== CLICK FUNCS ==============================
+
 	function onCopyToClipboard(v: any) {
 		let verse = `${v.bookName} ${v.number}:${v.verseNumber}\n${v.text}`;
 		navigator.clipboard.writeText(verse);
 		toastService.showToast(`Copied ${v.bookName} ${v.number}:${v.verseNumber}`);
+	}
+
+	function onSearchResultClicked(v: any) {
+		let pane = paneService.findNode(paneService.rootPane, paneId);
+		if (pane) {
+			pane.buffer.bag = {
+				chapterKey: v.key
+			};
+			pane?.updateBuffer(Modules.BIBLE);
+		}
 	}
 </script>
 
@@ -150,34 +160,39 @@
 		></VerticalSplit>
 	</div>
 {/snippet}
-
 {#snippet searchResultsSnippet()}
 	{#each searchResults as v}
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_static_element_interactions -->
 		<div
-			class="hover:cursor-pointer"
+			tabindex="0"
+			role="button"
+			class="leading-loose"
 			onclick={() => {
-				let pane = paneService.findNode(paneService.rootPane, paneId);
-				if (pane) {
-					pane.buffer.bag = {
-						chapterKey: v.key
-					};
-					pane?.updateBuffer(Modules.BIBLE);
-				}
+				onSearchResultClicked(v);
+			}}
+			onkeydown={() => {
+				onSearchResultClicked(v);
 			}}
 		>
-			<span class="py-2 text-left font-bold"
-				>{v.bookName} {v.number}:{v.verseNumber}</span
-			><br />
-			{#each v.text.split(' ') as w}
-				{#if match(w)}
-					<span class="text-redtxt inline-block">{w}</span>&nbsp;
-				{:else}
-					<span class="inline-block">{w}</span>&nbsp;
-				{/if}
-			{/each}
-			{@render actions(v)}
+			<div class="text-left whitespace-normal hover:cursor-pointer">
+				<span class="py-2 text-left font-bold"
+					>{v.bookName} {v.number}:{v.verseNumber}</span
+				>
+				<span class="flex-fill flex"></span>
+				{#each v.text.split(' ') as w, idx}
+					{#if match(w)}
+						<span>
+							{#if idx !== 0}<span>&nbsp;</span>{/if}
+							<span class="text-redtxt">{w}</span>
+						</span>
+					{:else}
+						<span>
+							{#if idx !== 0}<span>&nbsp;</span>{/if}
+							<span class="">{w}</span>
+						</span>
+					{/if}
+				{/each}
+				{@render actions(v)}
+			</div>
 		</div>
 	{/each}
 {/snippet}
