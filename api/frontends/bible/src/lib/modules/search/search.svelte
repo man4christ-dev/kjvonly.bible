@@ -66,7 +66,7 @@
 	{#if showInput}
 		<SearchInput bind:searchText ID={searchID} {onFilterIndex}></SearchInput>
 	{/if}
-	<SearchResults bind:paneID={paneId} bind:searchText {searchID} {onFilterIndex}
+	<SearchResults paneID={paneId} bind:searchText {searchID} {onFilterIndex}
 	></SearchResults>
 
 	<div class="h-6"></div>

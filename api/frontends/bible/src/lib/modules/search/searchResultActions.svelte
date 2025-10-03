@@ -7,7 +7,7 @@
 
 	// =============================== BINDINGS ================================
 
-	let { paneID = $bindable(), searchResult } = $props();
+	let { paneID, searchResult } = $props();
 
 	// ============================== CLICK FUNCS ==============================
 

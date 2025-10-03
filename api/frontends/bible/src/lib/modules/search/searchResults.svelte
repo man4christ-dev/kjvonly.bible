@@ -16,7 +16,7 @@
 	// =============================== BINDINGS ================================
 
 	let {
-		paneID = $bindable(),
+		paneID,
 		searchText = $bindable(),
 		searchID,
 		onFilterIndex = $bindable()
@@ -172,8 +172,7 @@
 						</span>
 					{/if}
 				{/each}
-				<SearchResultActions bind:paneID searchResult={sr}
-				></SearchResultActions>
+				<SearchResultActions {paneID} searchResult={sr}></SearchResultActions>
 			</div>
 		</div>
 	{/each}
