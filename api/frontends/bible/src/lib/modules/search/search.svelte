@@ -8,6 +8,7 @@
 	import { Modules } from '$lib/models/modules.model';
 	import Copy from '$lib/components/buttons/copy.svelte';
 	import HorizontalSplit from '$lib/components/buttons/horizontalSplit.svelte';
+	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
 	// =============================== BINDINGS ================================
 
 	let {
@@ -130,63 +131,23 @@
 
 {#snippet actions(v: any)}
 	<div class="flex flex-row justify-end space-x-4">
-		<!-- copy -->
 		<Copy
 			onCopy={() => {
 				onCopyToClipboard(v);
 			}}
 		></Copy>
 
-		<!-- horizontal split -->
 		<HorizontalSplit
 			paneID={paneId}
 			module={Modules.BIBLE}
 			data={{ chapterKey: v.key }}
 		></HorizontalSplit>
 
-		<!-- vertical split -->
-		<button
-			aria-label="vertical split"
-			onclick={(e) => {
-				e.stopPropagation();
-				paneService.onSplitPane(paneId, 'v', Modules.BIBLE, {
-					chapterKey: v.key
-				});
-			}}
-		>
-			<svg
-				class="h-8 w-8"
-				version="1.1"
-				id="svg2"
-				width="100%"
-				height="100%"
-				viewBox="0 0 94.018994 99.168052"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<g class="" id="g8" transform="translate(-16.898488,-13.804183)">
-					<rect
-						style="stroke-width:5;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-						class="fill-none stroke-neutral-400"
-						id="rect2158"
-						width="90"
-						height="42.665619"
-						x="-105.81368"
-						y="18.907988"
-						transform="rotate(-90)"
-					/>
-					<rect
-						style="stroke-width:5;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-						class="fill-none stroke-neutral-400"
-						id="rect2330"
-						width="90"
-						height="42.665619"
-						x="-105.81368"
-						y="70.164314"
-						transform="rotate(-90)"
-					/>
-				</g>
-			</svg>
-		</button>
+		<VerticalSplit
+			paneID={paneId}
+			module={Modules.BIBLE}
+			data={{ chapterKey: v.key }}
+		></VerticalSplit>
 	</div>
 {/snippet}
 
