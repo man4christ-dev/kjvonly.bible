@@ -6,13 +6,7 @@
 	import { toastService } from '$lib/services/toast.service';
 	import { bibleDB } from '$lib/storer/bible.db';
 	import { Modules } from '$lib/models/modules.model';
-
-	let searchID = uuid4();
-	let searchInputHeight: number = $state(0);
-	let searchText = $state('');
-	let searchResults: any[] = $state([]);
-	let searchResultsObj: any = $state({});
-	let loadedVerses: number = $state(0);
+	// =============================== BINDINGS ================================
 
 	let {
 		paneId,
@@ -25,16 +19,33 @@
 		onFilterIndex = undefined
 	} = $props();
 
-	function onSearchTextChanged() {
-		onFilterIndex = undefined;
-		if (searchText.length < 3) {
-			loadedVerses = 0;
-			searchResults = [];
-			searchResultsObj = {};
-		} else {
-			searchService.search(searchID, searchText);
+	// ================================== VARS =================================
+
+	let clientHeight = $state(0);
+	let headerHeight = $state(0);
+
+	let searchID = uuid4();
+	let searchInputHeight: number = $state(0);
+	let searchText = $state('');
+	let searchResults: any[] = $state([]);
+	let searchResultsObj: any = $state({});
+	let loadedVerses: number = $state(0);
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		searchService.subscribe(searchID, onSearchResult);
+		if (searchTerms?.length > 0) {
+			searchText = searchTerms;
+			searchService.search(searchID, searchTerms);
 		}
-	}
+
+		let el = document.getElementById(`${searchID}-scroll-container`);
+
+		el?.addEventListener('scroll', handleScroll);
+	});
+
+	// ================================ FUNCS ==================================
 
 	function match(word: string) {
 		let stripWord = word
@@ -42,6 +53,21 @@
 			.replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
 		let matchText = searchText.replaceAll('OR', '');
 		return new RegExp('\\b' + stripWord + '\\b').test(matchText.toLowerCase());
+	}
+
+	function handleScroll() {
+		let el = document.getElementById(`${searchID}-scroll-container`);
+		if (el === null) {
+			return;
+		}
+
+		const threshold = 20; // Adjust this value as needed
+		const isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+
+		if (isReachBottom) {
+			loadMoreVerses();
+		}
 	}
 
 	async function loadMoreVerses() {
@@ -70,6 +96,19 @@
 		}
 	}
 
+	// ============================== CLICK FUNCS ==============================
+
+	function onSearchTextChanged() {
+		onFilterIndex = undefined;
+		if (searchText.length < 3) {
+			loadedVerses = 0;
+			searchResults = [];
+			searchResultsObj = {};
+		} else {
+			searchService.search(searchID, searchText);
+		}
+	}
+
 	async function onSearchResult(data: any) {
 		if (onFilterIndex) {
 			data.indexes = onFilterIndex(data.indexes);
@@ -80,37 +119,7 @@
 		await loadMoreVerses();
 	}
 
-	function handleScroll() {
-		let el = document.getElementById(`${searchID}-scroll-container`);
-		if (el === null) {
-			return;
-		}
-
-		const threshold = 20; // Adjust this value as needed
-		const isReachBottom =
-			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
-
-		if (isReachBottom) {
-			loadMoreVerses();
-		}
-	}
-
-	onMount(() => {
-		searchService.subscribe(searchID, onSearchResult);
-		if (searchTerms?.length > 0) {
-			searchText = searchTerms;
-			searchService.search(searchID, searchTerms);
-		}
-
-		let el = document.getElementById(`${searchID}-scroll-container`);
-
-		el?.addEventListener('scroll', handleScroll);
-	});
-
-	let clientHeight = $state(0);
-	let headerHeight = $state(0);
-
-	function copyToClipboard(v: any) {
+	function onCopyToClipboard(v: any) {
 		let verse = `${v.bookName} ${v.number}:${v.verseNumber}\n${v.text}`;
 		navigator.clipboard.writeText(verse);
 		toastService.showToast(`Copied ${v.bookName} ${v.number}:${v.verseNumber}`);
@@ -124,7 +133,7 @@
 			aria-label="copy button"
 			onclick={(e) => {
 				e.stopPropagation();
-				copyToClipboard(v);
+				onCopyToClipboard(v);
 			}}
 		>
 			<svg
