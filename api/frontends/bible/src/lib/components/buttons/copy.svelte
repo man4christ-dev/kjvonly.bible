@@ -10,7 +10,7 @@
 	}}
 >
 	<svg
-		class={classes}
+		class="{classes} hover:cursor-pointer"
 		version="1.1"
 		width="100%"
 		height="100%"
