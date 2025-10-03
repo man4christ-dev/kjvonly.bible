@@ -8,6 +8,7 @@
 	import type { SearchResult } from '$lib/models/search.model';
 	import { bibleStorer } from '$lib/storer/bible.storer';
 	import { extractBookChapter, extractVerse } from '$lib/utils/chapter';
+	import { jsonToChapter, type Chapter } from '$lib/models/bible.model';
 
 	// =============================== BINDINGS ================================
 
@@ -88,8 +89,13 @@
 
 			let chapterKey = extractBookChapter(bcvKey);
 			let verseNumber = extractVerse(bcvKey);
-			let chapter = await bibleStorer.getValue(CHAPTERS, chapterKey);
-			let verse = chapter['verseMap'][verseNumber];
+			let chapter: Chapter = await jsonToChapter(
+				bibleStorer.getValue(CHAPTERS, chapterKey)
+			);
+			let verse = chapter.verseMap.get(String(verseNumber));
+			if (!verse) {
+				continue;
+			}
 
 			let data: SearchResult = {
 				key: bcvKey,
