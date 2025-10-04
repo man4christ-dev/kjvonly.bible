@@ -5,15 +5,15 @@
 	import CopyVersePopup from './copyVersePopup.svelte';
 	import NavReadingsList from './navReadingsList.svelte';
 	import { onMount, untrack } from 'svelte';
-	import { extractBookChapter, extractVerses } from '$lib/utils/chapter';
 	import Settings from '../settings/settings.svelte';
+	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
 
 	// =============================== BINDINGS ================================
 
 	let {
 		mode = $bindable(),
 		annotations = $bindable(),
-		chapterKey = $bindable(),
+		chapterKey: bibleLocationRef = $bindable(),
 		bookName,
 		bookChapter,
 		containerHeight,
@@ -34,14 +34,17 @@
 	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
-		bookIDChapter = extractBookChapter(chapterKey);
+		bookIDChapter =
+			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
 	});
 
 	$effect(() => {
-		if (chapterKey) {
-			bookIDChapter = extractBookChapter(chapterKey);
+		if (bibleLocationRef) {
+			bookIDChapter =
+				bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
 			untrack(() => {
-				let [start, end] = extractVerses(chapterKey);
+				let [start, end] =
+					bibleLocationReferenceService.extractVerses(bibleLocationRef);
 				if (start + end > 0) {
 					verses = `:${start + 1}-${end}`;
 				} else {
@@ -147,7 +150,9 @@
 
 {#if showBookChapterPopup}
 	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<BookChapterPopup bind:showBookChapterPopup bind:chapterKey
+		<BookChapterPopup
+			bind:showBookChapterPopup
+			bind:chapterKey={bibleLocationRef}
 		></BookChapterPopup>
 	</div>
 {/if}
@@ -156,7 +161,7 @@
 		<NavReadingsList
 			bind:showNavReadingsPopup
 			bind:navReadings={mode.navReadings}
-			bind:chapterKey
+			bind:chapterKey={bibleLocationRef}
 		></NavReadingsList>
 	</div>
 {/if}

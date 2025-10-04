@@ -1,11 +1,12 @@
 import { jsonToChapter, type Chapter } from '$lib/models/bible.model';
 import { CHAPTERS } from '$lib/storer/bible.db';
 import { bibleStorer } from '$lib/storer/bible.storer';
-import { extractBookChapter } from '$lib/utils/chapter';
+import { bibleLocationReferenceService } from './bibleLocationReference.service';
 
 class ChapterService {
-	async get(bcvKey: string): Promise<Chapter> {
-		let chapterKey = extractBookChapter(bcvKey);
+	async get(reference: string): Promise<Chapter> {
+		let chapterKey =
+			bibleLocationReferenceService.extractBookChapter(reference);
 		return await jsonToChapter(bibleStorer.getValue(CHAPTERS, chapterKey));
 	}
 }

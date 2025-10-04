@@ -1,16 +1,21 @@
 import { bibleStorer } from '../storer/bible.storer';
-import { extractBookChapter } from '$lib/utils/chapter';
 import { offlineApi } from './offline.api';
 import { ANNOTATIONS, UNSYNCED_ANNOTATIONS } from '$lib/storer/bible.db';
+import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
 
 export class AnnotsApi {
-	async getAnnotations(chapterKey: string): Promise<any> {
-		chapterKey = extractBookChapter(chapterKey);
-		let annotations = await offlineApi.cacheHit(chapterKey, UNSYNCED_ANNOTATIONS, ANNOTATIONS);
+	async getAnnotations(bibleLocationRef: string): Promise<any> {
+		bibleLocationRef =
+			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+		let annotations = await offlineApi.cacheHit(
+			bibleLocationRef,
+			UNSYNCED_ANNOTATIONS,
+			ANNOTATIONS
+		);
 
 		if (!annotations) {
 			annotations = {
-				id: chapterKey,
+				id: bibleLocationRef,
 				version: 0,
 				annots: {}
 			};

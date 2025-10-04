@@ -1,6 +1,6 @@
 import { notesApi } from '$lib/api/notes.api';
+import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
 import { bibleDB, SEARCH } from '$lib/storer/bible.db';
-import { extractBookChapter } from '$lib/utils/chapter';
 import { sleep } from '$lib/utils/sleep';
 import FlexSearch, { type Id } from 'flexsearch';
 
@@ -41,7 +41,9 @@ async function init() {
 }
 
 function addNote(noteID: string, note: any) {
-	note.bookChapter = extractBookChapter(note.chapterKey);
+	note.bookChapter = bibleLocationReferenceService.extractBookChapter(
+		note.chapterKey
+	);
 	notes[noteID] = note;
 	notesDocument.add(noteID, note);
 	getAllNotes('*');

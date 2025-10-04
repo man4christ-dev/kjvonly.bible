@@ -10,19 +10,13 @@
 		SearchResultResponse
 	} from '$lib/models/search.model';
 	import { bibleStorer } from '$lib/storer/bible.storer';
-	import {
-		extractBookChapter,
-		extractBookID,
-		extractBookName,
-		extractChapter,
-		extractVerse
-	} from '$lib/utils/chapter';
 	import { jsonToChapter, type Chapter } from '$lib/models/bible.model';
 	import { verseService } from '$lib/services/verse.service';
 	import {
 		bookNamesByIDService,
 		BookNamesByIDService
 	} from '$lib/services/bibleMetadata/bookNamesByID.service';
+	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
 
 	// =============================== BINDINGS ================================
 
@@ -108,17 +102,17 @@
 	}
 
 	async function searchResultIndexToSearchResult(
-		bcvKey: string
+		bibleLocationRef: string
 	): Promise<SearchResult | undefined> {
-		let verse = await verseService.get(bcvKey);
+		let verse = await verseService.get(bibleLocationRef);
 		if (!verse) {
 			return;
 		}
 
 		let sr: SearchResult = {
-			key: bcvKey,
-			bookName: extractBookName(bcvKey),
-			number: extractChapter(bcvKey),
+			key: bibleLocationRef,
+			bookName: bibleLocationReferenceService.extractBookName(bibleLocationRef),
+			number: bibleLocationReferenceService.extractChapter(bibleLocationRef),
 			verseNumber: verse.number,
 			text: verse.text
 		};

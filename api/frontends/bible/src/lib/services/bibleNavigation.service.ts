@@ -1,6 +1,6 @@
 import { bibleDB } from '../storer/bible.db';
 import { chapterApi } from '../api/chapters.api';
-import { extractBookChapter } from '$lib/utils/chapter';
+import { bibleLocationReferenceService } from './bibleLocationReference.service';
 
 var chapters: string[] = [
 	'1_1',
@@ -1207,9 +1207,10 @@ export class BibleNavigationService {
 		this.subscribers.push({ id: id, fn: fn });
 	}
 
-	next(currentKey: string): string {
-		currentKey = extractBookChapter(currentKey)
-		let ci = this.chapterList.indexOf(currentKey);
+	next(bibleLocationRef: string): string {
+		bibleLocationRef =
+			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+		let ci = this.chapterList.indexOf(bibleLocationRef);
 		if (ci + 1 >= this.chapterList.length) {
 			return this.chapterList[0];
 		} else {
@@ -1217,9 +1218,10 @@ export class BibleNavigationService {
 		}
 	}
 
-	previous(currentKey: string): string {
-		currentKey = extractBookChapter(currentKey)
-		let ci = this.chapterList.indexOf(currentKey);
+	previous(bibleLocationRef: string): string {
+		bibleLocationRef =
+			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+		let ci = this.chapterList.indexOf(bibleLocationRef);
 		if (ci - 1 < 0) {
 			return this.chapterList[this.chapterList.length - 1];
 		} else {

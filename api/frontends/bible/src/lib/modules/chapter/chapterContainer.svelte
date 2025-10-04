@@ -10,10 +10,10 @@
 
 	import uuid4 from 'uuid4';
 	import EditOptions from './editOptions.svelte';
-	import { extractBookChapter } from '$lib/utils/chapter';
 	import { Buffer } from '$lib/models/buffer.model';
 	import type { NavReadings } from '../../models/plans.model';
 	import { Modules } from '$lib/models/modules.model';
+	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
 
 	type WordAnnots = {
 		class: string[];
@@ -25,7 +25,7 @@
 	}
 
 	let id = uuid4();
-	let chapterKey: string | null = $state(null);
+	let bibleLocationRef: string | null = $state(null);
 	let mode: any = $state({
 		value: '',
 		colorAnnotation: 'bg-highlighta',
@@ -60,9 +60,13 @@
 	});
 
 	$effect(() => {
-		if (chapterKey) {
-			pane.buffer.bag.chapterKey = extractBookChapter(chapterKey);
-			localStorage.setItem('lastChapterKey', extractBookChapter(chapterKey));
+		if (bibleLocationRef) {
+			pane.buffer.bag.chapterKey =
+				bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+			localStorage.setItem(
+				'lastChapterKey',
+				bibleLocationReferenceService.extractBookChapter(bibleLocationRef)
+			);
 			paneService.save();
 		}
 	});
@@ -75,7 +79,7 @@
 			pane.updateBuffer(Modules.PLANS);
 		} else {
 			plan.currentNavReadingsIndex = nextIndex;
-			chapterKey = plan.readings.bcvs[nextIndex].chapterKey;
+			bibleLocationRef = plan.readings.bcvs[nextIndex].chapterKey;
 		}
 	}
 
@@ -85,7 +89,7 @@
 		let nextIndex = ci - 1;
 		if (nextIndex >= 0) {
 			nr.currentNavReadingsIndex = nextIndex;
-			chapterKey = nr.readings.bcvs[nextIndex].chapterKey;
+			bibleLocationRef = nr.readings.bcvs[nextIndex].chapterKey;
 		}
 	}
 
@@ -95,8 +99,8 @@
 			_nextPlanChapter();
 			return;
 		}
-		if (chapterKey) {
-			chapterKey = bibleNavigationService.next(chapterKey);
+		if (bibleLocationRef) {
+			bibleLocationRef = bibleNavigationService.next(bibleLocationRef);
 		}
 	}
 
@@ -107,8 +111,8 @@
 			return;
 		}
 
-		if (chapterKey) {
-			chapterKey = bibleNavigationService.previous(chapterKey);
+		if (bibleLocationRef) {
+			bibleLocationRef = bibleNavigationService.previous(bibleLocationRef);
 		}
 	}
 
@@ -163,11 +167,11 @@
 
 		let ck = pane.buffer.bag.chapterKey;
 		if (ck) {
-			chapterKey = ck;
+			bibleLocationRef = ck;
 		} else {
-			chapterKey = localStorage.getItem('lastChapterKey');
-			if (!chapterKey) {
-				chapterKey = '50_3'; // John 3
+			bibleLocationRef = localStorage.getItem('lastChapterKey');
+			if (!bibleLocationRef) {
+				bibleLocationRef = '50_3'; // John 3
 			}
 		}
 
@@ -207,7 +211,7 @@
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-{#if chapterKey}
+{#if bibleLocationRef}
 	<div
 		class="overflow-hidden"
 		oncontextmenu={() => {
@@ -222,7 +226,7 @@
 			<div class="sticky top-0 z-[1500] flex w-full justify-center">
 				<ChapterActions
 					bind:mode
-					bind:chapterKey
+					bind:chapterKey={bibleLocationRef}
 					bind:annotations
 					{bookName}
 					{bookChapter}
@@ -236,7 +240,7 @@
 						<Chapter
 							bind:bookName
 							bind:bookChapter
-							bind:chapterKey
+							bind:chapterKey={bibleLocationRef}
 							bind:id
 							bind:pane
 							bind:mode
