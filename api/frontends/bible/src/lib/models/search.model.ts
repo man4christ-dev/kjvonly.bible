@@ -10,11 +10,26 @@ export interface SearchResult {
 
 export interface SearchResultResponse {
 	id: string;
-	indexes: FlexSearch.IndexSearchResult;
+	indexes: string[];
 	stats: SearchResultStats;
+}
+
+export function newSearchResultResponse(): SearchResultResponse {
+	return {
+		id: '',
+		indexes: [],
+		stats: newSearchResultStats()
+	};
 }
 
 export interface SearchResultStats {
 	count: number;
 	time: string;
+}
+
+function newSearchResultStats(): SearchResultStats {
+	return {
+		count: 0,
+		time: ''
+	};
 }

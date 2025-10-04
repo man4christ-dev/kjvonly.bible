@@ -82,7 +82,9 @@ async function search(id: string, text: string) {
 		indexes.push(...matches);
 	}
 
-	let unique = indexes.filter(onlyUnique);
+	let unique: string[] = indexes
+		.filter(onlyUnique)
+		.map((value: FlexSearch.Id) => value as string);
 
 	unique = unique.sort((a: Id, b: Id) => {
 		let asplit = a

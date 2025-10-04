@@ -4,18 +4,12 @@
 	import { searchService } from '$lib/services/search.service';
 	import { onDestroy, onMount } from 'svelte';
 	import SearchResultActions from './searchResultActions.svelte';
-	import { CHAPTERS } from '$lib/storer/bible.db';
-	import type {
-		SearchResult,
-		SearchResultResponse
-	} from '$lib/models/search.model';
-	import { bibleStorer } from '$lib/storer/bible.storer';
-	import { jsonToChapter, type Chapter } from '$lib/models/bible.model';
-	import { verseService } from '$lib/services/verse.service';
 	import {
-		bookNamesByIDService,
-		BookNamesByIDService
-	} from '$lib/services/bibleMetadata/bookNamesByID.service';
+		newSearchResultResponse,
+		type SearchResult,
+		type SearchResultResponse
+	} from '$lib/models/search.model';
+	import { verseService } from '$lib/services/verse.service';
 	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
 
 	// =============================== BINDINGS ================================
@@ -35,8 +29,17 @@
 	// ================================== VARS =================================
 
 	let searchResults: SearchResult[] = $state([]);
-	let searchResultsResponse: any = $state({});
-	let loadedVersesCount: number = $state(0);
+	let searchResultsResponse: SearchResultResponse = $state(
+		newSearchResultResponse()
+	);
+	let renderedSearchResultsCount: number = $state(0);
+
+	/**
+	 * Position from bottom of scroll container before we load more
+	 * {@link SearchResult}s.
+	 */
+	let pixelsFromBottomBeforeLoadingMoreSearchResults = 20;
+	let numberOfSearchResultsToLoadAtOnce = 10;
 
 	// =============================== LIFECYCLE ===============================
 
@@ -65,9 +68,9 @@
 			srr.indexes = onFilterIndex(srr.indexes);
 		}
 		searchResultsResponse = srr;
-		loadedVersesCount = 0;
+		renderedSearchResultsCount = 0;
 		searchResults = [];
-		await loadMoreVerses();
+		await renderToScreenMoreSearchResults();
 	}
 
 	function handleScroll() {
@@ -76,29 +79,36 @@
 			return;
 		}
 
-		const threshold = 20; // Adjust this value as needed
 		const isReachBottom =
-			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+			el.scrollHeight - el.clientHeight - el.scrollTop <=
+			pixelsFromBottomBeforeLoadingMoreSearchResults;
 
 		if (isReachBottom) {
-			loadMoreVerses();
+			renderToScreenMoreSearchResults();
 		}
 	}
 
-	async function loadMoreVerses() {
+	async function renderToScreenMoreSearchResults() {
 		for (
 			let i = 0;
-			i < 10 && loadedVersesCount !== searchResultsResponse.indexes?.length;
-			i++, loadedVersesCount++
+			shouldContinueLoadingSearchResults(i);
+			i++, renderedSearchResultsCount++
 		) {
 			let sr = await searchResultIndexToSearchResult(
-				searchResultsResponse.indexes[loadedVersesCount]
+				searchResultsResponse.indexes[renderedSearchResultsCount]
 			);
 			if (!sr) {
 				continue;
 			}
 			searchResults.push(sr);
 		}
+	}
+
+	function shouldContinueLoadingSearchResults(i: number): boolean {
+		return (
+			i < numberOfSearchResultsToLoadAtOnce &&
+			renderedSearchResultsCount !== searchResultsResponse.indexes?.length
+		);
 	}
 
 	async function searchResultIndexToSearchResult(
@@ -135,11 +145,12 @@
 
 {#if searchResultsResponse?.indexes && searchResultsResponse?.indexes.length > 0}
 	<p class="sticky top-10 bg-neutral-50 text-center">
-		Showing {loadedVersesCount} of {searchResultsResponse?.indexes.length}
+		Showing {renderedSearchResultsCount} of {searchResultsResponse?.indexes
+			.length}
 	</p>
 {/if}
 
-<div class={searchResults?.length > 0 ? '' : 'hidden'}>
+<div class="{searchResults?.length > 0 ? '' : 'hidden'} pb-6">
 	{#each searchResults as sr}
 		<div
 			tabindex="0"
@@ -176,5 +187,4 @@
 			</div>
 		</div>
 	{/each}
-	<div class="h-6"></div>
 </div>
