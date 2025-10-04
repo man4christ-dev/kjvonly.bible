@@ -42,7 +42,7 @@
 			pane.buffer.bag.bibleLocationRef =
 				bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
 			localStorage.setItem(
-				'lastChapterKey',
+				'lastBibleLocationReference',
 				bibleLocationReferenceService.extractBookChapter(bibleLocationRef)
 			);
 			paneService.save();
@@ -136,7 +136,7 @@
 		if (ck) {
 			bibleLocationRef = ck;
 		} else {
-			bibleLocationRef = localStorage.getItem('lastChapterKey');
+			bibleLocationRef = localStorage.getItem('lastBibleLocationReference');
 			if (!bibleLocationRef) {
 				bibleLocationRef = '50_3'; // John 3
 			}

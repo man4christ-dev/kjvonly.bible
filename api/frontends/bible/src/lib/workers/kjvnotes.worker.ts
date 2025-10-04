@@ -25,10 +25,10 @@ let notesDocument = new FlexSearch.Document({
 let notes: any = {};
 
 async function init() {
-	let cahcedNotes = await notesApi.gets();
+	let cachedNotes = await notesApi.gets();
 	notes = {};
-	for (let i = 0; i < cahcedNotes.length; i++) {
-		let nn = cahcedNotes[i];
+	for (let i = 0; i < cachedNotes.length; i++) {
+		let nn = cachedNotes[i];
 		if (nn?.bibleLocationRef) {
 			let ck = nn.bibleLocationRef.split('_');
 			nn.bookChapter = `${ck[0]}_${ck[1]}`;

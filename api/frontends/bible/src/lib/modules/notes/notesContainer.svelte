@@ -5,7 +5,7 @@ The challenge to solve stemmed from two types of notes.
 1. There are notes associated to verse words
 2. There are notes independent of verse words i.e sermon notes, bible study etc...
 
-ChapterKey variable maps to a location in the bible. <book>_<chapter>_<verse>_<word>. 0_0_0_0 
+bibleLocationRef variable maps to a location in the bible. <book>_<chapter>_<verse>_<word>. 0_0_0_0 
 key is a standalone/independent note.
 
 kjvsearch worker uses flexsearch to index all the notes. We store all notes in indexdb and 
