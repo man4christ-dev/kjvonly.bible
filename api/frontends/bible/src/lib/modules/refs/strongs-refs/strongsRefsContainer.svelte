@@ -4,6 +4,7 @@
 	import { bibleDB } from '$lib/storer/bible.db';
 	import Search from '$lib/modules/search/search.svelte';
 	import { onMount } from 'svelte';
+	import type { Word } from '$lib/models/bible.model';
 
 	let { containerHeight, isVerseRef, strongsRefs, strongsWords, text, paneId } =
 		$props();
@@ -49,7 +50,7 @@
 		let byWord = s['usageByWord'];
 
 		let searchText = '';
-		byWord?.forEach((w) => {
+		byWord?.forEach((w: Word) => {
 			searchText += `${shortName} ${w.text} OR `;
 		});
 
@@ -79,7 +80,7 @@
 			</button>
 		{:else}
 			<span class="pe-4">{s['number']}: {text}</span>
-			{#if isVerseRef || strongs?.length > 1}
+			{#if isVerseRef || (strongs && strongs?.length > 1)}
 				<button
 					onclick={() => {
 						s.toggle = !s.toggle;
@@ -105,7 +106,7 @@
 	{/if}
 {/snippet}
 
-{#snippet brownContainer(s)}
+{#snippet brownContainer(s: any)}
 	{#if s.brownDef}
 		<div class="max-w-lg pt-4">
 			<p class="text-neutral-600">Brown Definition:</p>
@@ -245,7 +246,6 @@
 			>
 				<Search
 					{paneId}
-					{containerHeight}
 					showInput={true}
 					{searchTerms}
 					onClose={() => {

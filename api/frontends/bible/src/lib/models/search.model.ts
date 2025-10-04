@@ -7,7 +7,7 @@ export interface SearchResult {
 }
 
 export type onFilterBibleLocationRefFunction = (
-	bibleLocationReference: string
+	bibleLocationReferences: string[]
 ) => string[];
 
 export interface SearchResultResponse {
