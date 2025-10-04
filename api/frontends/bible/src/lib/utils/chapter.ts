@@ -1,3 +1,48 @@
+import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
+
+/**
+ * Reduces a reference chapter key to BookID.
+ *
+ * @param chapterKey any reference
+ * @returns
+ */
+export function extractBookID(chapterKey: string): string {
+	let bcvw = chapterKey.split('_');
+	if (bcvw.length > 0) {
+		chapterKey = bcvw[0];
+	}
+	return chapterKey;
+}
+
+/**
+ * Reduces a reference chapter key to BookID.
+ *
+ * @param chapterKey any reference
+ * @returns
+ */
+export function extractBookName(chapterKey: string): string {
+	let bcvw = chapterKey.split('_');
+	if (bcvw.length > 0) {
+		chapterKey = bcvw[0];
+		return bookNamesByIDService.get(extractBookID(chapterKey));
+	}
+	return '';
+}
+
+/**
+ * Reduces a reference chapter key to BookID.
+ *
+ * @param chapterKey any reference
+ * @returns
+ */
+export function extractChapter(chapterKey: string): number {
+	let bcvw = chapterKey.split('_');
+	if (bcvw.length > 1) {
+		return parseInt(bcvw[1]);
+	}
+	return 1;
+}
+
 /**
  * Reduces a reference chapter key to BookID_Chapter.
  *
@@ -34,6 +79,5 @@ export function extractVerse(chapterKey: string): number {
 	if (bcv.length > 2) {
 		return parseInt(bcv[2], 10);
 	}
-
-	return 0;
+	return 1;
 }

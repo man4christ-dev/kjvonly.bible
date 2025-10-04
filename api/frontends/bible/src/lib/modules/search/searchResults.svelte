@@ -10,8 +10,19 @@
 		SearchResultResponse
 	} from '$lib/models/search.model';
 	import { bibleStorer } from '$lib/storer/bible.storer';
-	import { extractBookChapter, extractVerse } from '$lib/utils/chapter';
+	import {
+		extractBookChapter,
+		extractBookID,
+		extractBookName,
+		extractChapter,
+		extractVerse
+	} from '$lib/utils/chapter';
 	import { jsonToChapter, type Chapter } from '$lib/models/bible.model';
+	import { verseService } from '$lib/services/verse.service';
+	import {
+		bookNamesByIDService,
+		BookNamesByIDService
+	} from '$lib/services/bibleMetadata/bookNamesByID.service';
 
 	// =============================== BINDINGS ================================
 
@@ -99,22 +110,17 @@
 	async function searchResultIndexToSearchResult(
 		bcvKey: string
 	): Promise<SearchResult | undefined> {
-		let chapterKey = extractBookChapter(bcvKey);
-		let verseNumber = extractVerse(bcvKey);
-		let chapter: Chapter = await jsonToChapter(
-			bibleStorer.getValue(CHAPTERS, chapterKey)
-		);
-		let verse = chapter.verseMap.get(String(verseNumber));
+		let verse = await verseService.get(bcvKey);
 		if (!verse) {
 			return;
 		}
 
 		let sr: SearchResult = {
 			key: bcvKey,
-			bookName: chapter.bookName,
-			number: chapter.number,
-			verseNumber: verseNumber,
-			text: verse
+			bookName: extractBookName(bcvKey),
+			number: extractChapter(bcvKey),
+			verseNumber: verse.number,
+			text: verse.text
 		};
 
 		return sr;
