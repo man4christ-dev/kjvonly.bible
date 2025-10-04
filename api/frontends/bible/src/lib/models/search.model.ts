@@ -1,5 +1,3 @@
-import FlexSearch, { type Id } from 'flexsearch';
-
 export interface SearchResult {
 	key: string;
 	bookName: string;
@@ -7,6 +5,10 @@ export interface SearchResult {
 	verseNumber: number;
 	text: string;
 }
+
+export type onFilterBibleLocationRefFunction = (
+	bibleLocationReference: string
+) => string[];
 
 export interface SearchResultResponse {
 	id: string;

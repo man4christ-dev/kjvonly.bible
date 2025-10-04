@@ -3,11 +3,15 @@
 
 	// =============================== BINDINGS ================================
 
-	let { searchText = $bindable<string>(), ID, onFilterIndex } = $props();
+	let {
+		searchText = $bindable<string>(),
+		ID,
+		onFilterBibleLocationRef
+	} = $props();
 
 	// ================================ FUNCS ==================================
 	function onSearchTextChanged() {
-		onFilterIndex = undefined;
+		onFilterBibleLocationRef = undefined;
 		if (searchText.length > 2) {
 			console.log(searchText);
 			searchService.search(ID, searchText);

@@ -7,10 +7,6 @@ import { type Settings, newSettings } from '../models/settings.model';
 class SettingsService {
 	applySettings() {
 		let cs = this.getSettings();
-		if (!cs) {
-			return;
-		}
-
 		let html = document.getElementById('kjvonly-html');
 		if (cs.isDarkTheme) {
 			html?.setAttribute('data-theme', `color-theme-dark-${cs.colorTheme}`);

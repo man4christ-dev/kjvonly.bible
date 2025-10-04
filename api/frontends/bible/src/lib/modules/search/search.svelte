@@ -9,27 +9,27 @@
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import SearchResults from './searchResults.svelte';
 	import SearchInput from './searchInput.svelte';
+	import type { Pane } from '$lib/models/pane.model';
 
 	// =============================== BINDINGS ================================
 
 	let {
-		paneId = $bindable(),
-		pane = $bindable(),
-		containerHeight = $bindable(),
-		containerWidth = $bindable(),
+		paneId = $bindable<string>(),
+		pane = $bindable<Pane>(),
 		showInput = true,
 		searchTerms,
 		onClose = undefined,
-		onFilterIndex = undefined
+		onFilterBibleLocationRef = undefined
 	} = $props();
 
 	// ================================== VARS =================================
 
+	// DOM vars
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 
+	// component vars
 	let searchID: string = uuid4();
-
 	let searchText = $state('');
 
 	// =============================== LIFECYCLE ===============================
@@ -64,9 +64,14 @@
 
 {#snippet body()}
 	{#if showInput}
-		<SearchInput bind:searchText ID={searchID} {onFilterIndex}></SearchInput>
+		<SearchInput bind:searchText ID={searchID} {onFilterBibleLocationRef}
+		></SearchInput>
 	{/if}
-	<SearchResults paneID={paneId} bind:searchText {searchID} {onFilterIndex}
+	<SearchResults
+		paneID={paneId}
+		bind:searchText
+		{searchID}
+		{onFilterBibleLocationRef}
 	></SearchResults>
 
 	<div class="h-6"></div>

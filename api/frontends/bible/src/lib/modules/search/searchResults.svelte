@@ -6,6 +6,7 @@
 
 	import {
 		newSearchResultResponse,
+		type onFilterBibleLocationRefFunction,
 		type SearchResult,
 		type SearchResultResponse
 	} from '$lib/models/search.model';
@@ -18,15 +19,15 @@
 	// =============================== BINDINGS ================================
 
 	let {
+		searchText = $bindable<string>(),
 		paneID,
-		searchText = $bindable(),
 		searchID,
-		onFilterIndex = $bindable()
+		onFilterBibleLocationRef
 	}: {
-		paneID: string;
 		searchText: string;
+		paneID: string;
 		searchID: string;
-		onFilterIndex: any;
+		onFilterBibleLocationRef: onFilterBibleLocationRefFunction;
 	} = $props();
 
 	// ================================== VARS =================================
@@ -67,8 +68,8 @@
 	// ================================ FUNCS ==================================
 
 	async function onSearchResult(srr: SearchResultResponse) {
-		if (onFilterIndex) {
-			srr.bibleLocationRefs = onFilterIndex(srr.bibleLocationRefs);
+		if (onFilterBibleLocationRef) {
+			srr.bibleLocationRefs = onFilterBibleLocationRef(srr.bibleLocationRefs);
 		}
 		searchResultsResponse = srr;
 		renderedSearchResultsCount = 0;

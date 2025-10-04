@@ -5,7 +5,8 @@
 	import Search from '$lib/modules/search/search.svelte';
 	import { onMount } from 'svelte';
 
-	let { containerHeight, isVerseRef, strongsRefs, strongsWords, text, paneId } = $props();
+	let { containerHeight, isVerseRef, strongsRefs, strongsWords, text, paneId } =
+		$props();
 
 	let toggleStrongs = $state(false);
 	let showByBook = $state(false);
@@ -33,10 +34,10 @@
 		booknames = await chapterApi.getBooknames();
 	});
 
-	function onFilterBookIndexes(indexes: string[]) {
-		return indexes.filter((bookId) => {
-			if (bookId.startsWith(startsWithBookId)) {
-				return bookId;
+	function onFilterBibleLocationRefByBookID(refs: string[]): string[] {
+		return refs.filter((ref) => {
+			if (ref.startsWith(startsWithBookId)) {
+				return ref;
 			}
 		});
 	}
@@ -85,7 +86,8 @@
 					}}
 					aria-label="toggle drop down"
 				>
-					<ChevronDown className="w-4 h-4" fill="fill-neutral-700"></ChevronDown>
+					<ChevronDown className="w-4 h-4" fill="fill-neutral-700"
+					></ChevronDown>
 				</button>
 			{/if}
 		{/if}
@@ -144,7 +146,8 @@
 					onclick={() => {
 						onByBook(s, b, idx);
 					}}
-					class="inline-block hover:cursor-pointer hover:text-neutral-400">{b.text}</span
+					class="inline-block hover:cursor-pointer hover:text-neutral-400"
+					>{b.text}</span
 				>
 			{/each}
 		</div>
@@ -161,7 +164,8 @@
 					onclick={() => {
 						onByWord(w, idx);
 					}}
-					class="inline-block hover:cursor-pointer hover:text-neutral-400">{w.text}</span
+					class="inline-block hover:cursor-pointer hover:text-neutral-400"
+					>{w.text}</span
 				>
 			{/each}
 		</div>
@@ -216,24 +220,29 @@
 <div class="">
 	{#if showByBook}
 		<div class="sticky top-0 z-[1500] flex w-full justify-center">
-			<div style={containerHeight} class="absolute z-[10000] w-full bg-neutral-50">
+			<div
+				style={containerHeight}
+				class="absolute z-[10000] w-full bg-neutral-50"
+			>
 				<Search
 					{paneId}
-					{containerHeight}
 					showInput={true}
 					{searchTerms}
 					onClose={() => {
 						showByBook = false;
 						searchTerms = '';
 					}}
-					onFilterIndex={onFilterBookIndexes}
+					onFilterBibleLocationRef={onFilterBibleLocationRefByBookID}
 				></Search>
 			</div>
 		</div>
 	{/if}
 	{#if showByWord}
 		<div class="sticky top-0 z-[1500] flex w-full justify-center">
-			<div style={containerHeight} class="absolute z-[10000] w-full bg-neutral-50">
+			<div
+				style={containerHeight}
+				class="absolute z-[10000] w-full bg-neutral-50"
+			>
 				<Search
 					{paneId}
 					{containerHeight}

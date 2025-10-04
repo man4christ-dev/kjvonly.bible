@@ -1,14 +1,12 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { newSettings, type Settings } from '../models/settings.model';
 	import { componentMapping } from '$lib/services/componentMappingService';
 	import { settingsService } from '$lib/services/settings.service';
 	import type { Pane } from '$lib/models/pane.model';
 
 	let containerHeight: string = $state('');
 	let containerWidth: string = $state('');
-	let chapterSettings: Settings | null = $state(null);
 
 	let { paneId = $bindable<string>() } = $props();
 
@@ -54,17 +52,7 @@
 	}
 
 	onMount(() => {
-		let cs = localStorage.getItem('settings');
-		if (cs !== null) {
-			chapterSettings = JSON.parse(cs);
-
-			if (chapterSettings && chapterSettings.colorTheme) {
-				settingsService.applySettings(chapterSettings?.colorTheme);
-			}
-		} else {
-			chapterSettings = newSettings();
-		}
-
+		settingsService.applySettings();
 		let p = paneService.findNode(paneService.rootPane, paneId);
 
 		/**
@@ -88,11 +76,17 @@
 		paneService.subscribe(paneId, updateHeightWidth);
 		updateHeightWidth(paneService.heightWidth);
 	});
+
+	onDestroy(() => {
+		//unsubscribe from paneService
+	});
 </script>
 
 <div style="{containerWidth} {containerHeight}">
-	<!-- Since component is a Const we need a way to rerender this when the component changes. 
-			     We accomplish this with the toggle. -->
+	<!--
+		Since component is a @const we need a way to rerender this when the 
+		component changes. We accomplish this with the toggle. 
+	 -->
 	{#if pane?.toggle}
 		{#if pane?.buffer?.componentName}
 			{@const Component = componentMapping.getComponent(
