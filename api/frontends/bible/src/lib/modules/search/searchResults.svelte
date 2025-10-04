@@ -1,16 +1,19 @@
 <script lang="ts">
 	import { Modules } from '$lib/models/modules.model';
-	import { paneService } from '$lib/services/pane.service.svelte';
-	import { searchService } from '$lib/services/search.service';
 	import { onDestroy, onMount } from 'svelte';
+
 	import SearchResultActions from './searchResultActions.svelte';
+
 	import {
 		newSearchResultResponse,
 		type SearchResult,
 		type SearchResultResponse
 	} from '$lib/models/search.model';
-	import { verseService } from '$lib/services/bible/verse.service';
+
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { paneService } from '$lib/services/pane.service.svelte';
+	import { searchService } from '$lib/services/search.service';
+	import { verseService } from '$lib/services/bible/verse.service';
 
 	// =============================== BINDINGS ================================
 
