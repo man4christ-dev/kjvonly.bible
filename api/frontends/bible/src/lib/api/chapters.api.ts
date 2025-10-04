@@ -10,7 +10,7 @@ import {
 } from '$lib/storer/bible.db';
 
 import { offlineApi } from './offline.api';
-import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
+import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 export class ChapterApi {
 	async getChapter(bibleLocationRef: string): Promise<any> {

@@ -1,5 +1,5 @@
-import { bibleDB } from '../storer/bible.db';
-import { chapterApi } from '../api/chapters.api';
+import { bibleDB } from '../../storer/bible.db';
+import { chapterApi } from '../../api/chapters.api';
 import { bibleLocationReferenceService } from './bibleLocationReference.service';
 
 var chapters: string[] = [

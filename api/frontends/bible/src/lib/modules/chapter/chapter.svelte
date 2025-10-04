@@ -8,7 +8,7 @@
 	import uuid4 from 'uuid4';
 	import { notesService } from '$lib/services/notes.service';
 	import { numberToLetters } from '$lib/services/dynamicGrid.service';
-	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 	let searchID = uuid4();
 

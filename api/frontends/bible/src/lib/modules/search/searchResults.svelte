@@ -9,8 +9,8 @@
 		type SearchResult,
 		type SearchResultResponse
 	} from '$lib/models/search.model';
-	import { verseService } from '$lib/services/verse.service';
-	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
+	import { verseService } from '$lib/services/bible/verse.service';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 	// =============================== BINDINGS ================================
 

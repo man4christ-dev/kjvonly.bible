@@ -1,19 +1,16 @@
 <script lang="ts">
-	import { bibleNavigationService } from '$lib/services/bibleNavigation.service';
+	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
 	import { onMount } from 'svelte';
 	import Chapter from './chapter.svelte';
-	import { newSettings, type Settings } from '../../models/settings.model';
-	import { settingsService } from '$lib/services/settings.service';
 
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import ChapterActions from './chapterActions.svelte';
 
 	import uuid4 from 'uuid4';
 	import EditOptions from './editOptions.svelte';
-	import { Buffer } from '$lib/models/buffer.model';
 	import type { NavReadings } from '../../models/plans.model';
 	import { Modules } from '$lib/models/modules.model';
-	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 	type WordAnnots = {
 		class: string[];
@@ -37,27 +34,12 @@
 	let bookChapter: string = $state('');
 	let chapterWidth = $state(0);
 
-	let chapterSettings: Settings | null = $state(null);
-
 	let {
 		paneId = $bindable<string>(),
 		pane = $bindable(),
 		containerHeight = $bindable(),
 		containerWidth = $bindable()
 	} = $props();
-
-	$effect(() => {
-		chapterSettings;
-
-		if (chapterSettings !== null) {
-			localStorage.setItem('settings', JSON.stringify(chapterSettings));
-		}
-
-		/* update color theme */
-		if (chapterSettings && chapterSettings.colorTheme) {
-			settingsService.applySettings(chapterSettings?.colorTheme);
-		}
-	});
 
 	$effect(() => {
 		if (bibleLocationRef) {
@@ -149,17 +131,6 @@
 		set paneId for popup actions
 		*/
 		mode.paneId = paneId;
-
-		let cs = localStorage.getItem('settings');
-		if (cs !== null) {
-			chapterSettings = JSON.parse(cs);
-
-			if (chapterSettings && chapterSettings.colorTheme) {
-				settingsService.applySettings(chapterSettings?.colorTheme);
-			}
-		} else {
-			chapterSettings = newSettings();
-		}
 
 		if (pane?.buffer?.bag?.navReadings) {
 			mode.navReadings = pane?.buffer?.bag?.navReadings;

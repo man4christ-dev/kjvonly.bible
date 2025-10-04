@@ -6,7 +6,7 @@
 	import NavReadingsList from './navReadingsList.svelte';
 	import { onMount, untrack } from 'svelte';
 	import Settings from '../settings/settings.svelte';
-	import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 	// =============================== BINDINGS ================================
 

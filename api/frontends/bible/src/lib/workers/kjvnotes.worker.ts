@@ -1,5 +1,5 @@
 import { notesApi } from '$lib/api/notes.api';
-import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
+import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 import { bibleDB, SEARCH } from '$lib/storer/bible.db';
 import { sleep } from '$lib/utils/sleep';
 import FlexSearch, { type Id } from 'flexsearch';

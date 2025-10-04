@@ -1,7 +1,7 @@
 import { bibleStorer } from '../storer/bible.storer';
 import { offlineApi } from './offline.api';
 import { ANNOTATIONS, UNSYNCED_ANNOTATIONS } from '$lib/storer/bible.db';
-import { bibleLocationReferenceService } from '$lib/services/bibleLocationReference.service';
+import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 export class AnnotsApi {
 	async getAnnotations(bibleLocationRef: string): Promise<any> {
