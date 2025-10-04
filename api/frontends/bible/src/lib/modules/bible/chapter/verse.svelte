@@ -3,7 +3,7 @@
 	import Word from './word.svelte';
 	let {
 		lastKnownScrollPosition,
-		chapterKey,
+		bibleLocationRef,
 		footnotes,
 		verse,
 		pane = $bindable(),
@@ -26,7 +26,7 @@
 				{verse}
 				{word}
 				{footnotes}
-				{chapterKey}
+				{bibleLocationRef}
 				{lastKnownScrollPosition}
 				wordIdx={idx}
 			></Word>
@@ -40,7 +40,7 @@
 			{verse}
 			{word}
 			{footnotes}
-			{chapterKey}
+			{bibleLocationRef}
 			{lastKnownScrollPosition}
 			wordIdx={idx + 2}
 		></Word>

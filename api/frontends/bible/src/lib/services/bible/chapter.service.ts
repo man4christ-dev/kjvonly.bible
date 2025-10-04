@@ -5,9 +5,11 @@ import { bibleLocationReferenceService } from './bibleLocationReference.service'
 
 class ChapterService {
 	async get(reference: string): Promise<Chapter> {
-		let chapterKey =
+		let bibleLocationRef =
 			bibleLocationReferenceService.extractBookChapter(reference);
-		return await jsonToChapter(bibleStorer.getValue(CHAPTERS, chapterKey));
+		return await jsonToChapter(
+			bibleStorer.getValue(CHAPTERS, bibleLocationRef)
+		);
 	}
 }
 

@@ -27,28 +27,28 @@ import { bookNamesByIDService } from '../bibleMetadata/bookNamesByID.service';
  *      "bookID": 1,
  *      "chapter": 1,
  *      "verses": "1-31",
- *      "chapterKey": "1_1_1-31"
+ *      "bibleLocationRef": "1_1_1-31"
  *    },
  *    {
  *      "bookName": "Matthew",
  *      "bookID": 47,
  *      "chapter": 1,
  *      "verses": "1-25",
- *      "chapterKey": "47_1_1-25"
+ *      "bibleLocationRef": "47_1_1-25"
  *    },
  *    {
  *      "bookName": "Ezra",
  *      "bookID": 15,
  *      "chapter": 1,
  *      "verses": "1-11",
- *      "chapterKey": "15_1_1-11"
+ *      "bibleLocationRef": "15_1_1-11"
  *    },
  *    {
  *      "bookName": "Acts",
  *      "bookID": 51,
  *      "chapter": 1,
  *      "verses": "1-26",
- *      "chapterKey": "51_1_1-26"
+ *      "bibleLocationRef": "51_1_1-26"
  *    }
  *  ],
  *  "totalVerses": 93
@@ -62,28 +62,28 @@ import { bookNamesByIDService } from '../bibleMetadata/bookNamesByID.service';
  *       "bookID": 1,
  *       "chapter": 2,
  *       "verses": "1-25",
- *       "chapterKey": "1_2_1-25"
+ *       "bibleLocationRef": "1_2_1-25"
  *     },
  *     {
  *       "bookName": "Matthew",
  *       "bookID": 47,
  *       "chapter": 2,
  *       "verses": "1-23",
- *       "chapterKey": "47_2_1-23"
+ *       "bibleLocationRef": "47_2_1-23"
  *     },
  *     {
  *       "bookName": "Ezra",
  *       "bookID": 15,
  *       "chapter": 2,
  *       "verses": "1-70",
- *       "chapterKey": "15_2_1-70"
+ *       "bibleLocationRef": "15_2_1-70"
  *     },
  *     {
  *       "bookName": "Acts",
  *       "bookID": 51,
  *       "chapter": 2,
  *       "verses": "1-47",
- *       "chapterKey": "51_2_1-47"
+ *       "bibleLocationRef": "51_2_1-47"
  *     }
  *   ],
  *   "totalVerses": 165
@@ -127,7 +127,7 @@ export class EncodedReadingsDecoderService {
 				bookID: parseInt(bcv[0]),
 				chapter: parseInt(bcv[1]),
 				verses: bcv[2],
-				chapterKey: r.replaceAll('/', '_')
+				bibleLocationRef: r.replaceAll('/', '_')
 			};
 		});
 	}

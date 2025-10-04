@@ -50,14 +50,14 @@ describe('set total verses', () => {
 						bookID: 0,
 						chapter: 0,
 						verses: '1-5',
-						chapterKey: ''
+						bibleLocationRef: ''
 					},
 					{
 						bookName: '',
 						bookID: 0,
 						chapter: 0,
 						verses: '1-5',
-						chapterKey: ''
+						bibleLocationRef: ''
 					}
 				]
 			},
@@ -69,14 +69,14 @@ describe('set total verses', () => {
 						bookID: 0,
 						chapter: 0,
 						verses: '1-10',
-						chapterKey: ''
+						bibleLocationRef: ''
 					},
 					{
 						bookName: '',
 						bookID: 0,
 						chapter: 0,
 						verses: '1-10',
-						chapterKey: ''
+						bibleLocationRef: ''
 					}
 				]
 			},
@@ -88,14 +88,14 @@ describe('set total verses', () => {
 						bookID: 0,
 						chapter: 0,
 						verses: '1-15',
-						chapterKey: ''
+						bibleLocationRef: ''
 					},
 					{
 						bookName: '',
 						bookID: 0,
 						chapter: 0,
 						verses: '1-15',
-						chapterKey: ''
+						bibleLocationRef: ''
 					}
 				]
 			}
@@ -124,28 +124,28 @@ describe('parseEncodedReadings', () => {
 						bookID: 1,
 						chapter: 1,
 						verses: '1-31',
-						chapterKey: '1_1_1-31'
+						bibleLocationRef: '1_1_1-31'
 					},
 					{
 						bookName: 'Matthew',
 						bookID: 47,
 						chapter: 1,
 						verses: '1-25',
-						chapterKey: '47_1_1-25'
+						bibleLocationRef: '47_1_1-25'
 					},
 					{
 						bookName: 'Ezra',
 						bookID: 15,
 						chapter: 1,
 						verses: '1-11',
-						chapterKey: '15_1_1-11'
+						bibleLocationRef: '15_1_1-11'
 					},
 					{
 						bookName: 'Acts',
 						bookID: 51,
 						chapter: 1,
 						verses: '1-26',
-						chapterKey: '51_1_1-26'
+						bibleLocationRef: '51_1_1-26'
 					}
 				],
 				totalVerses: 93

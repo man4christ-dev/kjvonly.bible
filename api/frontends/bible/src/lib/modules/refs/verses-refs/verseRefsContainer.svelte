@@ -22,10 +22,10 @@
 		refs.forEach(async (ref: string) => {
 			try {
 				let lastIndex = ref.lastIndexOf('/');
-				let chapterKey = ref.substring(0, lastIndex).replaceAll('/', '_');
-				let chapterNumber = chapterKey.split('_')[1];
+				let bibleLocationRef = ref.substring(0, lastIndex).replaceAll('/', '_');
+				let chapterNumber = bibleLocationRef.split('_')[1];
 				let verseNumber = ref.substring(lastIndex + 1, ref.length);
-				let data = await bibleDB.getValue('chapters', chapterKey);
+				let data = await bibleDB.getValue('chapters', bibleLocationRef);
 				let bookName = data['bookName'];
 				let bookId = data['id'].split('_')[0];
 				let verse = data['verseMap'][verseNumber];
@@ -50,10 +50,10 @@
 
 	async function updateRefs(vref: any) {
 		let index = vref.ref.lastIndexOf('/');
-		let chapterKey = vref.ref.substring(0, index).replaceAll('/', '_');
+		let bibleLocationRef = vref.ref.substring(0, index).replaceAll('/', '_');
 		let verseNumber = vref.ref.substring(index + 1, vref.ref.length);
 
-		let data = await bibleDB.getValue('chapters', chapterKey);
+		let data = await bibleDB.getValue('chapters', bibleLocationRef);
 		let verse = data['verses'][verseNumber];
 		let refKeys = [vref.ref];
 		verse.words.forEach((w: any) => {
@@ -112,7 +112,7 @@
 			aria-label="horizontal split"
 			onclick={() => {
 				paneService.onSplitPane(paneID, 'h', Modules.BIBLE, {
-					chapterKey: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
+					bibleLocationRef: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
 				});
 			}}
 		>
@@ -152,7 +152,7 @@
 			aria-label="horizontal split"
 			onclick={() => {
 				paneService.onSplitPane(paneID, 'v', Modules.BIBLE, {
-					chapterKey: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
+					bibleLocationRef: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
 				});
 			}}
 		>

@@ -101,9 +101,9 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		} else {
 			noteKeys = [];
 			notes = {};
-			/** filter to keys with the same chapterKey*/
+			/** filter to keys with the same bibleLocationRef*/
 			Object.keys(results.notes).forEach((k) => {
-				if (results.notes[k].chapterKey == mode.chapterKey) {
+				if (results.notes[k].bibleLocationRef == mode.bibleLocationRef) {
 					notes[k] = results.notes[k];
 				}
 			});
@@ -183,30 +183,30 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		let data: any = {};
 		noteKeys.forEach((k) => {
 			let n = notes[k];
-			let keys = n.chapterKey.split('_');
-			let chapterKey = `${keys[0]}_${keys[1]}`;
+			let keys = n.bibleLocationRef.split('_');
+			let bibleLocationRef = `${keys[0]}_${keys[1]}`;
 			let verseNumber = `${keys[2]}`;
 			let wordIdx = `${keys[3]}`;
 
-			if (!data[chapterKey]) {
-				data[chapterKey] = {
-					id: chapterKey
+			if (!data[bibleLocationRef]) {
+				data[bibleLocationRef] = {
+					id: bibleLocationRef
 				};
 			}
 
-			if (!data[chapterKey][verseNumber]) {
-				data[chapterKey][verseNumber] = {
+			if (!data[bibleLocationRef][verseNumber]) {
+				data[bibleLocationRef][verseNumber] = {
 					notes: {
 						words: {}
 					}
 				};
 			}
 
-			if (!data[chapterKey][verseNumber].notes.words[wordIdx]) {
-				data[chapterKey][verseNumber].notes.words[wordIdx] = {};
+			if (!data[bibleLocationRef][verseNumber].notes.words[wordIdx]) {
+				data[bibleLocationRef][verseNumber].notes.words[wordIdx] = {};
 			}
 
-			data[chapterKey][verseNumber].notes.words[wordIdx][k] = n;
+			data[bibleLocationRef][verseNumber].notes.words[wordIdx][k] = n;
 		});
 
 		let dataList: any[] = [];
@@ -283,7 +283,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		if (savedNote) {
 			noteID = savedNote.id;
 			note.id = savedNote.id;
-			note.chapterKey = savedNote.chapterKey;
+			note.bibleLocationRef = savedNote.bibleLocationRef;
 			note.version = savedNote.version;
 			note.dateCreated = savedNote.dateCreated;
 			note.dateUpdated = savedNote.dateUpdated;
@@ -294,14 +294,14 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	}
 
 	async function onAdd() {
-		let keys = mode.chapterKey?.split('_');
+		let keys = mode.bibleLocationRef?.split('_');
 
 		let now = Date.now();
 
 		if (keys[0] === '0') {
 			note = {
 				id: noteID,
-				chapterKey: mode.chapterKey,
+				bibleLocationRef: mode.bibleLocationRef,
 				text: ``,
 				html: ``,
 				title: `Note`,
@@ -312,13 +312,13 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			};
 		} else {
 			// This adds the verse to the note body
-			let chapter = await chapterApi.getChapter(mode.chapterKey);
+			let chapter = await chapterApi.getChapter(mode.bibleLocationRef);
 			let verse = chapter['verseMap'][keys[2]];
 			let title = `${booknames['shortNames'][keys[0]]} ${keys[1]}:${keys[2]}${keys[3] > 0 ? ':' + keys[3] : ''}`;
 
 			note = {
 				id: noteID,
-				chapterKey: mode.chapterKey,
+				bibleLocationRef: mode.bibleLocationRef,
 				bcv: `${booknames['shortNames'][keys[0]]} ${keys[1]}:${keys[2]}`,
 				text: `${title}\n${verse}`,
 				html: `<h1>${title}</h1><p><italic>${verse}</italic></p>`,
@@ -773,13 +773,13 @@ note icon in the Bible only the notes associated to that word will be displayed 
 {#snippet actions(note: any, nk: string)}
 	<div class="flex w-full flex-row justify-end space-x-4">
 		<!-- bible -->
-		{#if !note?.chapterKey?.startsWith('0')}
+		{#if !note?.bibleLocationRef?.startsWith('0')}
 			<button
 				aria-label="bible"
 				onclick={(e) => {
 					e.stopPropagation();
 					paneService.onSplitPane(mode.paneID, 'h', Modules.BIBLE, {
-						chapterKey: note.chapterKey
+						bibleLocationRef: note.bibleLocationRef
 					});
 				}}
 			>

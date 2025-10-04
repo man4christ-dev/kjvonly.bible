@@ -18,7 +18,7 @@ async function waitForSearchIndex(): Promise<boolean> {
 let notesDocument = new FlexSearch.Document({
 	document: {
 		id: 'id',
-		index: ['title', 'text', 'tags[]:tag', 'bookChapter', 'chapterKey']
+		index: ['title', 'text', 'tags[]:tag', 'bookChapter', 'bibleLocationRef']
 	}
 });
 
@@ -29,8 +29,8 @@ async function init() {
 	notes = {};
 	for (let i = 0; i < cahcedNotes.length; i++) {
 		let nn = cahcedNotes[i];
-		if (nn?.chapterKey) {
-			let ck = nn.chapterKey.split('_');
+		if (nn?.bibleLocationRef) {
+			let ck = nn.bibleLocationRef.split('_');
 			nn.bookChapter = `${ck[0]}_${ck[1]}`;
 			await notesDocument.addAsync(nn.id, nn);
 			notes[nn.id] = nn;
@@ -42,7 +42,7 @@ async function init() {
 
 function addNote(noteID: string, note: any) {
 	note.bookChapter = bibleLocationReferenceService.extractBookChapter(
-		note.chapterKey
+		note.bibleLocationRef
 	);
 	notes[noteID] = note;
 	notesDocument.add(noteID, note);

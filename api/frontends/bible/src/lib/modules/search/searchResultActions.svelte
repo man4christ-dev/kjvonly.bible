@@ -34,12 +34,12 @@
 	<HorizontalSplit
 		bind:paneID
 		module={Modules.BIBLE}
-		data={{ chapterKey: searchResult.key }}
+		data={{ bibleLocationRef: searchResult.key }}
 	></HorizontalSplit>
 
 	<VerticalSplit
 		bind:paneID
 		module={Modules.BIBLE}
-		data={{ chapterKey: searchResult.key }}
+		data={{ bibleLocationRef: searchResult.key }}
 	></VerticalSplit>
 </div>

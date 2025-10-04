@@ -56,8 +56,8 @@ async function fetchAndStoreAllBibleChapters() {
 	try {
 		let json = await api.getstatic(`/data/json.gz/all.json`);
 		let chapters = new Map<string, any>(Object.entries(json));
-		chapters.forEach((chapter: any, chapterKey: string) => {
-			chapter['id'] = chapterKey;
+		chapters.forEach((chapter: any, bibleLocationRef: string) => {
+			chapter['id'] = bibleLocationRef;
 			db.putValue(CHAPTERS, chapter);
 		});
 	} catch (err) {

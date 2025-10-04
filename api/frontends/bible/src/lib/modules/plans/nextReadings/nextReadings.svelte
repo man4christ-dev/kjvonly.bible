@@ -122,7 +122,7 @@
 		let nrs: NextReadings = nextReadings[idx];
 		let readings: Readings = nrs.readings;
 		readings.bcvs = readings.bcvs.map((r: any) => {
-			r.chapterKey = `${r.bookID}_${r.chapter}_${r.verses}`;
+			r.bibleLocationRef = `${r.bookID}_${r.chapter}_${r.verses}`;
 			return r;
 		});
 
@@ -136,7 +136,7 @@
 
 		pane.buffer.bag.navReadings = nr;
 
-		pane.buffer.bag.chapterKey = readings.bcvs[0].chapterKey;
+		pane.buffer.bag.bibleLocationRef = readings.bcvs[0].bibleLocationRef;
 		pane.updateBuffer(Modules.BIBLE);
 	}
 </script>

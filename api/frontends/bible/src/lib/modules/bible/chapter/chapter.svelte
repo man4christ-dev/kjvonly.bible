@@ -25,7 +25,7 @@
 	let rangeEndIndex = 0;
 
 	let {
-		chapterKey: bibleLocationRef = $bindable(),
+		bibleLocationRef: bibleLocationRef = $bindable(),
 		bookName = $bindable(),
 		bookChapter = $bindable(),
 		id = $bindable(),
@@ -49,7 +49,7 @@
 
 		if (bcv.length > 2) {
 			// untrack(() => {
-			// 	chapterKey = `${bcv[0]}_${bcv[1]}`;
+			// 	bibleLocationRef = `${bcv[0]}_${bcv[1]}`;
 			// });
 			let [start, end] =
 				bibleLocationReferenceService.extractVerses(bibleLocationRef);
@@ -125,7 +125,7 @@
 		if (data) {
 			let tempNotes: any = {};
 			Object.keys(data.notes).forEach(
-				(id) => (tempNotes[data.notes[id].chapterKey] = true)
+				(id) => (tempNotes[data.notes[id].bibleLocationRef] = true)
 			);
 			notes = tempNotes;
 		}
@@ -153,7 +153,7 @@
 					bind:mode
 					verse={verses[k]}
 					{footnotes}
-					chapterKey={bookIDChapter}
+					bibleLocationRef={bookIDChapter}
 					{lastKnownScrollPosition}
 				></Verse>
 			</span>

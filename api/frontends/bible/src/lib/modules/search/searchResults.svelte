@@ -146,7 +146,7 @@
 		let pane = paneService.findNode(paneService.rootPane, paneID);
 		if (pane) {
 			pane.buffer.bag = {
-				chapterKey: sr.key
+				bibleLocationRef: sr.key
 			};
 			pane?.updateBuffer(Modules.BIBLE);
 		}

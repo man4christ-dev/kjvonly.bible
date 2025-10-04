@@ -2,7 +2,8 @@
 	import { chapterApi } from '$lib/api/chapters.api';
 	import { onMount } from 'svelte';
 
-	let { chapterKey = $bindable(), showBookChapterPopup = $bindable() } = $props();
+	let { bibleLocationRef = $bindable(), showBookChapterPopup = $bindable() } =
+		$props();
 
 	let bookNames: any = $state();
 	let bookIds: any;
@@ -415,9 +416,11 @@
 	$effect(() => {
 		filterText;
 
-		filteredBooks = bookNamesSorted.filter((book: { name: string; id: number }) => {
-			return book.name.toLowerCase().includes(filterText.toLowerCase());
-		});
+		filteredBooks = bookNamesSorted.filter(
+			(book: { name: string; id: number }) => {
+				return book.name.toLowerCase().includes(filterText.toLowerCase());
+			}
+		);
 	});
 
 	onMount(async () => {
@@ -437,7 +440,7 @@
 		selectedBook = bn;
 	}
 	function chapterSelected(ch: any) {
-		chapterKey = `${selectedBook.id}_${ch}`;
+		bibleLocationRef = `${selectedBook.id}_${ch}`;
 		showBookChapterPopup = false;
 		selectedBook = undefined;
 	}
@@ -543,7 +546,12 @@
 					}}
 					class="h-12 w-12 px-2 text-neutral-700"
 				>
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="100%" height="100%">
+					<svg
+						xmlns="http://www.w3.org/2000/svg"
+						viewBox="0 0 24 24"
+						width="100%"
+						height="100%"
+					>
 						<path
 							class="fill-neutral-700"
 							d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
@@ -576,12 +584,17 @@
 					{#each new Array(bookNames['maxChapterById'][selectedBook.id]).keys() as ch}
 						<button
 							onclick={() => chapterSelected(ch + 1)}
-							class="hover:bg-primary-50 row-span-1 bg-neutral-50 p-4">{ch + 1}</button
+							class="hover:bg-primary-50 row-span-1 bg-neutral-50 p-4"
+							>{ch + 1}</button
 						>
 					{/each}
 				</div>
 			{:else if group}
-				<div class="grid w-full {clientWidth < 250 ? 'grid-cols-3' : 'grid-cols-5'} gap-1">
+				<div
+					class="grid w-full {clientWidth < 250
+						? 'grid-cols-3'
+						: 'grid-cols-5'} gap-1"
+				>
 					{#each filteredBooks as bn}
 						<button
 							onclick={(event) => bookSelected(event, bn)}
@@ -598,7 +611,8 @@
 					<div class="w-full">
 						<button
 							onclick={(event) => bookSelected(event, bn)}
-							class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start">{bn.name}</button
+							class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start"
+							>{bn.name}</button
 						>
 					</div>
 				{/each}

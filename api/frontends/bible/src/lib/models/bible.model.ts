@@ -11,7 +11,7 @@ import type { chapter } from './chapter.model';
  *      bookID: 1,
  *      chapter: 1,
  *      verses: "1-31",
- *      chapterKey: "1_1_1-31"
+ *      bibleLocationRef: "1_1_1-31"
  * }
  */
 export interface BCV {
@@ -19,7 +19,7 @@ export interface BCV {
 	bookID: number;
 	chapter: number;
 	verses: string;
-	chapterKey: string;
+	bibleLocationRef: string;
 }
 
 export async function jsonToChapter(jsonData: Promise<any>): Promise<Chapter> {

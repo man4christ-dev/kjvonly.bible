@@ -10,7 +10,7 @@
 		word,
 		verse,
 		footnotes,
-		chapterKey,
+		bibleLocationRef,
 		pane = $bindable(),
 		annotations = $bindable(),
 		notes = $bindable(),
@@ -55,7 +55,7 @@
 	});
 
 	function updateMode(m: string) {
-		mode.chapterKey = `${chapterKey}_${verse['number']}_${wordIdx}`;
+		mode.bibleLocationRef = `${bibleLocationRef}_${verse['number']}_${wordIdx}`;
 		mode.value = m;
 	}
 
@@ -79,7 +79,7 @@
 
 	function wordHasNotes() {
 		let verseNumber = verse['number'];
-		let wordKey = `${chapterKey}_${verseNumber}_${wordIdx}`;
+		let wordKey = `${bibleLocationRef}_${verseNumber}_${wordIdx}`;
 		notesAnnotations = notes[wordKey];
 	}
 
@@ -106,7 +106,7 @@
 
 		pane.buffer.bag.lastVerse = verse.number;
 		let verseNumber = verse['number'];
-		let ref = chapterKey.replaceAll('_', '/') + '/' + verseNumber;
+		let ref = bibleLocationRef.replaceAll('_', '/') + '/' + verseNumber;
 
 		if (word.class.includes('vno')) {
 			let refs: string[] = [];
@@ -230,7 +230,7 @@
 	}
 
 	function onNotesClicked() {
-		mode.chapterKey = `${chapterKey}_${verseNumber}_${wordIdx}`;
+		mode.bibleLocationRef = `${bibleLocationRef}_${verseNumber}_${wordIdx}`;
 		mode.notePopup.show = true;
 	}
 </script>

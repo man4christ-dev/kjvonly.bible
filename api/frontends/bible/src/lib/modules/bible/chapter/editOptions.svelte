@@ -143,7 +143,7 @@
 		<button
 			onclick={() => {
 				onSave();
-				mode.notePopup.chapterKey = mode.chapterKey;
+				mode.notePopup.bibleLocationRef = mode.bibleLocationRef;
 				mode.value = '';
 				mode.notePopup.show = true;
 			}}

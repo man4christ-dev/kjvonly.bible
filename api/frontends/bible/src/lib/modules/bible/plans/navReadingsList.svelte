@@ -4,7 +4,7 @@
 	let {
 		navReadings = $bindable(),
 		showNavReadingsPopup = $bindable(),
-		chapterKey = $bindable()
+		bibleLocationRef = $bindable()
 	} = $props();
 
 	let clientHeight = $state(0);
@@ -15,7 +15,7 @@
 		e.stopPropagation();
 		let nr: NavReadings = navReadings;
 		nr.currentNavReadingsIndex = idx;
-		chapterKey = r.chapterKey;
+		bibleLocationRef = r.bibleLocationRef;
 		showNavReadingsPopup = false;
 	}
 </script>

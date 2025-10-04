@@ -3,7 +3,8 @@
 	import { toastService } from '$lib/services/toast.service';
 	import { onMount } from 'svelte';
 
-	let { chapterKey = $bindable(), showCopyVersePopup = $bindable() } = $props();
+	let { bibleLocationRef = $bindable(), showCopyVersePopup = $bindable() } =
+		$props();
 
 	let verseKeys: string[] = $state([]);
 	let verses: any = $state({});
@@ -12,7 +13,7 @@
 
 	let title = $state('');
 	onMount(() => {
-		let keys = chapterKey.split('_');
+		let keys = bibleLocationRef.split('_');
 		if (keys.length < 2) {
 			showCopyVersePopup = false;
 		}

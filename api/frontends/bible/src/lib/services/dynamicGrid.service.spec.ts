@@ -1,5 +1,8 @@
 import { assert, describe, expect, it } from 'vitest';
-import { numberToLetters, renderGridTemplateAreas } from './dynamicGrid.service';
+import {
+	numberToLetters,
+	renderGridTemplateAreas
+} from './dynamicGrid.service';
 
 describe('suite name', () => {
 	it('large grid vertical', () => {
@@ -113,7 +116,9 @@ describe('suite name', () => {
 "f f f f f f f f f f f f f f f f n n n n n n n n n n n n n n n n "
 "g g g g g g g g h h h h h h h h o o o o o o o o p p p p p p p p "
 `;
-		expect(grid, 'expected grids to match but they do not').toEqual(expectedGrid);
+		expect(grid, 'expected grids to match but they do not').toEqual(
+			expectedGrid
+		);
 	});
 
 	it('large grid horizontal', () => {
@@ -231,7 +236,9 @@ describe('suite name', () => {
 "n n n n n n n n n n n n n n n n "
 "o o o o o o o o p p p p p p p p "
 `;
-		expect(grid, 'expected grids to match but they do not').toEqual(expectedGrid);
+		expect(grid, 'expected grids to match but they do not').toEqual(
+			expectedGrid
+		);
 	});
 
 	it('simple vertical', () => {
@@ -282,7 +289,7 @@ describe('suite name', () => {
                 "keyboardBindings": {},
                 "selected": false,
                 "bag": {
-                    "chapterKey": "2_8",
+                    "bibleLocationRef": "2_8",
                     "lastVerse": 1
                 }
             },
@@ -322,7 +329,7 @@ describe('suite name', () => {
             "keyboardBindings": {},
             "selected": false,
             "bag": {
-                "chapterKey": "2_8",
+                "bibleLocationRef": "2_8",
                 "lastVerse": 3
             }
         },
@@ -360,7 +367,7 @@ describe('suite name', () => {
         "keyboardBindings": {},
         "selected": false,
         "bag": {
-            "chapterKey": "2_8"
+            "bibleLocationRef": "2_8"
         }
     }
 }`;
@@ -396,7 +403,7 @@ describe('suite name', () => {
                 "keyboardBindings": {},
                 "selected": false,
                 "bag": {
-                    "chapterKey": "2_9"
+                    "bibleLocationRef": "2_9"
                 }
             }
         }
@@ -409,7 +416,7 @@ describe('suite name', () => {
             "keyboardBindings": {},
             "selected": false,
             "bag": {
-                "chapterKey": "2_9"
+                "bibleLocationRef": "2_9"
             }
         },
         "split": "h",
@@ -425,7 +432,7 @@ describe('suite name', () => {
                 "keyboardBindings": {},
                 "selected": false,
                 "bag": {
-                    "chapterKey": "2_9"
+                    "bibleLocationRef": "2_9"
                 }
             }
         }
@@ -437,7 +444,7 @@ describe('suite name', () => {
         "keyboardBindings": {},
         "selected": false,
         "bag": {
-            "chapterKey": "2_9"
+            "bibleLocationRef": "2_9"
         }
     }
 }`;

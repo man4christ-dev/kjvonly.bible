@@ -26,7 +26,7 @@
 	let mode: any = $state({
 		value: '',
 		colorAnnotation: 'bg-highlighta',
-		chapterKey: '73_1_1_1',
+		bibleLocationRef: '73_1_1_1',
 		notePopup: { show: false }
 	});
 
@@ -39,7 +39,7 @@
 
 	$effect(() => {
 		if (bibleLocationRef) {
-			pane.buffer.bag.chapterKey =
+			pane.buffer.bag.bibleLocationRef =
 				bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
 			localStorage.setItem(
 				'lastChapterKey',
@@ -57,7 +57,7 @@
 			pane.updateBuffer(Modules.PLANS);
 		} else {
 			plan.currentNavReadingsIndex = nextIndex;
-			bibleLocationRef = plan.readings.bcvs[nextIndex].chapterKey;
+			bibleLocationRef = plan.readings.bcvs[nextIndex].bibleLocationRef;
 		}
 	}
 
@@ -67,7 +67,7 @@
 		let nextIndex = ci - 1;
 		if (nextIndex >= 0) {
 			nr.currentNavReadingsIndex = nextIndex;
-			bibleLocationRef = nr.readings.bcvs[nextIndex].chapterKey;
+			bibleLocationRef = nr.readings.bcvs[nextIndex].bibleLocationRef;
 		}
 	}
 
@@ -132,7 +132,7 @@
 			mode.navReadings = pane?.buffer?.bag?.navReadings;
 		}
 
-		let ck = pane.buffer.bag.chapterKey;
+		let ck = pane.buffer.bag.bibleLocationRef;
 		if (ck) {
 			bibleLocationRef = ck;
 		} else {
@@ -190,7 +190,7 @@
 			<div class="sticky top-0 z-[1500] flex w-full justify-center">
 				<ChapterActions
 					bind:mode
-					bind:chapterKey={bibleLocationRef}
+					bind:bibleLocationRef
 					bind:annotations
 					bind:clientHeight
 					{bookName}
@@ -204,7 +204,7 @@
 						<Chapter
 							bind:bookName
 							bind:bookChapter
-							bind:chapterKey={bibleLocationRef}
+							bind:bibleLocationRef
 							bind:id
 							bind:pane
 							bind:mode

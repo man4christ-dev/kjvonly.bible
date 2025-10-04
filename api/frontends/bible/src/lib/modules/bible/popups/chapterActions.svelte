@@ -21,7 +21,7 @@
 	let {
 		mode = $bindable(),
 		annotations = $bindable<Annotations>(),
-		chapterKey: bibleLocationRef = $bindable(),
+		bibleLocationRef = $bindable(),
 		clientHeight = $bindable<number>(),
 		bookName,
 		bookChapter,
@@ -161,16 +161,14 @@
 		class="absolute z-[10000] h-full w-full max-w-lg"
 	>
 		{#if showBookChapterPopup}
-			<BookChapterPopup
-				bind:showBookChapterPopup
-				bind:chapterKey={bibleLocationRef}
+			<BookChapterPopup bind:showBookChapterPopup bind:bibleLocationRef
 			></BookChapterPopup>
 		{/if}
 		{#if showNavReadingsPopup}
 			<NavReadingsList
 				bind:showNavReadingsPopup
 				bind:navReadings={mode.navReadings}
-				bind:chapterKey={bibleLocationRef}
+				bind:bibleLocationRef
 			></NavReadingsList>
 		{/if}
 		{#if showSettingsPopup}
@@ -195,7 +193,9 @@
 		{/if}
 
 		{#if showCopyVersePopup}
-			<CopyVersePopup bind:showCopyVersePopup bind:chapterKey={bookIDChapter}
+			<CopyVersePopup
+				bind:showCopyVersePopup
+				bind:bibleLocationRef={bookIDChapter}
 			></CopyVersePopup>
 		{/if}
 	</div>
