@@ -61,3 +61,19 @@ export interface Word {
 	href: string[] | null;
 	emphasis: boolean;
 }
+
+export interface WordAnnots {
+	class: string[];
+}
+
+export interface Annotations {
+	version: number;
+	annots: Map<number, Map<number, WordAnnots>>;
+}
+
+export function newAnnotation(): Annotations {
+	return {
+		version: 0,
+		annots: new Map()
+	};
+}

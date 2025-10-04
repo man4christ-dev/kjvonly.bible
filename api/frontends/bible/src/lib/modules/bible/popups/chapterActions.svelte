@@ -1,18 +1,26 @@
 <script lang="ts">
-	import BookChapterPopup from './bookChapterPopup.svelte';
+	// SVELTE
+	import { onMount, untrack } from 'svelte';
+
+	// COMPONENTS
 	import ActionDropdown from './actionsPopup.svelte';
-	import NotesContainer from '../../notes/notesContainer.svelte';
+	import BookChapterPopup from './bookChapterPopup.svelte';
 	import CopyVersePopup from './copyVersePopup.svelte';
 	import NavReadingsList from '../plans/navReadingsList.svelte';
-	import { onMount, untrack } from 'svelte';
+	import NotesContainer from '../../notes/notesContainer.svelte';
 	import Settings from '../../settings/settings.svelte';
+
+	// MODELS
+	import type { Annotations } from '$lib/models/bible.model';
+
+	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 	// =============================== BINDINGS ================================
 
 	let {
 		mode = $bindable(),
-		annotations = $bindable(),
+		annotations = $bindable<Annotations>(),
 		chapterKey: bibleLocationRef = $bindable(),
 		clientHeight = $bindable<number>(),
 		bookName,

@@ -17,19 +17,29 @@ note icon in the Bible only the notes associated to that word will be displayed 
 
 -->
 <script lang="ts">
-	import { chapterApi } from '$lib/api/chapters.api';
-	import { notesApi } from '$lib/api/notes.api';
+	// SVELTE
+	import { onMount } from 'svelte';
+
+	// MODELS
+	import type { Annotations } from '$lib/models/bible.model';
 	import { Modules } from '$lib/models/modules.model';
+
+	// SERVICES
 	import { notesService } from '$lib/services/notes.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { toastService } from '$lib/services/toast.service';
+
+	// APIS
+	import { chapterApi } from '$lib/api/chapters.api';
+	import { notesApi } from '$lib/api/notes.api';
+
+	// OTHER
 	import Quill from 'quill';
-	import { onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 
 	let {
 		mode = $bindable(),
-		annotations = $bindable(),
+		annotations = $bindable<Annotations>(),
 		allNotes,
 		noteIDToOpen = ''
 	} = $props();

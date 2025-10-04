@@ -11,6 +11,7 @@
 	// MODELS
 	import { Modules } from '$lib/models/modules.model';
 	import type { NavReadings } from '../../models/plans.model';
+	import { newAnnotation, type Annotations } from '$lib/models/bible.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
@@ -19,15 +20,6 @@
 
 	// OTHER
 	import uuid4 from 'uuid4';
-
-	type WordAnnots = {
-		class: string[];
-	};
-
-	export class Annotations {
-		version: number = 0;
-		annots: Map<number, Map<number, WordAnnots>> = new Map();
-	}
 
 	let id = uuid4();
 	let bibleLocationRef: string | null = $state(null);
@@ -38,7 +30,7 @@
 		notePopup: { show: false }
 	});
 
-	let annotations: Annotations = $state(new Annotations());
+	let annotations: Annotations = $state(newAnnotation());
 	let bookName: string = $state('');
 	let bookChapter: string = $state('');
 	let clientHeight = $state(0);
