@@ -157,12 +157,12 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			showConfirmDelete = true;
 		},
 		'split vertical': () => {
-			paneService.onSplitPane(mode.paneId, 'v', Modules.MODULES, {});
+			paneService.onSplitPane(mode.paneID, 'v', Modules.MODULES, {});
 			showNoteActions = false;
 		},
 
 		'split horizontal': () => {
-			paneService.onSplitPane(mode.paneId, 'h', Modules.MODULES, {});
+			paneService.onSplitPane(mode.paneID, 'h', Modules.MODULES, {});
 			showNoteActions = false;
 		}
 	};
@@ -367,12 +367,12 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			onExport();
 		},
 		'split vertical': () => {
-			paneService.onSplitPane(mode.paneId, 'v', Modules.MODULES, {});
+			paneService.onSplitPane(mode.paneID, 'v', Modules.MODULES, {});
 			showNoteListActions = false;
 		},
 
 		'split horizontal': () => {
-			paneService.onSplitPane(mode.paneId, 'h', Modules.MODULES, {});
+			paneService.onSplitPane(mode.paneID, 'h', Modules.MODULES, {});
 			showNoteListActions = false;
 		}
 	};
@@ -690,7 +690,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			onclick={() => {
 				if (allNotes) {
 					if (!isShowingOptions()) {
-						paneService.onDeletePane(paneService.rootPane, mode.paneId);
+						paneService.onDeletePane(paneService.rootPane, mode.paneID);
 					}
 				} else {
 					if (!isShowingOptions()) {
@@ -768,7 +768,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 				aria-label="bible"
 				onclick={(e) => {
 					e.stopPropagation();
-					paneService.onSplitPane(mode.paneId, 'h', Modules.BIBLE, {
+					paneService.onSplitPane(mode.paneID, 'h', Modules.BIBLE, {
 						chapterKey: note.chapterKey
 					});
 				}}
@@ -799,7 +799,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			aria-label="horizontal split"
 			onclick={(e) => {
 				e.stopPropagation();
-				paneService.onSplitPane(mode.paneId, 'h', Modules.NOTES, {
+				paneService.onSplitPane(mode.paneID, 'h', Modules.NOTES, {
 					noteID: nk
 				});
 			}}
@@ -840,7 +840,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			aria-label="vertical split"
 			onclick={(e) => {
 				e.stopPropagation();
-				paneService.onSplitPane(mode.paneId, 'v', Modules.NOTES, {
+				paneService.onSplitPane(mode.paneID, 'v', Modules.NOTES, {
 					noteID: nk
 				});
 			}}

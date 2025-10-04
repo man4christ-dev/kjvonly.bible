@@ -8,7 +8,7 @@
 
 	let id = uuid4();
 	let {
-		paneId,
+		paneID,
 		pane = $bindable(),
 		containerHeight = $bindable(),
 		containerWidth = $bindable()
@@ -54,7 +54,10 @@
 		}
 
 		if (pane?.buffer?.bag?.word?.text) {
-			text = pane.buffer.bag.word.text.replace(/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g, '');
+			text = pane.buffer.bag.word.text.replace(
+				/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g,
+				''
+			);
 		}
 	});
 </script>
@@ -69,7 +72,7 @@
 						<button
 							aria-label="close"
 							onclick={() => {
-								paneService.onDeletePane(paneService.rootPane, paneId);
+								paneService.onDeletePane(paneService.rootPane, paneID);
 							}}
 							class="h-12 w-12 px-2 pt-2 text-neutral-700"
 						>
@@ -104,13 +107,14 @@
 								strongsWords={pane?.buffer?.bag?.strongsWords}
 								{text}
 								{strongsRefs}
-								{paneId}
+								{paneID}
 								{containerHeight}
 							></StrongsRefsContainer>
 						{/if}
 
 						{#if verseRefs.length > 0}
-							<VerseRefsContainer paneId={pane?.id} {verseRefs}></VerseRefsContainer>
+							<VerseRefsContainer paneID={pane?.id} {verseRefs}
+							></VerseRefsContainer>
 						{/if}
 					</div>
 				</div>

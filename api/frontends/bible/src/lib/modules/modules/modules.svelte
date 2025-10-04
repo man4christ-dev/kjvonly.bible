@@ -14,7 +14,7 @@
 		login: Modules.LOGIN
 	};
 
-	let { paneId, pane = $bindable() } = $props();
+	let { paneID, pane = $bindable() } = $props();
 
 	let headerHeight = $state(0);
 	let clientHeight = $state(0);
@@ -30,7 +30,7 @@
 				<button
 					aria-label="close"
 					onclick={() => {
-						paneService.onDeletePane(paneService.rootPane, paneId);
+						paneService.onDeletePane(paneService.rootPane, paneID);
 					}}
 					class="h-12 w-12 px-2 pt-2 text-neutral-700"
 				>

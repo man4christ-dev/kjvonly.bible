@@ -15,7 +15,7 @@
 	let {
 		plansDisplay = $bindable(),
 		clientHeight = $bindable(),
-		paneId = $bindable(),
+		paneID = $bindable(),
 		pane = $bindable()
 	} = $props();
 
@@ -51,7 +51,7 @@
 	// ============================== CLICK FUNCS ==============================
 
 	function onClosePlansList() {
-		paneService.onDeletePane(paneService.rootPane, paneId);
+		paneService.onDeletePane(paneService.rootPane, paneID);
 	}
 
 	function onGetAllPlans(data: any) {

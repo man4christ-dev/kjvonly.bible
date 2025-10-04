@@ -6,7 +6,7 @@
 	import { onMount } from 'svelte';
 	import type { Word } from '$lib/models/bible.model';
 
-	let { containerHeight, isVerseRef, strongsRefs, strongsWords, text, paneId } =
+	let { containerHeight, isVerseRef, strongsRefs, strongsWords, text, paneID } =
 		$props();
 
 	let toggleStrongs = $state(false);
@@ -226,7 +226,7 @@
 				class="absolute z-[10000] w-full bg-neutral-50"
 			>
 				<Search
-					{paneId}
+					{paneID}
 					showInput={true}
 					{searchTerms}
 					onClose={() => {
@@ -245,7 +245,7 @@
 				class="absolute z-[10000] w-full bg-neutral-50"
 			>
 				<Search
-					{paneId}
+					{paneID}
 					showInput={true}
 					{searchTerms}
 					onClose={() => {

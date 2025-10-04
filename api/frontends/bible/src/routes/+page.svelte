@@ -75,14 +75,14 @@
 		paneService.publishHw(heightWidth);
 	}
 
-	function findPane(p: Pane, paneId: string): Pane | undefined {
-		if (p.id === paneId) {
+	function findPane(p: Pane, paneID: string): Pane | undefined {
+		if (p.id === paneID) {
 			return p;
 		}
 		let found;
 
 		if (p.left) {
-			found = findPane(p.left, paneId);
+			found = findPane(p.left, paneID);
 		}
 
 		if (found) {
@@ -90,19 +90,19 @@
 		}
 
 		if (p.right) {
-			found = findPane(p.right, paneId);
+			found = findPane(p.right, paneID);
 		}
 
 		return found;
 	}
 
 	function splitPane(
-		paneId: string,
+		paneID: string,
 		split: string,
 		componentName: Modules,
 		bag: any
 	) {
-		let p = findPane(paneService.rootPane, paneId);
+		let p = findPane(paneService.rootPane, paneID);
 
 		/** p should never be undefined */
 		if (!p) {
@@ -244,10 +244,10 @@
 
 <div class="flex h-[100vh] w-full flex-col">
 	<div style="max-height: 100vh; min-width: 1px; {template};" class="w-full">
-		{#each paneIds as paneId}
-			{#if !deletedPaneIds[paneId]}
-				<div class="outline" style="grid-area: {paneId};">
-					<PaneContainer {paneId}></PaneContainer>
+		{#each paneIds as paneID}
+			{#if !deletedPaneIds[paneID]}
+				<div class="outline" style="grid-area: {paneID};">
+					<PaneContainer {paneID}></PaneContainer>
 				</div>
 			{/if}
 		{/each}

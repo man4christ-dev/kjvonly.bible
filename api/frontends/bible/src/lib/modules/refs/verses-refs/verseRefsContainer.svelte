@@ -6,7 +6,7 @@
 	import { Module } from 'quill';
 	import { Modules } from '$lib/models/modules.model';
 
-	let { paneId, verseRefs } = $props();
+	let { paneID, verseRefs } = $props();
 
 	let recursiveVerseRefs: any[] = $state([]);
 	let booknames: any;
@@ -111,7 +111,7 @@
 		<button
 			aria-label="horizontal split"
 			onclick={() => {
-				paneService.onSplitPane(paneId, 'h', Modules.BIBLE, {
+				paneService.onSplitPane(paneID, 'h', Modules.BIBLE, {
 					chapterKey: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
 				});
 			}}
@@ -151,7 +151,7 @@
 		<button
 			aria-label="horizontal split"
 			onclick={() => {
-				paneService.onSplitPane(paneId, 'v', Modules.BIBLE, {
+				paneService.onSplitPane(paneID, 'v', Modules.BIBLE, {
 					chapterKey: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
 				});
 			}}

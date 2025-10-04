@@ -5,7 +5,7 @@
 	import { toastService } from '$lib/services/toast.service';
 
 	let {
-		paneId,
+		paneID,
 		pane = $bindable(),
 		containerHeight = $bindable(),
 		containerWidth = $bindable(),
@@ -43,7 +43,7 @@
 							if (onClose) {
 								onClose();
 							} else {
-								paneService.onDeletePane(paneService.rootPane, paneId);
+								paneService.onDeletePane(paneService.rootPane, paneID);
 							}
 						}}
 						class="h-12 w-12 px-2 pt-2 text-neutral-700"

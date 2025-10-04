@@ -10,7 +10,7 @@
 	let {
 		showActionsDropdown = $bindable(),
 		showCopyVersePopup = $bindable(),
-		paneId
+		paneID
 	} = $props();
 
 	let actions: any = {
@@ -19,11 +19,11 @@
 			showCopyVersePopup = true;
 		},
 		search: () => {
-			let p = paneService.findNode(paneService.rootPane, paneId);
+			let p = paneService.findNode(paneService.rootPane, paneID);
 			p?.updateBuffer(Modules.SEARCH);
 		},
 		notes: () => {
-			let p = paneService.findNode(paneService.rootPane, paneId);
+			let p = paneService.findNode(paneService.rootPane, paneID);
 			p?.updateBuffer(Modules.NOTES);
 		},
 		'split vertical': () => {
@@ -46,17 +46,17 @@
 	let actionsOrder = [];
 
 	function onSplitVertical(): void {
-		paneService.onSplitPane(paneId, 'v', Modules.MODULES, {});
+		paneService.onSplitPane(paneID, 'v', Modules.MODULES, {});
 		showActionsDropdown = false;
 	}
 
 	function onSplitHorizontal() {
-		paneService.onSplitPane(paneId, 'h', Modules.MODULES, {});
+		paneService.onSplitPane(paneID, 'h', Modules.MODULES, {});
 		showActionsDropdown = false;
 	}
 
 	function onClosePane() {
-		paneService.onDeletePane(paneService.rootPane, paneId);
+		paneService.onDeletePane(paneService.rootPane, paneID);
 	}
 
 	async function onExport() {

@@ -14,7 +14,7 @@
 	// =============================== BINDINGS ================================
 
 	let {
-		paneId = $bindable<string>(),
+		paneID = $bindable<string>(),
 		pane = $bindable<Pane>(),
 		showInput = true,
 		searchTerms,
@@ -45,7 +45,7 @@
 		if (onClose) {
 			onClose();
 		} else {
-			paneService.onDeletePane(paneService.rootPane, paneId);
+			paneService.onDeletePane(paneService.rootPane, paneID);
 		}
 	}
 </script>
@@ -56,7 +56,7 @@
 	<div class="flex w-full items-center justify-between">
 		<span class="w-12"></span>
 		<span class="flex-1 text-center">Search</span>
-		<Close classes="h-12 w-12" onClose={() => applyOnClose()}></Close>
+		<Close classes="h-12 w-12" onClose={applyOnClose}></Close>
 	</div>
 {/snippet}
 
@@ -67,11 +67,7 @@
 		<SearchInput bind:searchText ID={searchID} {onFilterBibleLocationRef}
 		></SearchInput>
 	{/if}
-	<SearchResults
-		paneID={paneId}
-		bind:searchText
-		{searchID}
-		{onFilterBibleLocationRef}
+	<SearchResults {paneID} bind:searchText {searchID} {onFilterBibleLocationRef}
 	></SearchResults>
 
 	<div class="h-6"></div>

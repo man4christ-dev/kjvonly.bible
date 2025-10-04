@@ -7,7 +7,7 @@
 	let {
 		plansDisplay = $bindable<string>(),
 		pane = $bindable(),
-		paneId = $bindable(),
+		paneID = $bindable(),
 		clientHeight = $bindable(),
 		selectedSub = $bindable<Sub>(),
 		subsList = $bindable<Sub[]>()
@@ -25,7 +25,7 @@
 	}
 
 	function onClosePlansList() {
-		paneService.onDeletePane(paneService.rootPane, paneId);
+		paneService.onDeletePane(paneService.rootPane, paneID);
 	}
 </script>
 

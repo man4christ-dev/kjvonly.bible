@@ -14,7 +14,7 @@
 
 	// =============================== BINDINGS ================================
 	let {
-		paneId = $bindable<string>(),
+		paneID = $bindable<string>(),
 		pane = $bindable<Pane>(),
 		containerHeight = $bindable<string>(),
 		containerWidth = $bindable<string>()
@@ -43,10 +43,10 @@
 		<div bind:clientHeight style={containerHeight} class="overflow-hidden">
 			<div class="flex flex-col items-center">
 				{#if plansDisplay < PLANS_MAX_VIEW_ID}
-					<Discover bind:plansDisplay bind:pane bind:paneId bind:clientHeight
+					<Discover bind:plansDisplay bind:pane bind:paneID bind:clientHeight
 					></Discover>
 				{:else if plansDisplay < SUBS_MAX_VIEW_ID}
-					<SubsView bind:plansDisplay bind:pane bind:paneId bind:clientHeight
+					<SubsView bind:plansDisplay bind:pane bind:paneID bind:clientHeight
 					></SubsView>
 				{:else if plansDisplay < NEXT_MAX_VIEW_ID}
 					<NextReadings bind:plansDisplay bind:pane bind:clientHeight

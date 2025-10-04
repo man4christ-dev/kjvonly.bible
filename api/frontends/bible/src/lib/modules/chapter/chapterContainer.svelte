@@ -35,7 +35,7 @@
 	let chapterWidth = $state(0);
 	let clientHeight = $state(0);
 
-	let { paneId = $bindable<string>(), pane = $bindable() } = $props();
+	let { paneID = $bindable<string>(), pane = $bindable() } = $props();
 
 	$effect(() => {
 		if (bibleLocationRef) {
@@ -124,9 +124,9 @@
 
 	onMount(() => {
 		/*
-		set paneId for popup actions
+		set paneID for popup actions
 		*/
-		mode.paneId = paneId;
+		mode.paneID = paneID;
 
 		if (pane?.buffer?.bag?.navReadings) {
 			mode.navReadings = pane?.buffer?.bag?.navReadings;
@@ -195,7 +195,7 @@
 					bind:clientHeight
 					{bookName}
 					{bookChapter}
-					{paneId}
+					{paneID}
 				></ChapterActions>
 			</div>
 			<div class="kjvonly-noselect flex justify-center">

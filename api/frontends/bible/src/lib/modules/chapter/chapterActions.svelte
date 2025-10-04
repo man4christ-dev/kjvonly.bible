@@ -17,7 +17,7 @@
 		clientHeight = $bindable<number>(),
 		bookName,
 		bookChapter,
-		paneId
+		paneID
 	} = $props();
 
 	// ================================== VARS =================================
@@ -175,7 +175,7 @@
 
 		{#if showActionsPopup}
 			<ActionDropdown
-				{paneId}
+				{paneID}
 				bind:showCopyVersePopup
 				bind:showActionsDropdown={showActionsPopup}
 			></ActionDropdown>

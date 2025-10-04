@@ -7,12 +7,12 @@
 
 	let id = uuid4();
 	let noteID: string = $state('');
-	let { paneId = $bindable<string>(), pane = $bindable() } = $props();
+	let { paneID = $bindable<string>(), pane = $bindable() } = $props();
 
 	let mode = $state({
 		chapterKey: '0_0_0_0',
 		notePopup: { show: false },
-		paneId: paneId
+		paneID: paneID
 	});
 
 	onMount(() => {
