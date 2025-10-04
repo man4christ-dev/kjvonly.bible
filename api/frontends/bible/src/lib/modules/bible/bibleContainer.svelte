@@ -1,13 +1,13 @@
 <script lang="ts">
 	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
 	import { onMount } from 'svelte';
-	import Chapter from './chapter.svelte';
+	import Chapter from './chapter/chapter.svelte';
 
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import ChapterActions from './chapterActions.svelte';
+	import ChapterActions from './popups/chapterActions.svelte';
 
 	import uuid4 from 'uuid4';
-	import EditOptions from './editOptions.svelte';
+	import EditOptions from './chapter/editOptions.svelte';
 	import type { NavReadings } from '../../models/plans.model';
 	import { Modules } from '$lib/models/modules.model';
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';

@@ -1,5 +1,5 @@
 import { Modules as modules } from '$lib/models/modules.model';
-import ChapterContainer from '$lib/modules/bible/chapterContainer.svelte';
+import BibleContainer from '$lib/modules/bible/bibleContainer.svelte';
 import UserGuide from '$lib/modules/guide/userGuide.svelte';
 import Login from '$lib/modules/login/login.svelte';
 import Modules from '$lib/modules/modules/modules.svelte';
@@ -24,7 +24,7 @@ export class ComponentMapping {
 	getComponent(module: modules): any {
 		switch (module) {
 			case modules.BIBLE:
-				return ChapterContainer;
+				return BibleContainer;
 			case modules.STRONGS:
 				return StrongsVersesRefs;
 			case modules.SEARCH:
@@ -43,7 +43,7 @@ export class ComponentMapping {
 				return PlansContainer;
 		}
 
-		return ChapterContainer;
+		return BibleContainer;
 	}
 }
 

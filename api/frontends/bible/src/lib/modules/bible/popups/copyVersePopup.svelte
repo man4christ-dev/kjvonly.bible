@@ -199,7 +199,7 @@
 </div>
 
 <style>
-	@reference "../../../app.css";
+	@reference "../../../../app.css";
 	.vno {
 		vertical-align: baseline;
 		position: relative;

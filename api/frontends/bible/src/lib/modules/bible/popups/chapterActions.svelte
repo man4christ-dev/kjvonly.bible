@@ -1,11 +1,11 @@
 <script lang="ts">
 	import BookChapterPopup from './bookChapterPopup.svelte';
 	import ActionDropdown from './actionsPopup.svelte';
-	import NotesContainer from '../notes/notesContainer.svelte';
+	import NotesContainer from '../../notes/notesContainer.svelte';
 	import CopyVersePopup from './copyVersePopup.svelte';
-	import NavReadingsList from './navReadingsList.svelte';
+	import NavReadingsList from '../plans/navReadingsList.svelte';
 	import { onMount, untrack } from 'svelte';
-	import Settings from '../settings/settings.svelte';
+	import Settings from '../../settings/settings.svelte';
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 	// =============================== BINDINGS ================================
@@ -194,7 +194,7 @@
 {/if}
 
 <style>
-	@reference "../../../app.css";
+	@reference "../../../../app.css";
 	.bookChapter {
 		font-size: min(5cqw, 1rem);
 	}

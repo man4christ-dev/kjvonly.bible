@@ -305,7 +305,7 @@
 {/if}
 
 <style>
-	@reference "../../../app.css";
+	@reference "../../../../app.css";
 	.FOOTNO {
 		cursor: pointer;
 		vertical-align: baseline;
