@@ -1,5 +1,5 @@
 import { Modules as modules } from '$lib/models/modules.model';
-import ChapterContainer from '$lib/modules/chapter/chapterContainer.svelte';
+import ChapterContainer from '$lib/modules/bible/chapterContainer.svelte';
 import UserGuide from '$lib/modules/guide/userGuide.svelte';
 import Login from '$lib/modules/login/login.svelte';
 import Modules from '$lib/modules/modules/modules.svelte';
