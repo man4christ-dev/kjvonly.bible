@@ -306,7 +306,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 				html: ``,
 				title: `Note`,
 				dateCreated: now,
-				dateModified: now,
+				dateUpdated: now,
 				tags: [],
 				version: 0
 			};
@@ -324,7 +324,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 				html: `<h1>${title}</h1><p><italic>${verse}</italic></p>`,
 				title: `${title}`,
 				dateCreated: now,
-				dateModified: now,
+				dateUpdated: now,
 				tags: [],
 				version: 0
 			};
@@ -906,8 +906,8 @@ note icon in the Bible only the notes associated to that word will be displayed 
 					>{notes[nk].title}{notes[nk].title.length === 20 ? '...' : ''}</span
 				>
 				<span class="text-neutral-400"
-					>{new Date(notes[nk].dateUpdated * 1000).toLocaleDateString()}
-					{new Date(notes[nk].dateUpdated * 1000).toLocaleTimeString()}</span
+					>{new Date(notes[nk].dateUpdated).toLocaleDateString()}
+					{new Date(notes[nk].dateUpdated).toLocaleTimeString()}</span
 				>
 				{#if notes[nk].bcv}
 					<span class="text-neutral-400">{notes[nk].bcv}</span>

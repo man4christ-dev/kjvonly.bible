@@ -40,6 +40,7 @@ export class AnnotsApi {
 	}
 
 	async getAllAnnotations(): Promise<any> {
+		// TODO - GET UNSYNCED DATA
 		let data: any = undefined;
 		try {
 			data = await bibleStorer.getAllValue(ANNOTATIONS);

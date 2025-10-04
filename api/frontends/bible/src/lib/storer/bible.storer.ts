@@ -19,7 +19,10 @@ export class BibleStorer {
 	 * @param id
 	 * @returns data of the id in that objectstorename
 	 */
-	async getValueIfCacheIsReady(objectStoreName: string, id: string): Promise<any> {
+	async getValueIfCacheIsReady(
+		objectStoreName: string,
+		id: string
+	): Promise<any> {
 		return this.getValue(objectStoreName, id);
 	}
 
@@ -28,8 +31,8 @@ export class BibleStorer {
 	 * @param objectStoreName
 	 * @returns data of the id in that objectstorename
 	 */
-	async getAllValue(objectStoreName: string): Promise<any> {
-		return await bibleDB.getAllValue(objectStoreName);
+	async getAllValue(objectStoreName: string): Promise<any[]> {
+		return (await bibleDB.getAllValue(objectStoreName)) || [];
 	}
 
 	/**

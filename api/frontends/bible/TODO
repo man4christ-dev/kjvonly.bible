@@ -9,3 +9,4 @@
 ◊ does paneID need to be bindable?
 ◊ after moving everything to bufferContainer component remove bind:containerHeight
 note needed with h-full on the bufferContainer
+◊ get all annotations does not include unsynced annots

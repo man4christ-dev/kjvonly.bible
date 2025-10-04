@@ -2,6 +2,6 @@ version: '0.2'
 ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
-words: [bcvs, STRONGS]
+words: [bcvs, STRONGS, Storer, annots, flexsearch]
 ignoreWords: []
 import: []
