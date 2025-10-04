@@ -1,8 +1,12 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// COMPONENTS
 	import Copy from '$lib/components/buttons/copy.svelte';
 	import HorizontalSplit from '$lib/components/buttons/horizontalSplit.svelte';
-	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
 	import { Modules } from '$lib/models/modules.model';
+	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
+
+	// SERVICES
 	import { toastService } from '$lib/services/toast.service';
 
 	// =============================== BINDINGS ================================

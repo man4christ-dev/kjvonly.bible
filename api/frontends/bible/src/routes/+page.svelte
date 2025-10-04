@@ -218,12 +218,11 @@
 
 		paneService.rootPane.buffer = new Buffer();
 
-		// DEV NOTE: Update the component to w/e you are working on
-		// Save you a few clicks on reload.
-		//		paneService.rootPane.buffer.componentName = 'ChapterContainer';
-		//		paneService.rootPane.buffer.name = 'ChapterContainer';
-		paneService.rootPane.buffer.componentName = Modules.SEARCH;
-		paneService.rootPane.buffer.name = `${Modules.SETTINGS}`;
+		/**
+		 * DEV NOTE: Update the component to w/e you are working on
+		 * Save you a few clicks on reload.
+		 */
+		paneService.rootPane.buffer.componentName = Modules.BIBLE;
 
 		paneService.onDeletePane = deletePane;
 		paneService.onSplitPane = splitPane;

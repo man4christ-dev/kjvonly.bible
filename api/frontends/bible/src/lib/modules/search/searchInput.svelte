@@ -1,4 +1,6 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// SERVICES
 	import { searchService } from '$lib/services/search.service';
 
 	// =============================== BINDINGS ================================

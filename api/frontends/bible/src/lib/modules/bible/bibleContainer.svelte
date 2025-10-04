@@ -1,16 +1,24 @@
 <script lang="ts">
-	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount } from 'svelte';
+
+	// COMPONENTS
 	import Chapter from './chapter/chapter.svelte';
-
-	import { paneService } from '$lib/services/pane.service.svelte';
 	import ChapterActions from './popups/chapterActions.svelte';
-
-	import uuid4 from 'uuid4';
 	import EditOptions from './chapter/editOptions.svelte';
-	import type { NavReadings } from '../../models/plans.model';
+
+	// MODELS
 	import { Modules } from '$lib/models/modules.model';
+	import type { NavReadings } from '../../models/plans.model';
+
+	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
+	import { paneService } from '$lib/services/pane.service.svelte';
+
+	// OTHER
+	import uuid4 from 'uuid4';
 
 	type WordAnnots = {
 		class: string[];
@@ -29,10 +37,10 @@
 		chapterKey: '73_1_1_1',
 		notePopup: { show: false }
 	});
+
 	let annotations: Annotations = $state(new Annotations());
 	let bookName: string = $state('');
 	let bookChapter: string = $state('');
-	let chapterWidth = $state(0);
 	let clientHeight = $state(0);
 
 	let { paneID = $bindable<string>(), pane = $bindable() } = $props();
@@ -200,7 +208,7 @@
 			</div>
 			<div class="kjvonly-noselect flex justify-center">
 				<div class="max-w-lg">
-					<div id="chapter-container-{id}" bind:clientWidth={chapterWidth}>
+					<div id="chapter-container-{id}" class="w-full">
 						<Chapter
 							bind:bookName
 							bind:bookChapter
@@ -296,21 +304,3 @@
 		</div>
 	</div>
 {/if}
-
-<style>
-	.kjvonly-noselect {
-		-webkit-touch-callout: none;
-		/* iOS Safari */
-		-webkit-user-select: none;
-		/* Safari */
-		-khtml-user-select: none;
-		/* Konqueror HTML */
-		-moz-user-select: none;
-		/* Old versions of Firefox */
-		-ms-user-select: none;
-		/* Internet Explorer/Edge */
-		user-select: none;
-		/* Non-prefixed version, currently
-								  supported by Chrome, Edge, Opera and Firefox */
-	}
-</style>

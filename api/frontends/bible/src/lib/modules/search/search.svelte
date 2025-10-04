@@ -1,15 +1,25 @@
 <script lang="ts">
-	import { searchService } from '$lib/services/search.service';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount } from 'svelte';
-	import { paneService } from '$lib/services/pane.service.svelte';
-	import uuid4 from 'uuid4';
-	import Close from '$lib/components/buttons/close.svelte';
+
+	// COMPONENTS
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import SearchResults from './searchResults.svelte';
+	import Close from '$lib/components/buttons/close.svelte';
 	import SearchInput from './searchInput.svelte';
+	import SearchResults from './searchResults.svelte';
+
+	// MODELS
 	import type { Pane } from '$lib/models/pane.model';
+
+	// SERVICES
+	import { paneService } from '$lib/services/pane.service.svelte';
+	import { searchService } from '$lib/services/search.service';
+
+	// OTHER
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
 
@@ -22,7 +32,7 @@
 		onFilterBibleLocationRef = undefined
 	} = $props();
 
-	// ================================== VARS =================================
+	// ================================= VARS ==================================
 
 	// DOM vars
 	let clientHeight = $state(0);

@@ -1,9 +1,13 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { Modules } from '$lib/models/modules.model';
 	import { onDestroy, onMount } from 'svelte';
 
+	// COMPONENTS
 	import SearchResultActions from './searchResultActions.svelte';
 
+	// MODELS
 	import {
 		newSearchResultResponse,
 		type onFilterBibleLocationRefFunction,
@@ -11,6 +15,7 @@
 		type SearchResultResponse
 	} from '$lib/models/search.model';
 
+	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { searchService } from '$lib/services/search.service';
