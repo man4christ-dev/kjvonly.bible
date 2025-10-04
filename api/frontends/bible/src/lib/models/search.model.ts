@@ -10,14 +10,14 @@ export interface SearchResult {
 
 export interface SearchResultResponse {
 	id: string;
-	indexes: string[];
+	bibleLocationRefs: string[];
 	stats: SearchResultStats;
 }
 
 export function newSearchResultResponse(): SearchResultResponse {
 	return {
 		id: '',
-		indexes: [],
+		bibleLocationRefs: [],
 		stats: newSearchResultStats()
 	};
 }

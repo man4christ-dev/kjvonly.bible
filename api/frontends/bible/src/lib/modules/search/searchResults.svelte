@@ -65,7 +65,7 @@
 
 	async function onSearchResult(srr: SearchResultResponse) {
 		if (onFilterIndex) {
-			srr.indexes = onFilterIndex(srr.indexes);
+			srr.bibleLocationRefs = onFilterIndex(srr.bibleLocationRefs);
 		}
 		searchResultsResponse = srr;
 		renderedSearchResultsCount = 0;
@@ -95,7 +95,7 @@
 			i++, renderedSearchResultsCount++
 		) {
 			let sr = await searchResultIndexToSearchResult(
-				searchResultsResponse.indexes[renderedSearchResultsCount]
+				searchResultsResponse.bibleLocationRefs[renderedSearchResultsCount]
 			);
 			if (!sr) {
 				continue;
@@ -107,7 +107,8 @@
 	function shouldContinueLoadingSearchResults(i: number): boolean {
 		return (
 			i < numberOfSearchResultsToLoadAtOnce &&
-			renderedSearchResultsCount !== searchResultsResponse.indexes?.length
+			renderedSearchResultsCount !==
+				searchResultsResponse.bibleLocationRefs?.length
 		);
 	}
 
@@ -143,10 +144,10 @@
 	}
 </script>
 
-{#if searchResultsResponse?.indexes && searchResultsResponse?.indexes.length > 0}
+{#if searchResultsResponse?.bibleLocationRefs && searchResultsResponse?.bibleLocationRefs.length > 0}
 	<p class="sticky top-10 bg-neutral-50 text-center">
-		Showing {renderedSearchResultsCount} of {searchResultsResponse?.indexes
-			.length}
+		Showing {renderedSearchResultsCount} of {searchResultsResponse
+			?.bibleLocationRefs.length}
 	</p>
 {/if}
 

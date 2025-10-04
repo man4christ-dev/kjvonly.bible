@@ -114,7 +114,11 @@ async function search(id: string, text: string) {
 		time: `${timeDiffInMilliseconds} ms`
 	};
 
-	let srr: SearchResultResponse = { id: id, indexes: unique, stats: stats };
+	let srr: SearchResultResponse = {
+		id: id,
+		bibleLocationRefs: unique,
+		stats: stats
+	};
 	postMessage(srr);
 }
 
