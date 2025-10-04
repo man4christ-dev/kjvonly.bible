@@ -1,19 +1,14 @@
 <script lang="ts">
 	import { paneService } from '$lib/services/pane.service.svelte';
 
-	let {
-		paneId,
-		pane = $bindable(),
-		containerHeight = $bindable(),
-		containerWidth = $bindable()
-	} = $props();
+	let { paneId, pane = $bindable() } = $props();
 
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 </script>
 
-<div bind:clientHeight style={containerHeight} class="overflow-hidden">
-	<div class="flex flex-col items-center justify-center">
+<div bind:clientHeight class="h-full overflow-hidden">
+	<div class="flex h-full flex-col items-center justify-center">
 		<div
 			bind:clientHeight={headerHeight}
 			class="flex w-full flex-col items-center"

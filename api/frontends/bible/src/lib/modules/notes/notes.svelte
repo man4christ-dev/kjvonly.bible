@@ -7,12 +7,7 @@
 
 	let id = uuid4();
 	let noteID: string = $state('');
-	let {
-		paneId = $bindable<string>(),
-		pane = $bindable(),
-		containerHeight = $bindable(),
-		containerWidth = $bindable()
-	} = $props();
+	let { paneId = $bindable<string>(), pane = $bindable() } = $props();
 
 	let mode = $state({
 		chapterKey: '0_0_0_0',
@@ -27,12 +22,11 @@
 	});
 </script>
 
-<div class="kjvonly-noselect overflow-hidden">
-	<div {id} style="{containerHeight} {containerWidth}">
+<div class="kjvonly-noselect h-full overflow-hidden">
+	<div {id} class="h-full">
 		<NotesContainer
 			annotations={{}}
 			allNotes={true}
-			{containerHeight}
 			bind:mode
 			noteIDToOpen={noteID}
 		></NotesContainer>
