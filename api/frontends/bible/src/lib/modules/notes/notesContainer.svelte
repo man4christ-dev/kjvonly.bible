@@ -28,7 +28,6 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	import uuid4 from 'uuid4';
 
 	let {
-		containerHeight,
 		mode = $bindable(),
 		annotations = $bindable(),
 		allNotes,
@@ -940,7 +939,6 @@ note icon in the Bible only the notes associated to that word will be displayed 
 <div
 	bind:clientHeight
 	bind:clientWidth
-	style={containerHeight}
 	class="flex h-full w-full flex-col items-center bg-neutral-50"
 >
 	{#if note}

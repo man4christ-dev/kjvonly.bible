@@ -174,14 +174,11 @@
 		element.click();
 	}
 
-	let containerHeight = $state(0);
+	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 </script>
 
-<div
-	bind:clientHeight={containerHeight}
-	class="flex h-full w-full justify-center bg-neutral-50"
->
+<div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
 	<div class="w-full justify-center md:max-w-lg">
 		<header
 			bind:clientHeight={headerHeight}
@@ -211,7 +208,7 @@
 		</header>
 
 		<div
-			style="height: {containerHeight - headerHeight}px"
+			style="height: {clientHeight - headerHeight}px"
 			class="flex w-full flex-col overflow-y-scroll border"
 		>
 			{#each Object.keys(actions) as a}

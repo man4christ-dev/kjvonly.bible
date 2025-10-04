@@ -14,9 +14,9 @@
 		mode = $bindable(),
 		annotations = $bindable(),
 		chapterKey: bibleLocationRef = $bindable(),
+		clientHeight = $bindable<number>(),
 		bookName,
 		bookChapter,
-		containerHeight,
 		paneId
 	} = $props();
 
@@ -72,13 +72,14 @@
 
 	function onActionClick(e: Event) {
 		e.stopPropagation();
+		console.log('clicked');
 		showActionsPopup = !showActionsPopup;
 	}
 </script>
 
 <!-- book chapter selection -->
 
-<div bind:clientWidth class="leading-tight">
+<div class="max-w-lg leading-tight">
 	<!-- svelte-ignore a11y_click_events_have_key_events -->
 	<!-- svelte-ignore a11y_no_static_element_interactions -->
 	<span
@@ -145,57 +146,50 @@
 			>
 		</span>
 	</span>
-	<div></div>
 </div>
+{#if showBookChapterPopup || showNavReadingsPopup || showSettingsPopup || showActionsPopup || mode.notePopup.show || showCopyVersePopup}
+	<div
+		style="height: {clientHeight}px"
+		class="absolute z-[10000] h-full w-full max-w-lg"
+	>
+		{#if showBookChapterPopup}
+			<BookChapterPopup
+				bind:showBookChapterPopup
+				bind:chapterKey={bibleLocationRef}
+			></BookChapterPopup>
+		{/if}
+		{#if showNavReadingsPopup}
+			<NavReadingsList
+				bind:showNavReadingsPopup
+				bind:navReadings={mode.navReadings}
+				bind:chapterKey={bibleLocationRef}
+			></NavReadingsList>
+		{/if}
+		{#if showSettingsPopup}
+			<Settings
+				onClose={() => {
+					showSettingsPopup = false;
+				}}
+			></Settings>
+		{/if}
 
-{#if showBookChapterPopup}
-	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<BookChapterPopup
-			bind:showBookChapterPopup
-			bind:chapterKey={bibleLocationRef}
-		></BookChapterPopup>
-	</div>
-{/if}
-{#if showNavReadingsPopup}
-	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<NavReadingsList
-			bind:showNavReadingsPopup
-			bind:navReadings={mode.navReadings}
-			bind:chapterKey={bibleLocationRef}
-		></NavReadingsList>
-	</div>
-{/if}
-{#if showSettingsPopup}
-	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<Settings
-			onClose={() => {
-				showSettingsPopup = false;
-			}}
-		></Settings>
-	</div>
-{/if}
+		{#if showActionsPopup}
+			<ActionDropdown
+				{paneId}
+				bind:showCopyVersePopup
+				bind:showActionsDropdown={showActionsPopup}
+			></ActionDropdown>
+		{/if}
 
-{#if showActionsPopup}
-	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<ActionDropdown
-			{paneId}
-			bind:showCopyVersePopup
-			bind:showActionsDropdown={showActionsPopup}
-		></ActionDropdown>
-	</div>
-{/if}
+		{#if mode.notePopup.show}
+			<NotesContainer bind:mode allNotes={false} bind:annotations
+			></NotesContainer>
+		{/if}
 
-{#if mode.notePopup.show}
-	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<NotesContainer containerHeight bind:mode allNotes={false} bind:annotations
-		></NotesContainer>
-	</div>
-{/if}
-
-{#if showCopyVersePopup}
-	<div style={containerHeight} class="absolute z-[10000] w-full shadow-lg">
-		<CopyVersePopup bind:showCopyVersePopup bind:chapterKey={bookIDChapter}
-		></CopyVersePopup>
+		{#if showCopyVersePopup}
+			<CopyVersePopup bind:showCopyVersePopup bind:chapterKey={bookIDChapter}
+			></CopyVersePopup>
+		{/if}
 	</div>
 {/if}
 

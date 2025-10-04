@@ -33,13 +33,9 @@
 	let bookName: string = $state('');
 	let bookChapter: string = $state('');
 	let chapterWidth = $state(0);
+	let clientHeight = $state(0);
 
-	let {
-		paneId = $bindable<string>(),
-		pane = $bindable(),
-		containerHeight = $bindable(),
-		containerWidth = $bindable()
-	} = $props();
+	let { paneId = $bindable<string>(), pane = $bindable() } = $props();
 
 	$effect(() => {
 		if (bibleLocationRef) {
@@ -184,24 +180,21 @@
 <!-- svelte-ignore a11y_no_static_element_interactions -->
 {#if bibleLocationRef}
 	<div
-		class="overflow-hidden"
+		bind:clientHeight
+		class="h-full overflow-hidden"
 		oncontextmenu={() => {
 			return false;
 		}}
 	>
-		<div
-			{id}
-			style="{containerHeight} {containerWidth}"
-			class="overflow-y-scroll"
-		>
+		<div {id} class="h-full overflow-y-scroll">
 			<div class="sticky top-0 z-[1500] flex w-full justify-center">
 				<ChapterActions
 					bind:mode
 					bind:chapterKey={bibleLocationRef}
 					bind:annotations
+					bind:clientHeight
 					{bookName}
 					{bookChapter}
-					{containerHeight}
 					{paneId}
 				></ChapterActions>
 			</div>

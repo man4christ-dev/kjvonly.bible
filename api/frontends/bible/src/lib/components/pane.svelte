@@ -92,8 +92,7 @@
 			{@const Component = componentMapping.getComponent(
 				pane?.buffer?.componentName
 			)}
-			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}
-			></Component>
+			<Component bind:pane {paneId}></Component>
 		{/if}
 	{/if}
 
@@ -102,8 +101,7 @@
 			{@const Component = componentMapping.getComponent(
 				pane?.buffer?.componentName
 			)}
-			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}
-			></Component>
+			<Component bind:pane {paneId}></Component>
 		{/if}
 	{/if}
 </div>
