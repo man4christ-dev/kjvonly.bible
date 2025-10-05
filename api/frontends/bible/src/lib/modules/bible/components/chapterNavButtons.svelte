@@ -4,6 +4,7 @@
 	import { Modules } from '$lib/models/modules.model';
 	import type { NavReadings } from '$lib/models/plans.model';
 	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
+	import { attachEvents } from '$lib/utils/eventHandlers';
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
 
@@ -11,10 +12,42 @@
 		mode = $bindable(),
 		pane = $bindable(),
 		bibleLocationRef = $bindable(),
-		showNavButtons = $bindable()
+		showNavButtons = $bindable(),
+		ID
 	} = $props();
 
-	onMount(() => {});
+	onMount(() => {
+		attachScrolls();
+	});
+
+	function attachScrolls() {
+		attachEvents(`${ID}-scroll-container`, 'scroll', handleNavButtonVisibility);
+	}
+
+	function handleNavButtonVisibility() {
+		let el = document.getElementById(`${ID}-scroll-container`);
+		if (!el) {
+			return;
+		}
+
+		if (el.scrollTop === 0) {
+			showNavButtons = true;
+			return;
+		}
+
+		if (el.scrollHeight + el.clientHeight + el.scrollTop === 0) {
+			return;
+		}
+		showNavButtons = false;
+
+		const threshold = 40; // Adjust this value as needed
+		const isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+
+		if (isReachBottom) {
+			showNavButtons = true;
+		}
+	}
 
 	// ============================== CLICK FUNCS ==============================
 

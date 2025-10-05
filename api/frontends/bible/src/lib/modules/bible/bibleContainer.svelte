@@ -4,8 +4,11 @@
 	import { onMount } from 'svelte';
 
 	// COMPONENTS
+	import BufferBody from '$lib/components/bufferBody.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import Chapter from './chapter/chapter.svelte';
 	import ChapterActions from './popups/chapterActions.svelte';
+	import ChapterNavButtons from './components/chapterNavButtons.svelte';
 	import EditOptions from './chapter/editOptions.svelte';
 
 	// MODELS
@@ -18,10 +21,8 @@
 
 	// OTHER
 	import uuid4 from 'uuid4';
-	import ChapterNavButtons from './components/chapterNavButtons.svelte';
-	import BufferContainer from '$lib/components/bufferContainer.svelte';
-	import BufferBody from '$lib/components/bufferBody.svelte';
-	import { sleep } from '$lib/utils/sleep';
+
+	import { attachEvents } from '$lib/utils/eventHandlers';
 
 	// =============================== BINDINGS ================================
 
@@ -58,7 +59,7 @@
 		setModePaneID();
 		setNavReadings();
 		setBibleLocationRef();
-		attachHandleScroll();
+		attachScrolls();
 		scrollToVerse();
 		overrideContextMenu();
 	});
@@ -112,48 +113,16 @@
 		}, 500);
 	}
 
-	function attachHandleScroll() {
-		setTimeout(async () => {
-			let el = document.getElementById(`${id}-scroll-container`);
-			let retriesMax = 10;
-			let count = 0;
-			while (!el && count != retriesMax) {
-				el = document.getElementById(`${id}-scroll-container`);
-				await sleep(1000);
-				count++;
-			}
-
-			if (count === 10) {
-				return;
-			}
-
-			el?.addEventListener('scroll', handleScroll);
-		}, 250);
+	function attachScrolls() {
+		attachEvents(`${id}-scroll-container`, 'scroll', trackScrollPosition);
 	}
 
-	function handleScroll() {
+	function trackScrollPosition() {
 		let el = document.getElementById(`${id}-scroll-container`);
-		if (el === null) {
+		if (!el) {
 			return;
 		}
-
-		if (el.scrollTop === 0) {
-			showNavButtons = true;
-			return;
-		}
-
-		if (el.scrollHeight + el.clientHeight + el.scrollTop === 0) {
-			return;
-		}
-		showNavButtons = false;
-
-		const threshold = 40; // Adjust this value as needed
-		const isReachBottom =
-			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
-
-		if (isReachBottom) {
-			showNavButtons = true;
-		}
+		lastKnownScrollPosition = el.scrollTop;
 	}
 
 	function onBibleLocationRefChanged() {
@@ -218,6 +187,7 @@
 					bind:pane
 					bind:bibleLocationRef
 					bind:showNavButtons
+					ID={id}
 				></ChapterNavButtons>
 			{:else}
 				<div
