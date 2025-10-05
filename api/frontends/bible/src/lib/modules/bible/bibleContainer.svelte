@@ -62,7 +62,6 @@
 		setNavReadings();
 		setBibleLocationRef();
 		attachScrolls();
-		scrollToVerse();
 		overrideContextMenu();
 	});
 
@@ -104,12 +103,6 @@
 		let chapter = 10;
 		let verse = 9;
 		bibleLocationRef = `${bookID}_${chapter}_${verse}`;
-	}
-
-	function scrollToVerse() {
-		if (pane?.buffer?.bag?.lastVerse) {
-			scrollTo(`${id}-vno-${pane.buffer.bag.lastVerse}`);
-		}
 	}
 
 	function overrideContextMenu() {

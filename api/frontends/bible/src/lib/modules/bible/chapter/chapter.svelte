@@ -20,6 +20,7 @@
 
 	// OTHER
 	import uuid4 from 'uuid4';
+	import { scrollTo } from '$lib/utils/eventHandlers';
 
 	// =============================== BINDINGS ================================
 
@@ -45,8 +46,8 @@
 
 	let notes: any = $state();
 
-	let rangeStartIndex = 0;
-	let rangeEndIndex = 0;
+	let verseRangeStartIndex = 0;
+	let verseRangeEndIndex = 0;
 
 	let bookIDChapter = $state('');
 	let verses: any = $state();
@@ -64,55 +65,41 @@
 	});
 
 	$effect(() => {
-		if (!bibleLocationRef) {
-			return;
-		}
-		mode.value = '';
-
+		resetMode();
 		bookIDChapter =
 			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
 
-		let bcv = bibleLocationRef.split('_');
+		let [start, end] =
+			bibleLocationReferenceService.extractVerses(bibleLocationRef);
 
-		if (bcv.length > 2) {
-			// untrack(() => {
-			// 	bibleLocationRef = `${bcv[0]}_${bcv[1]}`;
-			// });
-			let [start, end] =
-				bibleLocationReferenceService.extractVerses(bibleLocationRef);
-
-			if (start + end > 0) {
-				verseRange = true;
-				rangeStartIndex = start;
-				rangeEndIndex = end;
-			} else {
-				setTimeout(() => {
-					let e = document.getElementById(`${id}-vno-${bcv[2]}`);
-					e?.scrollIntoView({
-						behavior: 'smooth',
-						block: 'center',
-						inline: 'nearest'
-					});
-					e?.classList.add('animate-pulse');
-					setTimeout(() => {
-						e?.classList.remove('animate-pulse');
-					}, 4000);
-				}, 250);
-			}
+		if (start + end > 0) {
+			verseRange = true;
+			verseRangeStartIndex = start;
+			verseRangeEndIndex = end;
+		} else {
+			let verseNumber =
+				bibleLocationReferenceService.extractVerse(bibleLocationRef);
+			scrollTo(`${id}-vno-${verseNumber}`, animateScrolledToVerse);
 		}
 
-		if (bibleLocationRef) {
-			let el = document.getElementById(id);
-			el?.scrollTo(0, 0);
-			annotations = {};
-			loadAnnotations();
-			loadNotes();
-			loadChapter();
-		}
+		annotations = {};
+		loadAnnotations();
+		loadNotes();
+		loadChapter();
 	});
 
 	// ================================ FUNCS ==================================
 
+	function resetMode() {
+		mode.value = '';
+	}
+
+	function animateScrolledToVerse(el: HTMLElement) {
+		el?.classList.add('animate-pulse');
+		setTimeout(() => {
+			el?.classList.remove('animate-pulse');
+		}, 4000);
+	}
 	async function loadAnnotations() {
 		annotations = await annotsApi.getAnnotations(bookIDChapter);
 	}
@@ -138,7 +125,7 @@
 		if (verseRange) {
 			keys = Object.keys(verses)
 				.sort((a, b) => (Number(a) < Number(b) ? -1 : 1))
-				.slice(rangeStartIndex, rangeEndIndex);
+				.slice(verseRangeStartIndex, verseRangeEndIndex);
 		} else {
 			keys = Object.keys(verses).sort((a, b) =>
 				Number(a) < Number(b) ? -1 : 1
