@@ -22,7 +22,8 @@
 	// OTHER
 	import uuid4 from 'uuid4';
 
-	import { attachEvents } from '$lib/utils/eventHandlers';
+	import { attachEvents, scrollTo } from '$lib/utils/eventHandlers';
+	import { bookIDByBookNameService } from '$lib/services/bibleMetadata/bookIDByBookName.service';
 
 	// =============================== BINDINGS ================================
 
@@ -43,6 +44,7 @@
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 	let id = $state(uuid4());
+	const LAST_BIBLE_LOCATION_REF = 'lastBibleLocationReference';
 	let mode: any = $state({
 		value: '',
 		colorAnnotation: 'bg-highlighta',
@@ -55,6 +57,7 @@
 	let showNavButtons = $state(true);
 
 	// =============================== LIFECYCLE ===============================
+
 	onMount(() => {
 		setModePaneID();
 		setNavReadings();
@@ -80,37 +83,40 @@
 			mode.navReadings = pane?.buffer?.bag?.navReadings;
 		}
 	}
+
 	function setBibleLocationRef() {
 		let ref = pane.buffer.bag.bibleLocationRef;
 		if (ref) {
 			bibleLocationRef = ref;
 		} else {
-			bibleLocationRef = localStorage.getItem('lastBibleLocationReference');
-			if (!bibleLocationRef) {
-				bibleLocationRef = '50_3'; // John 3
-			}
+			setToLastBibleLocationRef();
 		}
+	}
+
+	function setToLastBibleLocationRef() {
+		bibleLocationRef = localStorage.getItem(LAST_BIBLE_LOCATION_REF);
+		if (!bibleLocationRef) {
+			setDefaultBibleLocationRef();
+		}
+	}
+
+	function setDefaultBibleLocationRef() {
+		let bookID = bookIDByBookNameService.get('Romans');
+		let chapter = 10;
+		let verse = 9;
+		bibleLocationRef = `${bookID}_${chapter}_${verse}`;
 	}
 
 	function scrollToVerse() {
 		if (pane?.buffer?.bag?.lastVerse) {
-			setTimeout(() => {
-				let vel = document.getElementById(
-					`${id}-vno-${pane.buffer.bag.lastVerse}`
-				);
-				vel?.scrollIntoView({
-					behavior: 'instant',
-					block: 'center'
-				});
-			}, 50);
+			scrollTo(`${id}-vno-${pane.buffer.bag.lastVerse}`);
 		}
 	}
 
 	function overrideContextMenu() {
-		setTimeout(() => {
-			let cc = document.getElementById(`chapter-container-${id}`);
-			cc?.addEventListener('contextmenu', (e) => e.preventDefault());
-		}, 500);
+		attachEvents(`chapter-container-${id}`, 'contextmenu', (e) =>
+			e.preventDefault()
+		);
 	}
 
 	function attachScrolls() {
@@ -127,12 +133,8 @@
 
 	function onBibleLocationRefChanged() {
 		if (bibleLocationRef) {
-			pane.buffer.bag.bibleLocationRef =
-				bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
-			localStorage.setItem(
-				'lastBibleLocationReference',
-				bibleLocationReferenceService.extractBookChapter(bibleLocationRef)
-			);
+			pane.buffer.bag.bibleLocationRef = bibleLocationRef;
+			localStorage.setItem(LAST_BIBLE_LOCATION_REF, bibleLocationRef);
 			paneService.save();
 		}
 	}
@@ -206,25 +208,18 @@
 <!-- ============================== CONTAINER ============================== -->
 
 <BufferContainer bind:clientHeight>
-	<div
-		role="document"
-		oncontextmenu={() => {
-			return false;
-		}}
+	<BufferBody
+		ID={id}
+		bind:clientHeight
+		bind:headerHeight
+		classes="clear-default-classes"
 	>
-		<BufferBody
-			ID={id}
-			bind:clientHeight
-			bind:headerHeight
-			classes="clear-default-classes"
-		>
-			{#if bibleLocationRef}
-				{@render header()}
-				{@render body()}
-			{/if}
-		</BufferBody>
 		{#if bibleLocationRef}
-			{@render footer()}
+			{@render header()}
+			{@render body()}
 		{/if}
-	</div>
+	</BufferBody>
+	{#if bibleLocationRef}
+		{@render footer()}
+	{/if}
 </BufferContainer>

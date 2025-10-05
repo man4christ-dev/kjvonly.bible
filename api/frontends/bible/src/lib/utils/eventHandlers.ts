@@ -22,3 +22,13 @@ export async function attachEvents(
 		el?.addEventListener(event, fn);
 	}, 250);
 }
+
+export function scrollTo(id: string) {
+	setTimeout(() => {
+		let el = document.getElementById(id);
+		el?.scrollIntoView({
+			behavior: 'instant',
+			block: 'center'
+		});
+	}, 50);
+}

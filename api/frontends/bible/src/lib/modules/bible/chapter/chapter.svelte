@@ -9,9 +9,7 @@
 	import { notesService } from '$lib/services/notes.service';
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
-	let searchID = uuid4();
-
-	let showChapter: boolean = $state(true);
+	let notesID = uuid4();
 
 	let loadedBookName = $state();
 	let loadedChapter = $state();
@@ -92,7 +90,7 @@
 
 	async function loadNotes() {
 		notesService.searchNotes(
-			searchID,
+			notesID,
 			bibleLocationReferenceService.extractBookChapter(bookIDChapter),
 			['bookChapter']
 		);
@@ -134,27 +132,25 @@
 			loadAnnotations();
 		});
 
-		notesService.subscribe(searchID, onSearchResults);
+		notesService.subscribe(notesID, onSearchResults);
 		notesService.subscribe('*', loadNotes);
 	});
 </script>
 
 <div class="px-4 leading-loose">
-	{#if showChapter}
-		{#each keys as k, idx}
-			<span class="whitespace-normal" id={`${id}-vno-${idx + 1}`}>
-				<Verse
-					bind:pane
-					bind:annotations
-					bind:notes
-					bind:mode
-					verse={verses[k]}
-					{footnotes}
-					bibleLocationRef={bookIDChapter}
-					{lastKnownScrollPosition}
-				></Verse>
-			</span>
-		{/each}
-		<div class="mt-18"></div>
-	{/if}
+	{#each keys as k, idx}
+		<span class="whitespace-normal" id={`${id}-vno-${idx + 1}`}>
+			<Verse
+				bind:pane
+				bind:annotations
+				bind:notes
+				bind:mode
+				verse={verses[k]}
+				{footnotes}
+				bibleLocationRef={bookIDChapter}
+				{lastKnownScrollPosition}
+			></Verse>
+		</span>
+	{/each}
+	<div class="mt-18"></div>
 </div>
