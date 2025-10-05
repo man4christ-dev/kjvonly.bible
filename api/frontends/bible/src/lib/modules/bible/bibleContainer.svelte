@@ -19,6 +19,8 @@
 	// OTHER
 	import uuid4 from 'uuid4';
 	import ChapterNavButtons from './components/chapterNavButtons.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -37,6 +39,7 @@
 	let bookName: string = $state('');
 	let bibleLocationRef: string | null = $state(null);
 	let clientHeight = $state(0);
+	let headerHeight = $state(0);
 	let id = $state(uuid4());
 	let mode: any = $state({
 		value: '',
@@ -232,22 +235,26 @@
 
 <!-- ============================== CONTAINER ============================== -->
 
-<div
-	bind:clientHeight
-	class="h-full overflow-hidden"
-	role="document"
-	oncontextmenu={() => {
-		return false;
-	}}
->
-	<div {id} class="h-full overflow-y-scroll">
+<BufferContainer bind:clientHeight>
+	<div
+		role="document"
+		oncontextmenu={() => {
+			return false;
+		}}
+	>
+		<BufferBody
+			ID={id}
+			bind:clientHeight
+			bind:headerHeight
+			classes="clear-default-classes"
+		>
+			{#if bibleLocationRef}
+				{@render header()}
+				{@render body()}
+			{/if}
+		</BufferBody>
 		{#if bibleLocationRef}
-			{@render header()}
-			{@render body()}
+			{@render footer()}
 		{/if}
 	</div>
-
-	{#if bibleLocationRef}
-		{@render footer()}
-	{/if}
-</div>
+</BufferContainer>
