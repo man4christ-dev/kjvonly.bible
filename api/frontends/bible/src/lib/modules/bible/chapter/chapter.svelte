@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
+	import { onMount } from 'svelte';
 	import { chapterApi } from '$lib/api/chapters.api';
 	import Verse from './verse.svelte';
 	import { syncService } from '$lib/services/sync.service';
@@ -158,6 +158,3 @@
 		<div class="mt-18"></div>
 	{/if}
 </div>
-
-<style>
-</style>

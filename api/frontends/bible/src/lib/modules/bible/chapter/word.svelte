@@ -181,17 +181,17 @@
 			return;
 		}
 
-		let widxs = [];
+		let wordIndexes = [];
 		if (word.class?.includes('vno')) {
 			for (let i = 0; i < verse.words.length; i++) {
-				widxs.push(i);
+				wordIndexes.push(i);
 			}
 		} else {
-			widxs.push(wordIdx);
+			wordIndexes.push(wordIdx);
 		}
 
 		let shouldAdd = true;
-		if (widxs.length > 1) {
+		if (wordIndexes.length > 1) {
 			let w = initWordAnnotations(0);
 			w.class.forEach((c: string) => {
 				if (c.startsWith('bg')) {
@@ -200,7 +200,7 @@
 			});
 		}
 
-		widxs.forEach((i) => {
+		wordIndexes.forEach((i) => {
 			let w = initWordAnnotations(i);
 
 			let indexOf: number | undefined;
@@ -294,6 +294,9 @@
 {:else}
 	<span class=" {wordAnnotations?.class?.join(' ')}">
 		<span class="">&nbsp;</span><span
+			tabindex="-1"
+			role="button"
+			onkeydown={() => {}}
 			ontouchstart={onMouseDownTouchStart}
 			ontouchend={onMouseUpTouchEnd}
 			onmousedown={onMouseDownTouchStart}
