@@ -9,7 +9,10 @@
 			"url": "http://localhost:5173",
 			"webRoot": "${workspaceFolder}",
 			"userDataDir": false,
-			"runtimeArgs": ["--remote-debugging-port=9222"]
+			"runtimeArgs": [
+				"--profile-directory='Your Brave'",
+				"--remote-debugging-port=9222"
+			]
 		}
 	]
 }
