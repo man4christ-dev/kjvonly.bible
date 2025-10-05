@@ -27,7 +27,7 @@
 	// =============================== BINDINGS ================================
 
 	let {
-		bibleLocationRef: bibleLocationRef = $bindable(),
+		bibleLocationRef = $bindable(),
 		id = $bindable(),
 		pane = $bindable(),
 		mode = $bindable(),
@@ -47,7 +47,6 @@
 	let verseRangeStartIndex: number = 0;
 	let verseRangeEndIndex: number = 0;
 
-	let bookIDChapter: string = $state('');
 	let chapter: Chapter | undefined = $state();
 	let verses: Map<string, VerseModel> = $state(new Map());
 	let versesToShow: string[] = $state([]);
@@ -67,7 +66,6 @@
 	$effect(() => {
 		bibleLocationRef;
 		resetMode();
-		setBookChapterID();
 		setVerseRanges();
 		scrollToVerse();
 		resetAnnotations();
@@ -84,11 +82,6 @@
 
 	function resetAnnotations() {
 		annotations = {};
-	}
-
-	function setBookChapterID() {
-		bookIDChapter =
-			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 	}
 
 	function setVerseRanges() {
@@ -127,7 +120,7 @@
 	}
 
 	async function loadAnnotations() {
-		annotations = await annotsApi.getAnnotations(bookIDChapter);
+		annotations = await annotsApi.getAnnotations(bibleLocationRef);
 	}
 
 	function subscribeToNotes() {
@@ -141,7 +134,7 @@
 	async function loadNotes() {
 		notesService.searchNotes(
 			notesID,
-			bibleLocationReferenceService.extractBookIDChapter(bookIDChapter),
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef),
 			['bookChapter']
 		);
 	}
@@ -150,7 +143,6 @@
 		chapter = await chapterService.get(bibleLocationRef);
 		verses = chapter.verses;
 		footnotes = chapter.footnotes;
-
 		setChapterVersesToShow();
 	}
 
@@ -189,7 +181,7 @@
 				bind:notes
 				bind:mode
 				verse={chapter?.verses.get(k)}
-				bibleLocationRef={bookIDChapter}
+				{bibleLocationRef}
 				{footnotes}
 				{lastKnownScrollPosition}
 			></Verse>

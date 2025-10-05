@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { Modules } from '$lib/models/modules.model';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { searchService } from '$lib/services/search.service';
 	import { onMount, untrack } from 'svelte';
 
 	let {
@@ -22,6 +22,11 @@
 	let wordAnnotations: any = $state();
 	let notesAnnotations: any = $state(false);
 	let hasVerseReferences = $state(false);
+
+	onMount(() => {
+		verseNumber = verse['number'];
+	});
+
 	$effect(() => {
 		annotations;
 		wordAnnotations = getWordAnnotations();
@@ -55,7 +60,9 @@
 	});
 
 	function updateMode(m: string) {
-		mode.bibleLocationRef = `${bibleLocationRef}_${verse['number']}_${wordIdx}`;
+		let bookIDChapter =
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
+		mode.bibleLocationRef = `${bookIDChapter}_${verse['number']}_${wordIdx}`;
 		mode.value = m;
 	}
 
@@ -78,8 +85,11 @@
 	}
 
 	function wordHasNotes() {
+		let bookIDChapter =
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
+
 		let verseNumber = verse['number'];
-		let wordKey = `${bibleLocationRef}_${verseNumber}_${wordIdx}`;
+		let wordKey = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
 		notesAnnotations = notes[wordKey];
 	}
 
@@ -137,10 +147,6 @@
 			});
 		}
 	}
-
-	onMount(() => {
-		verseNumber = verse['number'];
-	});
 
 	let pressThresholdInMilliseconds = 1000;
 
@@ -230,7 +236,10 @@
 	}
 
 	function onNotesClicked() {
-		mode.bibleLocationRef = `${bibleLocationRef}_${verseNumber}_${wordIdx}`;
+		let bookIDChapter =
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
+
+		mode.bibleLocationRef = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
 		mode.notePopup.show = true;
 	}
 </script>

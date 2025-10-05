@@ -78,7 +78,11 @@
 	class="flex h-24 w-full flex-col items-center space-x-3 border bg-neutral-50 px-2 py-1"
 >
 	<div class="absolute right-1">
-		<button onclick={onClose} aria-label="save" class="h-8 w-8">
+		<button
+			onclick={onClose}
+			aria-label="save"
+			class="h-8 w-8 hover:cursor-pointer"
+		>
 			<svg
 				xmlns="http://www.w3.org/2000/svg"
 				viewBox="0 0 24 24"
