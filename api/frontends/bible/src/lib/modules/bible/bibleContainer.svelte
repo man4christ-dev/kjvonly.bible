@@ -16,7 +16,6 @@
 	import type { Pane } from '$lib/models/pane.model';
 
 	// SERVICES
-	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 
 	// OTHER

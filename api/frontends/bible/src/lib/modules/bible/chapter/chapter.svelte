@@ -1,13 +1,40 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// SVELTE
+
 	import { onMount } from 'svelte';
-	import { chapterApi } from '$lib/api/chapters.api';
+
+	// COMPONENTS
 	import Verse from './verse.svelte';
+
+	// MODELS
+
+	// SERVICES
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { notesService } from '$lib/services/notes.service';
 	import { syncService } from '$lib/services/sync.service';
+
+	// API
+	import { chapterApi } from '$lib/api/chapters.api';
 	import { annotsApi } from '$lib/api/annots.api';
 
+	// OTHER
 	import uuid4 from 'uuid4';
-	import { notesService } from '$lib/services/notes.service';
-	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+
+	// =============================== BINDINGS ================================
+
+	let {
+		bibleLocationRef: bibleLocationRef = $bindable(),
+		bookName = $bindable(),
+		bookChapter = $bindable(),
+		id = $bindable(),
+		pane = $bindable(),
+		mode = $bindable(),
+		annotations = $bindable(),
+		lastKnownScrollPosition
+	} = $props();
+
+	// ================================= VARS ==================================
 
 	let notesID = uuid4();
 
@@ -21,16 +48,20 @@
 	let rangeStartIndex = 0;
 	let rangeEndIndex = 0;
 
-	let {
-		bibleLocationRef: bibleLocationRef = $bindable(),
-		bookName = $bindable(),
-		bookChapter = $bindable(),
-		id = $bindable(),
-		pane = $bindable(),
-		mode = $bindable(),
-		annotations = $bindable(),
-		lastKnownScrollPosition
-	} = $props();
+	let bookIDChapter = $state('');
+	let verses: any = $state();
+	let keys: string[] = $state([]);
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(async () => {
+		syncService.subscribe('annotations', () => {
+			loadAnnotations();
+		});
+
+		notesService.subscribe(notesID, onSearchResults);
+		notesService.subscribe('*', loadNotes);
+	});
 
 	$effect(() => {
 		if (!bibleLocationRef) {
@@ -80,9 +111,7 @@
 		}
 	});
 
-	let bookIDChapter = $state('');
-	let verses: any = $state();
-	let keys: string[] = $state([]);
+	// ================================ FUNCS ==================================
 
 	async function loadAnnotations() {
 		annotations = await annotsApi.getAnnotations(bookIDChapter);
@@ -126,15 +155,6 @@
 			notes = tempNotes;
 		}
 	}
-
-	onMount(async () => {
-		syncService.subscribe('annotations', () => {
-			loadAnnotations();
-		});
-
-		notesService.subscribe(notesID, onSearchResults);
-		notesService.subscribe('*', loadNotes);
-	});
 </script>
 
 <div class="px-4 leading-loose">
