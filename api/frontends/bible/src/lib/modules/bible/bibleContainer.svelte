@@ -12,6 +12,7 @@
 	import { Modules } from '$lib/models/modules.model';
 	import type { NavReadings } from '../../models/plans.model';
 	import { newAnnotation, type Annotations } from '$lib/models/bible.model';
+	import type { Pane } from '$lib/models/pane.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
@@ -20,6 +21,18 @@
 
 	// OTHER
 	import uuid4 from 'uuid4';
+
+	// =============================== BINDINGS ================================
+
+	let {
+		paneID = $bindable<string>(),
+		pane = $bindable<Pane>()
+	}: {
+		paneID: string;
+		pane: Pane;
+	} = $props();
+
+	// ================================= VARS ==================================
 
 	let id = uuid4();
 	let bibleLocationRef: string | null = $state(null);
@@ -35,9 +48,114 @@
 	let bookChapter: string = $state('');
 	let clientHeight = $state(0);
 
-	let { paneID = $bindable<string>(), pane = $bindable() } = $props();
+	let lastKnownScrollPosition = $state(0);
+	let ticking = false;
+	let buttonTopOffset = $state(0);
+
+	// =============================== LIFECYCLE ===============================
+	onMount(() => {
+		setModePaneID();
+		setNavReadings();
+		setBibleLocationRef();
+		attachScrollEventListener();
+		scrollToVerse();
+		overrideContextMenu();
+	});
 
 	$effect(() => {
+		bibleLocationRef;
+		onBibleLocationRefChanged();
+	});
+
+	// ================================ FUNCS ==================================
+
+	function setModePaneID() {
+		mode.paneID = paneID;
+	}
+
+	function setNavReadings() {
+		if (pane?.buffer?.bag?.navReadings) {
+			mode.navReadings = pane?.buffer?.bag?.navReadings;
+		}
+	}
+	function setBibleLocationRef() {
+		let ref = pane.buffer.bag.bibleLocationRef;
+		if (ref) {
+			bibleLocationRef = ref;
+		} else {
+			bibleLocationRef = localStorage.getItem('lastBibleLocationReference');
+			if (!bibleLocationRef) {
+				bibleLocationRef = '50_3'; // John 3
+			}
+		}
+	}
+
+	function attachScrollEventListener() {
+		let el = document.getElementById(id);
+		if (el === null) {
+			return;
+		}
+
+		el.addEventListener('scroll', (event) => {
+			//lastKnownScrollPosition = window.scrollY;
+
+			lastKnownScrollPosition = el.scrollTop;
+			if (!ticking) {
+				window.requestAnimationFrame(() => {
+					setChapterNavigationButtonOffset(lastKnownScrollPosition);
+					ticking = false;
+				});
+				ticking = true;
+			}
+		});
+	}
+
+	function scrollToVerse() {
+		if (pane?.buffer?.bag?.lastVerse) {
+			setTimeout(() => {
+				let vel = document.getElementById(
+					`${id}-vno-${pane.buffer.bag.lastVerse}`
+				);
+				vel?.scrollIntoView({
+					behavior: 'instant',
+					block: 'center'
+				});
+			}, 50);
+		}
+	}
+
+	function overrideContextMenu() {
+		setTimeout(() => {
+			let cc = document.getElementById(`chapter-container-${id}`);
+			cc?.addEventListener('contextmenu', (e) => e.preventDefault());
+		}, 500);
+	}
+
+	function setChapterNavigationButtonOffset(sp: number) {
+		let el = document.getElementById(id);
+		if (el === null) {
+			return;
+		}
+
+		const threshold = 200; // Adjust this value as needed
+		const isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+
+		if (isReachBottom) {
+			// this function will be called when window height changes i.e. changing a chapter.
+			// when this happens pos will be negative. If we remove this check the buttons will
+			// end up in the header :)
+			let pos = (el.scrollTop + el.clientHeight - el.scrollHeight) * -1;
+			if (pos < 0) {
+				return;
+			}
+			buttonTopOffset = (el.scrollTop + el.clientHeight - el.scrollHeight) * -1;
+		} else {
+			buttonTopOffset = el.scrollTop / 3;
+		}
+	}
+
+	function onBibleLocationRefChanged() {
 		if (bibleLocationRef) {
 			pane.buffer.bag.bibleLocationRef =
 				bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
@@ -47,7 +165,9 @@
 			);
 			paneService.save();
 		}
-	});
+	}
+
+	// ============================== CLICK FUNCS ==============================
 
 	async function _nextPlanChapter() {
 		let plan: NavReadings = mode.navReadings;
@@ -93,100 +213,19 @@
 			bibleLocationRef = bibleNavigationService.previous(bibleLocationRef);
 		}
 	}
-
-	let lastKnownScrollPosition = $state(0);
-	let ticking = false;
-
-	let buttonTopOffset = $state(0);
-	function setButtonOffset(sp: number) {
-		let el = document.getElementById(id);
-		if (el === null) {
-			return;
-		}
-
-		const threshold = 200; // Adjust this value as needed
-		const isReachBottom =
-			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
-
-		if (isReachBottom) {
-			// this function will be called when window height changes i.e. changing a chapter.
-			// when this happens pos will be negative. If we remove this check the buttons will
-			// end up in the header :)
-			let pos = (el.scrollTop + el.clientHeight - el.scrollHeight) * -1;
-			if (pos < 0) {
-				return;
-			}
-			buttonTopOffset = (el.scrollTop + el.clientHeight - el.scrollHeight) * -1;
-		} else {
-			buttonTopOffset = el.scrollTop / 3;
-		}
-	}
-
-	onMount(() => {
-		/*
-		set paneID for popup actions
-		*/
-		mode.paneID = paneID;
-
-		if (pane?.buffer?.bag?.navReadings) {
-			mode.navReadings = pane?.buffer?.bag?.navReadings;
-		}
-
-		let ck = pane.buffer.bag.bibleLocationRef;
-		if (ck) {
-			bibleLocationRef = ck;
-		} else {
-			bibleLocationRef = localStorage.getItem('lastBibleLocationReference');
-			if (!bibleLocationRef) {
-				bibleLocationRef = '50_3'; // John 3
-			}
-		}
-
-		let el = document.getElementById(id);
-		if (el === null) {
-			return;
-		}
-
-		el.addEventListener('scroll', (event) => {
-			//lastKnownScrollPosition = window.scrollY;
-
-			lastKnownScrollPosition = el.scrollTop;
-			if (!ticking) {
-				window.requestAnimationFrame(() => {
-					setButtonOffset(lastKnownScrollPosition);
-					ticking = false;
-				});
-				ticking = true;
-			}
-		});
-
-		if (pane?.buffer?.bag?.lastVerse) {
-			setTimeout(() => {
-				let vel = document.getElementById(
-					`${id}-vno-${pane.buffer.bag.lastVerse}`
-				);
-				vel?.scrollIntoView({
-					behavior: 'instant',
-					block: 'center'
-				});
-			}, 50);
-		}
-
-		let cc = document.getElementById(`chapter-container-${id}`);
-		cc?.addEventListener('contextmenu', (e) => e.preventDefault());
-	});
 </script>
 
 <!-- svelte-ignore a11y_no_static_element_interactions -->
-{#if bibleLocationRef}
-	<div
-		bind:clientHeight
-		class="h-full overflow-hidden"
-		oncontextmenu={() => {
-			return false;
-		}}
-	>
-		<div {id} class="h-full overflow-y-scroll">
+
+<div
+	bind:clientHeight
+	class="h-full overflow-hidden"
+	oncontextmenu={() => {
+		return false;
+	}}
+>
+	<div {id} class="h-full overflow-y-scroll">
+		{#if bibleLocationRef}
 			<div class="sticky top-0 z-[1500] flex w-full justify-center">
 				<ChapterActions
 					bind:mode
@@ -215,8 +254,10 @@
 					</div>
 				</div>
 			</div>
-		</div>
+		{/if}
+	</div>
 
+	{#if bibleLocationRef}
 		<!-- prev/next chapter buttons -->
 		<div class="flex w-full justify-center">
 			<div class="w-full max-w-6xl">
@@ -294,5 +335,5 @@
 				{/if}
 			</div>
 		</div>
-	</div>
-{/if}
+	{/if}
+</div>
