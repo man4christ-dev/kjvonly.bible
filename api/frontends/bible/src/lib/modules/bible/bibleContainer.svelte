@@ -215,11 +215,10 @@
 	}
 </script>
 
-<!-- svelte-ignore a11y_no_static_element_interactions -->
-
 <div
 	bind:clientHeight
 	class="h-full overflow-hidden"
+	role="document"
 	oncontextmenu={() => {
 		return false;
 	}}
@@ -250,7 +249,6 @@
 							bind:annotations
 							{lastKnownScrollPosition}
 						></Chapter>
-						<span class="h-16 md:hidden"></span>
 					</div>
 				</div>
 			</div>
@@ -261,12 +259,13 @@
 		<!-- prev/next chapter buttons -->
 		<div class="flex w-full justify-center">
 			<div class="w-full max-w-6xl">
+				<!-- Need to type mode.value -->
 				{#if mode.value === ''}
 					<div
 						style="transform: translate3d(0px, {buttonTopOffset}px, 0px);"
 						class="sticky z-10"
 					>
-						<div class="absolute bottom-4 left-4">
+						<div class="absolute bottom-2 left-4">
 							<button
 								onclick={_previousChapter}
 								class="rounded-full bg-neutral-100 text-neutral-700 shadow-lg ring-2 ring-neutral-300"
@@ -296,7 +295,7 @@
 						style="transform: translate3d(0px, {buttonTopOffset}px, 0px); "
 						class="sticky z-10"
 					>
-						<div class="absolute right-4 bottom-4">
+						<div class="absolute right-4 bottom-2">
 							<button
 								onclick={_nextChapter}
 								class="h-12 w-12 rounded-full bg-neutral-100 text-neutral-700 ring-2 ring-neutral-300"

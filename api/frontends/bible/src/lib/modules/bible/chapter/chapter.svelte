@@ -7,7 +7,6 @@
 
 	import uuid4 from 'uuid4';
 	import { notesService } from '$lib/services/notes.service';
-	import { numberToLetters } from '$lib/services/dynamicGrid.service';
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 
 	let searchID = uuid4();
@@ -144,7 +143,6 @@
 <div class="px-4 leading-loose">
 	{#if showChapter}
 		{#each keys as k, idx}
-			<!-- w-full required for safari. -->
 			<span class="whitespace-normal" id={`${id}-vno-${idx + 1}`}>
 				<Verse
 					bind:pane
@@ -158,12 +156,7 @@
 				></Verse>
 			</span>
 		{/each}
-
-		<div class="mt-16"></div>
-
-		{#if mode.value !== ''}
-			<div class="mt-32"></div>
-		{/if}
+		<div class="mt-18"></div>
 	{/if}
 </div>
 
