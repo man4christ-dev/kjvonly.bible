@@ -9,14 +9,11 @@
 	import EditOptions from './chapter/editOptions.svelte';
 
 	// MODELS
-	import { Modules } from '$lib/models/modules.model';
-	import type { NavReadings } from '../../models/plans.model';
 	import { newAnnotation, type Annotations } from '$lib/models/bible.model';
 	import type { Pane } from '$lib/models/pane.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
-	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 
 	// OTHER
@@ -35,8 +32,12 @@
 
 	// ================================= VARS ==================================
 
-	let id = uuid4();
+	let annotations: Annotations = $state(newAnnotation());
+	let bookChapter: string = $state('');
+	let bookName: string = $state('');
 	let bibleLocationRef: string | null = $state(null);
+	let clientHeight = $state(0);
+	let id = $state(uuid4());
 	let mode: any = $state({
 		value: '',
 		colorAnnotation: 'bg-highlighta',
@@ -44,11 +45,7 @@
 		notePopup: { show: false }
 	});
 
-	let annotations: Annotations = $state(newAnnotation());
-	let bookName: string = $state('');
-	let bookChapter: string = $state('');
-	let clientHeight = $state(0);
-
+	// DOM related vars
 	let lastKnownScrollPosition = $state(0);
 	let ticking = false;
 	let buttonTopOffset = $state(0);
@@ -169,6 +166,72 @@
 	}
 </script>
 
+<!-- ================================ HEADER =============================== -->
+
+{#snippet header()}
+	<div class="sticky top-0 z-[1500] flex w-full justify-center">
+		<ChapterActions
+			bind:mode
+			bind:bibleLocationRef
+			bind:annotations
+			bind:clientHeight
+			{bookName}
+			{bookChapter}
+			{paneID}
+		></ChapterActions>
+	</div>
+{/snippet}
+
+<!-- ================================= BODY ================================ -->
+
+{#snippet body()}
+	<div class="kjvonly-noselect flex justify-center">
+		<div class="max-w-lg">
+			<div id="chapter-container-{id}" class="w-full">
+				<Chapter
+					bind:bookName
+					bind:bookChapter
+					bind:bibleLocationRef
+					bind:id
+					bind:pane
+					bind:mode
+					bind:annotations
+					{lastKnownScrollPosition}
+				></Chapter>
+			</div>
+		</div>
+	</div>
+{/snippet}
+
+<!-- ================================ FOOTER =============================== -->
+
+{#snippet footer()}
+	<div class="flex w-full justify-center">
+		<div class="w-full max-w-6xl">
+			<!-- Need to type mode.value -->
+			{#if mode.value === ''}
+				<ChapterNavButtons
+					bind:mode
+					bind:pane
+					bind:bibleLocationRef
+					bind:buttonTopOffset
+				></ChapterNavButtons>
+			{:else}
+				<div
+					style="transform: translate3d(0px, 0px, 0px); "
+					class="sticky z-10"
+				>
+					<div class="absolute bottom-0 w-full">
+						<EditOptions bind:mode bind:annotations></EditOptions>
+					</div>
+				</div>
+			{/if}
+		</div>
+	</div>
+{/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
+
 <div
 	bind:clientHeight
 	class="h-full overflow-hidden"
@@ -179,59 +242,12 @@
 >
 	<div {id} class="h-full overflow-y-scroll">
 		{#if bibleLocationRef}
-			<div class="sticky top-0 z-[1500] flex w-full justify-center">
-				<ChapterActions
-					bind:mode
-					bind:bibleLocationRef
-					bind:annotations
-					bind:clientHeight
-					{bookName}
-					{bookChapter}
-					{paneID}
-				></ChapterActions>
-			</div>
-			<div class="kjvonly-noselect flex justify-center">
-				<div class="max-w-lg">
-					<div id="chapter-container-{id}" class="w-full">
-						<Chapter
-							bind:bookName
-							bind:bookChapter
-							bind:bibleLocationRef
-							bind:id
-							bind:pane
-							bind:mode
-							bind:annotations
-							{lastKnownScrollPosition}
-						></Chapter>
-					</div>
-				</div>
-			</div>
+			{@render header()}
+			{@render body()}
 		{/if}
 	</div>
 
 	{#if bibleLocationRef}
-		<!-- prev/next chapter buttons -->
-		<div class="flex w-full justify-center">
-			<div class="w-full max-w-6xl">
-				<!-- Need to type mode.value -->
-				{#if mode.value === ''}
-					<ChapterNavButtons
-						bind:mode
-						bind:pane
-						bind:bibleLocationRef
-						bind:buttonTopOffset
-					></ChapterNavButtons>
-				{:else}
-					<div
-						style="transform: translate3d(0px, 0px, 0px); "
-						class="sticky z-10"
-					>
-						<div class="absolute bottom-0 w-full">
-							<EditOptions bind:mode bind:annotations></EditOptions>
-						</div>
-					</div>
-				{/if}
-			</div>
-		</div>
+		{@render footer()}
 	{/if}
 </div>
