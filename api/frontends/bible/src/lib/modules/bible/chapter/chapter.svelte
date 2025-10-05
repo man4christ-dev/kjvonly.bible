@@ -66,21 +66,9 @@
 
 	$effect(() => {
 		resetMode();
-		bookIDChapter =
-			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
-
-		let [start, end] =
-			bibleLocationReferenceService.extractVerses(bibleLocationRef);
-
-		if (start + end > 0) {
-			verseRange = true;
-			verseRangeStartIndex = start;
-			verseRangeEndIndex = end;
-		} else {
-			let verseNumber =
-				bibleLocationReferenceService.extractVerse(bibleLocationRef);
-			scrollTo(`${id}-vno-${verseNumber}`, animateScrolledToVerse);
-		}
+		setBookChapterID();
+		setVerseRanges();
+		scrollToVerse();
 
 		annotations = {};
 		loadAnnotations();
@@ -92,6 +80,26 @@
 
 	function resetMode() {
 		mode.value = '';
+	}
+
+	function setBookChapterID() {
+		bookIDChapter =
+			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+	}
+
+	function setVerseRanges() {
+		let [start, end] =
+			bibleLocationReferenceService.extractVerses(bibleLocationRef);
+
+		verseRange = start + end > 0;
+		verseRangeStartIndex = start;
+		verseRangeEndIndex = end;
+	}
+
+	function scrollToVerse() {
+		let verseNumber =
+			bibleLocationReferenceService.extractVerse(bibleLocationRef);
+		scrollTo(`${id}-vno-${verseNumber}`, animateScrolledToVerse);
 	}
 
 	function animateScrolledToVerse(el: HTMLElement) {

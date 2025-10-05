@@ -78,9 +78,16 @@ class BibleLocationReferenceService {
 	extractVerse(ref: string): number {
 		let bcv = ref.split('_');
 		if (bcv.length > 2) {
-			return parseInt(bcv[2], 10);
+			return this.extractFirstVerse(bcv[2]);
 		}
 		return 1;
+	}
+
+	extractFirstVerse(verse: string) {
+		if (verse.includes('-')) {
+			verse = verse.split('-')[0];
+		}
+		return parseInt(verse, 10);
 	}
 }
 

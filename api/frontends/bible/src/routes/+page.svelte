@@ -228,6 +228,7 @@
 		paneService.onSplitPane = splitPane;
 		onGridUpdate();
 
+		trySetDataPersistence();
 		toastService.showToast = showToast;
 	});
 
@@ -238,6 +239,23 @@
 		timeoutId = setTimeout(() => {
 			toasts.shift();
 		}, 2500 * toasts.length);
+	}
+
+	function trySetDataPersistence() {
+		(async () => {
+			if (navigator.storage && navigator.storage.persist) {
+				const persisted = await navigator.storage.persisted();
+				if (!persisted) {
+					const granted = await navigator.storage.persist();
+
+					if (granted) {
+						console.log('Persistent storage granted');
+					} else {
+						console.log('Persistent storage NOT granted');
+					}
+				}
+			}
+		})();
 	}
 </script>
 
