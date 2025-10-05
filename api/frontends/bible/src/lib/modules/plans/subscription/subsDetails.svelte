@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { sleep } from '$lib/utils/sleep';
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import Header from '../components/header.svelte';
 	import ReadingsComponent from '../components/readings.svelte';
 	import uuid4 from 'uuid4';
@@ -55,7 +55,9 @@
 
 	$effect(() => {
 		selectedSub;
-		loadMoreSubReadings();
+		untrack(() => {
+			loadMoreSubReadings();
+		});
 	});
 
 	// ================================ FUNCS ==================================

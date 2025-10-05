@@ -16,7 +16,7 @@
 	let {
 		paneID = $bindable<string>(),
 		pane = $bindable<Pane>(),
-		containerHeight = $bindable<string>(),
+		containerHeight = 'height: 100vh;',
 		containerWidth = $bindable<string>()
 	} = $props();
 

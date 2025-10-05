@@ -21,6 +21,7 @@
 	import ChapterNavButtons from './components/chapterNavButtons.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
+	import { sleep } from '$lib/utils/sleep';
 
 	// =============================== BINDINGS ================================
 
@@ -50,15 +51,14 @@
 
 	// DOM related vars
 	let lastKnownScrollPosition = $state(0);
-	let ticking = false;
-	let buttonTopOffset = $state(0);
+	let showNavButtons = $state(true);
 
 	// =============================== LIFECYCLE ===============================
 	onMount(() => {
 		setModePaneID();
 		setNavReadings();
 		setBibleLocationRef();
-		attachScrollEventListener();
+		attachHandleScroll();
 		scrollToVerse();
 		overrideContextMenu();
 	});
@@ -91,26 +91,6 @@
 		}
 	}
 
-	function attachScrollEventListener() {
-		let el = document.getElementById(id);
-		if (el === null) {
-			return;
-		}
-
-		el.addEventListener('scroll', (event) => {
-			//lastKnownScrollPosition = window.scrollY;
-
-			lastKnownScrollPosition = el.scrollTop;
-			if (!ticking) {
-				window.requestAnimationFrame(() => {
-					setChapterNavigationButtonOffset(lastKnownScrollPosition);
-					ticking = false;
-				});
-				ticking = true;
-			}
-		});
-	}
-
 	function scrollToVerse() {
 		if (pane?.buffer?.bag?.lastVerse) {
 			setTimeout(() => {
@@ -132,27 +112,47 @@
 		}, 500);
 	}
 
-	function setChapterNavigationButtonOffset(sp: number) {
-		let el = document.getElementById(id);
+	function attachHandleScroll() {
+		setTimeout(async () => {
+			let el = document.getElementById(`${id}-scroll-container`);
+			let retriesMax = 10;
+			let count = 0;
+			while (!el && count != retriesMax) {
+				el = document.getElementById(`${id}-scroll-container`);
+				await sleep(1000);
+				count++;
+			}
+
+			if (count === 10) {
+				return;
+			}
+
+			el?.addEventListener('scroll', handleScroll);
+		}, 250);
+	}
+
+	function handleScroll() {
+		let el = document.getElementById(`${id}-scroll-container`);
 		if (el === null) {
 			return;
 		}
 
-		const threshold = 200; // Adjust this value as needed
+		if (el.scrollTop === 0) {
+			showNavButtons = true;
+			return;
+		}
+
+		if (el.scrollHeight + el.clientHeight + el.scrollTop === 0) {
+			return;
+		}
+		showNavButtons = false;
+
+		const threshold = 40; // Adjust this value as needed
 		const isReachBottom =
 			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
 
 		if (isReachBottom) {
-			// this function will be called when window height changes i.e. changing a chapter.
-			// when this happens pos will be negative. If we remove this check the buttons will
-			// end up in the header :)
-			let pos = (el.scrollTop + el.clientHeight - el.scrollHeight) * -1;
-			if (pos < 0) {
-				return;
-			}
-			buttonTopOffset = (el.scrollTop + el.clientHeight - el.scrollHeight) * -1;
-		} else {
-			buttonTopOffset = el.scrollTop / 3;
+			showNavButtons = true;
 		}
 	}
 
@@ -217,7 +217,7 @@
 					bind:mode
 					bind:pane
 					bind:bibleLocationRef
-					bind:buttonTopOffset
+					bind:showNavButtons
 				></ChapterNavButtons>
 			{:else}
 				<div
