@@ -2,7 +2,7 @@
 	// ================================ IMPORTS ================================
 	// SVELTE
 
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 
 	// COMPONENTS
 	import Verse from './verse.svelte';
@@ -28,8 +28,6 @@
 
 	let {
 		bibleLocationRef: bibleLocationRef = $bindable(),
-		bookName = $bindable(),
-		bookChapter = $bindable(),
 		id = $bindable(),
 		pane = $bindable(),
 		mode = $bindable(),
@@ -57,12 +55,13 @@
 	// =============================== LIFECYCLE ===============================
 
 	onMount(async () => {
-		syncService.subscribe('annotations', () => {
-			loadAnnotations();
-		});
+		subscribeToAnnotations();
+		subscribeToNotes();
+	});
 
-		notesService.subscribe(notesID, onSearchResults);
-		notesService.subscribe('*', loadNotes);
+	onDestroy(() => {
+		unsubscribeToAnnotations();
+		unsubscribeToNotes();
 	});
 
 	$effect(() => {
@@ -95,7 +94,6 @@
 	function setVerseRanges() {
 		let [start, end] =
 			bibleLocationReferenceService.extractVerses(bibleLocationRef);
-
 		hasVerseRange = start + end > 0;
 		verseRangeStartIndex = start;
 		verseRangeEndIndex = end;
@@ -118,10 +116,28 @@
 		}, 4000);
 	}
 
+	function subscribeToAnnotations() {
+		syncService.subscribe(id, 'annotations', () => {
+			loadAnnotations();
+		});
+	}
+
+	function unsubscribeToAnnotations() {
+		syncService.unsubscribe(id);
+	}
+
 	async function loadAnnotations() {
 		annotations = await annotsApi.getAnnotations(bookIDChapter);
 	}
 
+	function subscribeToNotes() {
+		notesService.subscribe(id, notesID, onSearchResults);
+		notesService.subscribe(id, '*', loadNotes);
+	}
+
+	function unsubscribeToNotes() {
+		notesService.unsubscribe(id);
+	}
 	async function loadNotes() {
 		notesService.searchNotes(
 			notesID,
@@ -132,9 +148,6 @@
 
 	async function loadChapter() {
 		chapter = await chapterService.get(bibleLocationRef);
-		bookName = chapter.bookName;
-		bookChapter = chapter.number;
-
 		verses = chapter.verses;
 		footnotes = chapter.footnotes;
 

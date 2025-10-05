@@ -1,9 +1,12 @@
 import { CHAPTERS, BOOKNAMES, STRONGS, SEARCH } from '$lib/storer/bible.db';
 import { sleep } from '$lib/utils/sleep';
 import { bibleDB } from '$lib/storer/bible.db';
-const syncWorker = new Worker(new URL('../workers/kjvsync.worker?worker', import.meta.url), {
-	type: 'module'
-});
+const syncWorker = new Worker(
+	new URL('../workers/kjvsync.worker?worker', import.meta.url),
+	{
+		type: 'module'
+	}
+);
 
 /*
  * NOTE: github does not ungzip your files so we zcat them to .json on
@@ -21,7 +24,6 @@ const TOTAL_BOOKNAMES_KEYS = 1;
 const TOTAL_STRONGS_KEYS = 14058;
 
 export class SyncService {
-	//todo unsubscribe
 	subscribers: any[] = [];
 
 	constructor() {
@@ -34,8 +36,17 @@ export class SyncService {
 		};
 	}
 
-	subscribe(id: any, fn: any) {
-		this.subscribers.push({ id: id, fn: fn });
+	unsubscribe(subID: any) {
+		let tmpSubscribers: any = [];
+		this.subscribers.forEach((s) => {
+			if (s.subID !== subID) {
+				tmpSubscribers.push();
+			}
+		});
+		this.subscribers = tmpSubscribers;
+	}
+	subscribe(subID: string, id: any, fn: any) {
+		this.subscribers.push({ subID: subID, id: id, fn: fn });
 	}
 
 	sync() {

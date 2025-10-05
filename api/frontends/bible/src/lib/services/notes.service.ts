@@ -1,12 +1,24 @@
-const notesWorker = new Worker(new URL('../workers/kjvnotes.worker?worker', import.meta.url), {
-	type: 'module'
-});
+const notesWorker = new Worker(
+	new URL('../workers/kjvnotes.worker?worker', import.meta.url),
+	{
+		type: 'module'
+	}
+);
 
 /**
  * Note the * character is wildcard for get all notes. Will change in the future.
  */
 class NotesService {
-	// TODO: unsubscribe
+	unsubscribe(subID: any) {
+		let tmpSubscribers: any = [];
+		this.subscribers.forEach((s) => {
+			if (s.subID !== subID) {
+				tmpSubscribers.push();
+			}
+		});
+		this.subscribers = tmpSubscribers;
+	}
+
 	subscribers: any[] = [];
 	constructor() {
 		notesWorker.onmessage = (e) => {
@@ -18,12 +30,17 @@ class NotesService {
 		};
 	}
 
-	subscribe(id: any, fn: any) {
-		this.subscribers.push({ id: id, fn: fn });
+	subscribe(subID: string, id: any, fn: any) {
+		this.subscribers.push({ subID: subID, id: id, fn: fn });
 	}
 
 	searchNotes(id: string, text: string, indexes: string[]) {
-		notesWorker.postMessage({ action: 'searchNotes', id: id, text: text, indexes: indexes });
+		notesWorker.postMessage({
+			action: 'searchNotes',
+			id: id,
+			text: text,
+			indexes: indexes
+		});
 	}
 
 	getAllNotes(id: string) {

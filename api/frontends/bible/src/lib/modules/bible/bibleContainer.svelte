@@ -37,8 +37,6 @@
 	// ================================= VARS ==================================
 
 	let annotations: Annotations = $state(newAnnotation());
-	let bookChapter: string = $state('');
-	let bookName: string = $state('');
 	let bibleLocationRef: string | null = $state(null);
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
@@ -153,8 +151,6 @@
 		<div class="max-w-lg">
 			<div id="chapter-container-{id}" class="w-full">
 				<Chapter
-					bind:bookName
-					bind:bookChapter
 					bind:bibleLocationRef
 					bind:id
 					bind:pane
