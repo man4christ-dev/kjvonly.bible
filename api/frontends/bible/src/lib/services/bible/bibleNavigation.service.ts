@@ -1208,7 +1208,7 @@ export class BibleNavigationService {
 
 	next(bibleLocationRef: string): string {
 		bibleLocationRef =
-			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		let ci = this.chapterList.indexOf(bibleLocationRef);
 		if (ci + 1 >= this.chapterList.length) {
 			return this.chapterList[0];
@@ -1219,7 +1219,7 @@ export class BibleNavigationService {
 
 	previous(bibleLocationRef: string): string {
 		bibleLocationRef =
-			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		let ci = this.chapterList.indexOf(bibleLocationRef);
 		if (ci - 1 < 0) {
 			return this.chapterList[this.chapterList.length - 1];

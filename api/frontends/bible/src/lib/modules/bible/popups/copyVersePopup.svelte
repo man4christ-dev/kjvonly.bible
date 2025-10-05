@@ -1,5 +1,8 @@
 <script lang="ts">
 	import { chapterApi } from '$lib/api/chapters.api';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { chapterService } from '$lib/services/bible/chapter.service';
+	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import { toastService } from '$lib/services/toast.service';
 	import { onMount } from 'svelte';
 
@@ -13,24 +16,28 @@
 
 	let title = $state('');
 	onMount(() => {
-		let keys = bibleLocationRef.split('_');
-		if (keys.length < 2) {
-			showCopyVersePopup = false;
-		}
+		closePopupOnInvalidBibleLocationReference();
+
+		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
+		let shortBookName = shortBookNamesByIDService.get(bookID);
+		let chapterNumber =
+			bibleLocationReferenceService.extractChapter(bibleLocationRef);
 
 		(async () => {
-			let chapter = await chapterApi.getChapter(`${keys[0]}_${keys[1]}`);
-			booknames = await chapterApi.getBooknames();
+			let chapter = await chapterService.get(bibleLocationRef);
 			verses = chapter.verses;
-			if (chapter) {
-				verseKeys = Object.keys(chapter.verseMap).sort((a, b) => {
-					return parseInt(a) - parseInt(b);
-				});
-			}
-
-			title = `${booknames['shortNames'][keys[0]]} ${keys[1]}`;
+			verseKeys = Object.keys(chapter.verseMap).sort((a, b) => {
+				return parseInt(a) - parseInt(b);
+			});
+			title = `${shortBookName} ${chapterNumber}`;
 		})();
 	});
+
+	function closePopupOnInvalidBibleLocationReference() {
+		if (bibleLocationRef.split('_') < 2) {
+			showCopyVersePopup = false;
+		}
+	}
 
 	function onCopy() {
 		let checked: any = [];

@@ -25,7 +25,7 @@ export function attachEvents(
 	setTimeout(async () => {
 		let el = await findElement(id);
 		el?.addEventListener(event, fn);
-	}, 250);
+	}, 50);
 }
 
 export type ScrollToViewFunction = (el: HTMLElement) => void;
@@ -41,6 +41,18 @@ export function scrollTo(id: string, fn: Function) {
 			block: 'center',
 			inline: 'nearest'
 		});
+
+		fn(el);
+	}, 50);
+}
+
+export function scrollToTop(id: string, fn: Function) {
+	setTimeout(async () => {
+		let el = await findElement(id);
+		if (!el) {
+			return;
+		}
+		el?.scrollTo(0, 0);
 
 		fn(el);
 	}, 50);

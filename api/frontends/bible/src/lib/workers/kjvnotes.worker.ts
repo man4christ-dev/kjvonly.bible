@@ -30,7 +30,7 @@ async function init() {
 	for (let i = 0; i < cachedNotes.length; i++) {
 		let nn = cachedNotes[i];
 		if (nn?.bibleLocationRef) {
-			nn.bookChapter = bibleLocationReferenceService.extractBookChapter(
+			nn.bookChapter = bibleLocationReferenceService.extractBookIDChapter(
 				nn.bibleLocationRef
 			);
 			await notesDocument.addAsync(nn.id, nn);
@@ -42,7 +42,7 @@ async function init() {
 }
 
 function addNote(noteID: string, note: any) {
-	note.bookChapter = bibleLocationReferenceService.extractBookChapter(
+	note.bookChapter = bibleLocationReferenceService.extractBookIDChapter(
 		note.bibleLocationRef
 	);
 	notes[noteID] = note;

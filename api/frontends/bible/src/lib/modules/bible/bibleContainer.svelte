@@ -141,8 +141,6 @@
 			bind:bibleLocationRef
 			bind:annotations
 			bind:clientHeight
-			{bookName}
-			{bookChapter}
 			{paneID}
 		></ChapterActions>
 	</div>

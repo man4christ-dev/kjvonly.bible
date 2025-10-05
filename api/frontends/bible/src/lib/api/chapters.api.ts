@@ -15,7 +15,7 @@ import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocation
 export class ChapterApi {
 	async getChapter(bibleLocationRef: string): Promise<any> {
 		bibleLocationRef =
-			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		return offlineApi.cacheHitThenFetch(
 			`/data/json.gz/${bibleLocationRef}.json`,
 			bibleLocationRef,

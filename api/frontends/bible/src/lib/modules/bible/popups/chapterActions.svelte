@@ -15,6 +15,7 @@
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
 
 	// =============================== BINDINGS ================================
 
@@ -23,8 +24,6 @@
 		annotations = $bindable<Annotations>(),
 		bibleLocationRef = $bindable(),
 		clientHeight = $bindable<number>(),
-		bookName,
-		bookChapter,
 		paneID
 	} = $props();
 
@@ -36,31 +35,35 @@
 	let showActionsPopup: Boolean = $state(false);
 	let showCopyVersePopup: boolean = $state(false);
 	let verses: string = $state('');
-	let bookIDChapter = $state('');
-	let clientWidth: number = $state(0);
+	let bookName: string = $state('');
+	let bookChapter: number = $state(0);
 
 	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
-		bookIDChapter =
-			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+		setBookNameAndChapter();
 	});
 
 	$effect(() => {
-		if (bibleLocationRef) {
-			bookIDChapter =
-				bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
-			untrack(() => {
-				let [start, end] =
-					bibleLocationReferenceService.extractVerses(bibleLocationRef);
-				if (start + end > 0) {
-					verses = `:${start + 1}-${end}`;
-				} else {
-					verses = '';
-				}
-			});
-		}
+		bibleLocationRef;
+		untrack(() => {
+			setBookNameAndChapter();
+			let [start, end] =
+				bibleLocationReferenceService.extractVerses(bibleLocationRef);
+			if (start + end > 0) {
+				verses = `:${start + 1}-${end}`;
+			} else {
+				verses = '';
+			}
+		});
 	});
+
+	function setBookNameAndChapter() {
+		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
+		bookName = bookNamesByIDService.get(bookID);
+		bookChapter =
+			bibleLocationReferenceService.extractChapter(bibleLocationRef);
+	}
 
 	// ============================== CLICK FUNCS ==============================
 
@@ -193,9 +196,7 @@
 		{/if}
 
 		{#if showCopyVersePopup}
-			<CopyVersePopup
-				bind:showCopyVersePopup
-				bind:bibleLocationRef={bookIDChapter}
+			<CopyVersePopup bind:showCopyVersePopup bind:bibleLocationRef
 			></CopyVersePopup>
 		{/if}
 	</div>

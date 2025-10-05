@@ -8,6 +8,8 @@
 	import Verse from './verse.svelte';
 
 	// MODELS
+	import { type Verse as VerseModel } from '../../../models/bible.model';
+	import { type Chapter } from '../../../models/bible.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
@@ -15,12 +17,12 @@
 	import { syncService } from '$lib/services/sync.service';
 
 	// API
-	import { chapterApi } from '$lib/api/chapters.api';
 	import { annotsApi } from '$lib/api/annots.api';
 
 	// OTHER
 	import uuid4 from 'uuid4';
-	import { scrollTo } from '$lib/utils/eventHandlers';
+	import { scrollTo, scrollToTop } from '$lib/utils/eventHandlers';
+	import { chapterService } from '$lib/services/bible/chapter.service';
 
 	// =============================== BINDINGS ================================
 
@@ -39,19 +41,18 @@
 
 	let notesID = uuid4();
 
-	let loadedBookName = $state();
-	let loadedChapter = $state();
 	let footnotes: any = $state();
-	let verseRange: boolean = $state(false);
+	let hasVerseRange: boolean = $state(false);
 
 	let notes: any = $state();
 
-	let verseRangeStartIndex = 0;
-	let verseRangeEndIndex = 0;
+	let verseRangeStartIndex: number = 0;
+	let verseRangeEndIndex: number = 0;
 
-	let bookIDChapter = $state('');
-	let verses: any = $state();
-	let keys: string[] = $state([]);
+	let bookIDChapter: string = $state('');
+	let chapter: Chapter | undefined = $state();
+	let verses: Map<string, VerseModel> = $state(new Map());
+	let versesToShow: string[] = $state([]);
 
 	// =============================== LIFECYCLE ===============================
 
@@ -65,12 +66,12 @@
 	});
 
 	$effect(() => {
+		bibleLocationRef;
 		resetMode();
 		setBookChapterID();
 		setVerseRanges();
 		scrollToVerse();
-
-		annotations = {};
+		resetAnnotations();
 		loadAnnotations();
 		loadNotes();
 		loadChapter();
@@ -82,24 +83,32 @@
 		mode.value = '';
 	}
 
+	function resetAnnotations() {
+		annotations = {};
+	}
+
 	function setBookChapterID() {
 		bookIDChapter =
-			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 	}
 
 	function setVerseRanges() {
 		let [start, end] =
 			bibleLocationReferenceService.extractVerses(bibleLocationRef);
 
-		verseRange = start + end > 0;
+		hasVerseRange = start + end > 0;
 		verseRangeStartIndex = start;
 		verseRangeEndIndex = end;
 	}
 
 	function scrollToVerse() {
-		let verseNumber =
-			bibleLocationReferenceService.extractVerse(bibleLocationRef);
-		scrollTo(`${id}-vno-${verseNumber}`, animateScrolledToVerse);
+		if (bibleLocationReferenceService.hasVerse(bibleLocationRef)) {
+			let verseNumber =
+				bibleLocationReferenceService.extractVerse(bibleLocationRef);
+			scrollTo(`${id}-vno-${verseNumber}`, animateScrolledToVerse);
+		} else {
+			scrollToTop(`${id}-scroll-container`, (el: HTMLElement) => {});
+		}
 	}
 
 	function animateScrolledToVerse(el: HTMLElement) {
@@ -108,6 +117,7 @@
 			el?.classList.remove('animate-pulse');
 		}, 4000);
 	}
+
 	async function loadAnnotations() {
 		annotations = await annotsApi.getAnnotations(bookIDChapter);
 	}
@@ -115,29 +125,34 @@
 	async function loadNotes() {
 		notesService.searchNotes(
 			notesID,
-			bibleLocationReferenceService.extractBookChapter(bookIDChapter),
+			bibleLocationReferenceService.extractBookIDChapter(bookIDChapter),
 			['bookChapter']
 		);
 	}
 
 	async function loadChapter() {
-		let data = await chapterApi.getChapter(bookIDChapter);
-		bookName = data['bookName'];
-		bookChapter = data['number'];
-		loadedBookName = bookName;
-		loadedChapter = bookChapter;
-		verses = data['verses'];
-		footnotes = data['footnotes'];
-		keys = Object.keys(verses).sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
+		chapter = await chapterService.get(bibleLocationRef);
+		bookName = chapter.bookName;
+		bookChapter = chapter.number;
 
-		if (verseRange) {
-			keys = Object.keys(verses)
+		verses = chapter.verses;
+		footnotes = chapter.footnotes;
+
+		setChapterVersesToShow();
+	}
+
+	function setChapterVersesToShow() {
+		if (hasVerseRange) {
+			versesToShow = verses
+				.keys()
+				.toArray()
 				.sort((a, b) => (Number(a) < Number(b) ? -1 : 1))
 				.slice(verseRangeStartIndex, verseRangeEndIndex);
 		} else {
-			keys = Object.keys(verses).sort((a, b) =>
-				Number(a) < Number(b) ? -1 : 1
-			);
+			versesToShow = verses
+				.keys()
+				.toArray()
+				.sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
 		}
 	}
 
@@ -153,16 +168,16 @@
 </script>
 
 <div class="px-4 leading-loose">
-	{#each keys as k, idx}
+	{#each versesToShow as k, idx}
 		<span class="whitespace-normal" id={`${id}-vno-${idx + 1}`}>
 			<Verse
 				bind:pane
 				bind:annotations
 				bind:notes
 				bind:mode
-				verse={verses[k]}
-				{footnotes}
+				verse={chapter?.verses.get(k)}
 				bibleLocationRef={bookIDChapter}
+				{footnotes}
 				{lastKnownScrollPosition}
 			></Verse>
 		</span>

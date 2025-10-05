@@ -50,7 +50,7 @@ class BibleLocationReferenceService {
 	 * @param ref any reference
 	 * @returns
 	 */
-	extractBookChapter(ref: string): string {
+	extractBookIDChapter(ref: string): string {
 		let bcvw = ref.split('_');
 		if (bcvw.length > 2) {
 			ref = `${bcvw[0]}_${bcvw[1]}`;
@@ -88,6 +88,10 @@ class BibleLocationReferenceService {
 			verse = verse.split('-')[0];
 		}
 		return parseInt(verse, 10);
+	}
+
+	hasVerse(ref: string) {
+		return ref.split('_').length > 2;
 	}
 }
 

@@ -6,7 +6,7 @@ import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocation
 export class AnnotsApi {
 	async getAnnotations(bibleLocationRef: string): Promise<any> {
 		bibleLocationRef =
-			bibleLocationReferenceService.extractBookChapter(bibleLocationRef);
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		let annotations = await offlineApi.cacheHit(
 			bibleLocationRef,
 			UNSYNCED_ANNOTATIONS,
