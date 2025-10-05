@@ -36,7 +36,6 @@
 
 	$effect(() => {
 		if (!bibleLocationRef) {
-			console.log('returning');
 			return;
 		}
 		mode.value = '';
@@ -65,9 +64,9 @@
 						block: 'center',
 						inline: 'nearest'
 					});
-					e?.classList.add('scrolled-to');
+					e?.classList.add('animate-pulse');
 					setTimeout(() => {
-						e?.classList.remove('scrolled-to');
+						e?.classList.remove('animate-pulse');
 					}, 4000);
 				}, 250);
 			}
@@ -161,7 +160,4 @@
 </div>
 
 <style>
-	.scrolled-to {
-		/* @apply animate-pulse; */
-	}
 </style>
