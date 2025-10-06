@@ -239,20 +239,36 @@
 	}
 
 	function onEditClick() {
-		let wordIndexes = getWordIndexesToEdit();
-		let shouldAdd = true;
-		if (wordIndexes.length > 1) {
+		if (isWordAVerseNumber()) {
 			let w = initWordAnnotations(0);
+			let exists = false;
 			w.class.forEach((c: string) => {
-				if (c.startsWith('bg')) {
-					shouldAdd = false;
+				if (c.startsWith(mode.type)) {
+					exists = true;
 				}
 			});
-		}
-		wordIndexes.forEach((i) => {
-			let w = initWordAnnotations(i);
+
+			let wordIndexes = getWordIndexesToEdit();
+			wordIndexes.forEach((i) => {
+				let w = initWordAnnotations(i);
+				if (exists) {
+					clearAnnotation(w);
+				} else {
+					clearAnnotation(w);
+					addAnnotation(w.class);
+				}
+			});
+		} else {
+			let w = initWordAnnotations(wordIdx);
 			updateAnnotation(w);
-		});
+		}
+	}
+
+	function clearAnnotation(w: Word) {
+		let indexOf = getExistingAnnotationIndex(w);
+		if (indexOf !== undefined) {
+			removeAnnotation(w.class, indexOf);
+		}
 	}
 
 	function updateAnnotation(w: Word) {
@@ -315,12 +331,8 @@
 
 	function getWordIndexesToEdit(): number[] {
 		let wordIndexes = [];
-		if (isWordAVerseNumber()) {
-			for (let i = 0; i < verse.words.length; i++) {
-				wordIndexes.push(i);
-			}
-		} else {
-			wordIndexes.push(wordIdx);
+		for (let i = 0; i < verse.words.length; i++) {
+			wordIndexes.push(i);
 		}
 		return wordIndexes;
 	}
