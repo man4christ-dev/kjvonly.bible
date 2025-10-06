@@ -43,7 +43,7 @@
 	let track: any = {};
 	let wordAnnotations: any = $state();
 	let wordHasNotes: boolean = $state(false);
-	let wordHasVerseReferences = $state(false);
+	let verseHasReferences = $state(false);
 	let pressThresholdInMilliseconds = 1000;
 
 	// =============================== LIFECYCLE ===============================
@@ -59,23 +59,23 @@
 	});
 
 	onMount(() => {
-		setWordHasVerseReferences();
+		setVerseHasReferences();
 	});
 
 	// ================================ FUNCS ==================================
 
-	function setWordHasVerseReferences() {
-		if (wordIdx === 0) {
+	function setVerseHasReferences() {
+		if (isWordAVerseNumber()) {
 			for (let w of verse.words) {
 				for (var h of w.href || []) {
 					if (h.includes('/')) {
-						wordHasVerseReferences = true;
+						verseHasReferences = true;
 						return;
 					}
 				}
 			}
 		}
-		wordHasVerseReferences = false;
+		verseHasReferences = false;
 	}
 
 	function setWordAnnotations() {
@@ -92,7 +92,6 @@
 		if (notes) {
 			let bookIDChapter =
 				bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
-
 			let wordKey = `${bookIDChapter}_${verse.number}_${wordIdx}`;
 			wordHasNotes = wordKey in notes;
 		}
@@ -128,20 +127,9 @@
 
 		let crossRef = getBibleCrossReference();
 
-		if (word.class.includes('vno')) {
-			let refs: string[] = [];
-			let strongsWords: string[] = [];
-			verse.words.forEach((w: any) => {
-				if (w.href) {
-					refs.push(...w.href);
-
-					w.href.forEach((ref: string) => {
-						if (ref.startsWith('G') || ref.startsWith('H')) {
-							strongsWords.push(w.text);
-						}
-					});
-				}
-			});
+		if (isWordAVerseNumber()) {
+			let refs = extractAllVerseRefs();
+			let strongsWords = extractStrongsWords();
 
 			paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
 				footnotes: footnotes,
@@ -156,6 +144,32 @@
 				currentVerseRef: crossRef
 			});
 		}
+	}
+
+	function isWordAVerseNumber(): boolean {
+		return wordIdx === 0;
+	}
+
+	function extractAllVerseRefs(): string[] {
+		return verse.words
+			.flatMap((w: Word) => {
+				return w.href;
+			})
+			.filter((s: string | null) => {
+				return s !== null;
+			});
+	}
+
+	function extractStrongsWords(): string[] {
+		return verse.words
+			.filter((w: Word) => {
+				return w.href?.find((ref: string) => {
+					return ref.startsWith('G') || ref.startsWith('H');
+				});
+			})
+			.map((w: Word) => {
+				return w.text;
+			});
 	}
 
 	function getBibleCrossReference(): string {
@@ -309,10 +323,8 @@
 			ontouchend={onMouseUpTouchEnd}
 			onmousedown={onMouseDownTouchStart}
 			onmouseup={onMouseUpTouchEnd}
-			class="{word.class?.join(' ')} {wordHasVerseReferences &&
-			word.class.includes('vno')
-				? 'vno-refs'
-				: ''} ">{word.text}</span
+			class="{word.class?.join(' ')} {verseHasReferences ? 'vno-refs' : ''} "
+			>{word.text}</span
 		></span
 	>
 {:else}
