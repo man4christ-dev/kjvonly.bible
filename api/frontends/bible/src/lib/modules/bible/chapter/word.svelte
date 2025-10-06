@@ -239,15 +239,7 @@
 	}
 
 	function onEditClick() {
-		let wordIndexes = [];
-		if (word.class?.includes('vno')) {
-			for (let i = 0; i < verse.words.length; i++) {
-				wordIndexes.push(i);
-			}
-		} else {
-			wordIndexes.push(wordIdx);
-		}
-
+		let wordIndexes = getWordIndexesToEdit();
 		let shouldAdd = true;
 		if (wordIndexes.length > 1) {
 			let w = initWordAnnotations(0);
@@ -257,34 +249,80 @@
 				}
 			});
 		}
-
 		wordIndexes.forEach((i) => {
 			let w = initWordAnnotations(i);
+			updateAnnotation(w);
+		});
+	}
 
-			let indexOf: number | undefined;
-			w.class.forEach((c: string, idx: number) => {
-				if (c.startsWith(mode.type)) {
-					indexOf = idx;
-				}
-			});
+	function updateAnnotation(w: Word) {
+		let indexOf = getExistingAnnotationIndex(w);
+		if (indexOf !== undefined) {
+			removeAnnotation(w.class, indexOf);
+		} else {
+			addAnnotation(w.class);
+		}
+	}
 
-			if (indexOf !== undefined || !shouldAdd) {
-				w.class.splice(indexOf, 1);
-				if (mode.type === 'decoration') {
-					w.class = w.class.filter((c: string) => {
-						if (c === 'underline' || c.startsWith('decoration')) {
-							return;
-						}
-						return c;
-					});
-				}
-			} else {
-				w.class.push(mode.colorAnnotation);
-				if (mode.type === 'decoration') {
-					w.class.push('underline', 'decoration-solid');
-				}
+	function getExistingAnnotationIndex(w: Word): number | undefined {
+		let indexOf: number | undefined;
+		w.class?.forEach((c: string, idx: number) => {
+			if (c.startsWith(mode.type)) {
+				indexOf = idx;
 			}
 		});
+		return indexOf;
+	}
+
+	function removeAnnotation(cls: string[] | null, indexOf: number) {
+		if (!cls) {
+			return;
+		}
+		cls.splice(indexOf, 1);
+		removeClassDecorations(cls);
+	}
+
+	function removeClassDecorations(cls: string[]) {
+		if (mode.type === 'decoration') {
+			let filtered = cls.filter((c: string) => {
+				if (c === 'underline' || c.startsWith('decoration')) {
+					return;
+				}
+				return c;
+			});
+			cls.length = 0;
+			cls.push(...filtered);
+		}
+	}
+
+	function addAnnotation(cls: string[] | null) {
+		if (cls === null) {
+			return;
+		}
+		addColorAnnotation(cls);
+		addClassDecorations(cls);
+	}
+
+	function addColorAnnotation(cls: string[]) {
+		cls.push(mode.colorAnnotation);
+	}
+
+	function addClassDecorations(cls: string[]) {
+		if (mode.type === 'decoration') {
+			cls.push('underline', 'decoration-solid');
+		}
+	}
+
+	function getWordIndexesToEdit(): number[] {
+		let wordIndexes = [];
+		if (isWordAVerseNumber()) {
+			for (let i = 0; i < verse.words.length; i++) {
+				wordIndexes.push(i);
+			}
+		} else {
+			wordIndexes.push(wordIdx);
+		}
+		return wordIndexes;
 	}
 
 	function onNotesClicked() {
