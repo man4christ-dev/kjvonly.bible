@@ -240,28 +240,30 @@
 
 	function onEditClick() {
 		if (isWordAVerseNumber()) {
-			let w = initWordAnnotations(0);
-			let exists = false;
-			w.class.forEach((c: string) => {
-				if (c.startsWith(mode.type)) {
-					exists = true;
-				}
-			});
-
-			let wordIndexes = getWordIndexesToEdit();
-			wordIndexes.forEach((i) => {
-				let w = initWordAnnotations(i);
-				if (exists) {
-					clearAnnotation(w);
-				} else {
-					clearAnnotation(w);
-					addAnnotation(w.class);
-				}
-			});
+			applyAnnotationToVerse();
 		} else {
-			let w = initWordAnnotations(wordIdx);
-			updateAnnotation(w);
+			applyAnnotationToWord();
 		}
+	}
+
+	function applyAnnotationToVerse() {
+		let w = initWordAnnotations(0);
+		let exists = getExistingAnnotationIndex(w) !== undefined;
+		let wordIndexes = getWordIndexesToEdit();
+		wordIndexes.forEach((i) => {
+			let w = initWordAnnotations(i);
+			if (exists) {
+				clearAnnotation(w);
+			} else {
+				clearAnnotation(w);
+				addAnnotation(w.class);
+			}
+		});
+	}
+
+	function applyAnnotationToWord() {
+		let w = initWordAnnotations(wordIdx);
+		updateAnnotation(w);
 	}
 
 	function clearAnnotation(w: Word) {
