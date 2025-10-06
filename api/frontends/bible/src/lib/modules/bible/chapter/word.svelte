@@ -10,14 +10,19 @@
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import type { Pane } from '$lib/models/pane.model';
-	import type { Verse, Word } from '$lib/models/bible.model';
+	import {
+		BibleModes,
+		type BibleMode,
+		type Verse,
+		type Word
+	} from '$lib/models/bible.model';
 
 	// =============================== BINDINGS ================================
 
 	let {
 		annotations = $bindable(),
 		pane = $bindable(),
-		mode = $bindable(),
+		mode = $bindable<BibleMode>(),
 		notes = $bindable(),
 		bibleLocationRef,
 		footnotes,
@@ -28,7 +33,7 @@
 	}: {
 		annotations: any;
 		pane: Pane;
-		mode: any;
+		mode: BibleMode;
 		notes: any;
 		bibleLocationRef: string;
 		footnotes: Map<string, string>;
@@ -97,7 +102,7 @@
 		}
 	}
 
-	function updateMode(updMode: string) {
+	function updateMode(updMode: BibleModes) {
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		mode.bibleLocationRef = `${bookIDChapter}_${verse.number}_${wordIdx}`;
@@ -124,11 +129,29 @@
 
 	function onWordClicked(e: Event) {
 		e.stopPropagation();
+
+		if (isBibleModeEdit()) {
+			onEditClick();
+			return;
+		}
+
+		if (track[wordIdx] && track[wordIdx].finished) {
+			return;
+		}
+
+		if (track[wordIdx]) {
+			track[wordIdx].finished = true;
+		}
+
 		if (isWordAVerseNumber()) {
 			verseNumberClicked();
 		} else {
 			nonVerseNumberClicked();
 		}
+	}
+
+	function isBibleModeEdit() {
+		return mode.value === BibleModes.EDIT;
 	}
 
 	function verseNumberClicked() {
@@ -200,7 +223,7 @@
 				return;
 			}
 
-			updateMode('edit');
+			updateMode(BibleModes.EDIT);
 
 			track[wordIdx].finished = true;
 		}, pressThresholdInMilliseconds);
@@ -216,10 +239,6 @@
 	}
 
 	function onEditClick() {
-		if (mode.value == '') {
-			return;
-		}
-
 		let wordIndexes = [];
 		if (word.class?.includes('vno')) {
 			for (let i = 0; i < verse.words.length; i++) {
@@ -307,22 +326,7 @@
 	<span class={wordAnnotations?.class?.join(' ')}>
 		<span class="">&nbsp;</span
 		><!-- svelte-ignore a11y_no_static_element_interactions --><!-- svelte-ignore a11y_click_events_have_key_events --><span
-			onclick={(e) => {
-				if (mode.value !== '') {
-					onEditClick();
-					return;
-				}
-
-				if (track[wordIdx] && track[wordIdx].finished) {
-					return;
-				}
-
-				if (track[wordIdx]) {
-					track[wordIdx].finished = true;
-				}
-
-				onWordClicked(e);
-			}}
+			onclick={onWordClicked}
 			ontouchstart={onMouseDownTouchStart}
 			ontouchend={onMouseUpTouchEnd}
 			onmousedown={onMouseDownTouchStart}

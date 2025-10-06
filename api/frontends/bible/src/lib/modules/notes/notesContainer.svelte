@@ -399,8 +399,8 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		booknames = await chapterApi.getBooknames();
 
 		/* search */
-		notesService.subscribe(searchID, onFilterInputResults);
-		notesService.subscribe('*', onSearchResults);
+		notesService.subscribe(noteID, searchID, onFilterInputResults);
+		notesService.subscribe(noteID, '*', onSearchResults);
 		notesService.getAllNotes('*');
 
 		/* editor */

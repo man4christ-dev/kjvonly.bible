@@ -77,3 +77,32 @@ export function newAnnotation(): Annotations {
 		annots: new Map()
 	};
 }
+
+export interface BibleMode {
+	value: BibleModes;
+
+	bibleLocationRef: string;
+	notePopup: NotePopup;
+
+	// edit options, word
+	colorAnnotation: string;
+	type: string;
+}
+
+export interface NotePopup {
+	show: boolean;
+}
+
+export function newBibleMode(): BibleMode {
+	return {
+		value: BibleModes.EDIT,
+		colorAnnotation: 'bg-highlighta',
+		type: '',
+		bibleLocationRef: '73_1_1_1',
+		notePopup: { show: false }
+	};
+}
+
+export enum BibleModes {
+	EDIT = 1
+}

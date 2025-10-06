@@ -12,7 +12,11 @@
 	import EditOptions from './chapter/editOptions.svelte';
 
 	// MODELS
-	import { newAnnotation, type Annotations } from '$lib/models/bible.model';
+	import {
+		newAnnotation,
+		newBibleMode,
+		type Annotations
+	} from '$lib/models/bible.model';
 	import type { Pane } from '$lib/models/pane.model';
 
 	// SERVICES
@@ -42,12 +46,7 @@
 	let headerHeight = $state(0);
 	let id = $state(uuid4());
 	const LAST_BIBLE_LOCATION_REF = 'lastBibleLocationReference';
-	let mode: any = $state({
-		value: '',
-		colorAnnotation: 'bg-highlighta',
-		bibleLocationRef: '73_1_1_1',
-		notePopup: { show: false }
-	});
+	let mode: any = $state(newBibleMode());
 
 	// DOM related vars
 	let lastKnownScrollPosition = $state(0);
