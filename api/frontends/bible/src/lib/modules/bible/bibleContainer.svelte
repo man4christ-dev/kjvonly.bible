@@ -13,6 +13,7 @@
 
 	// MODELS
 	import {
+		BIBLE_MODES,
 		newAnnotation,
 		newBibleMode,
 		type Annotations
@@ -41,7 +42,7 @@
 	// ================================= VARS ==================================
 
 	let annotations: Annotations = $state(newAnnotation());
-	let bibleLocationRef: string | null = $state(null);
+	let bibleLocationRef: string = $state('');
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 	let id = $state(uuid4());
@@ -89,10 +90,12 @@
 	}
 
 	function setToLastBibleLocationRef() {
-		bibleLocationRef = localStorage.getItem(LAST_BIBLE_LOCATION_REF);
-		if (!bibleLocationRef) {
+		let ref = localStorage.getItem(LAST_BIBLE_LOCATION_REF);
+		if (!ref) {
 			setDefaultBibleLocationRef();
+			return;
 		}
+		bibleLocationRef = ref;
 	}
 
 	function setDefaultBibleLocationRef() {
@@ -168,7 +171,7 @@
 	<div class="flex w-full justify-center">
 		<div class="w-full max-w-6xl">
 			<!-- Need to type mode.value -->
-			{#if mode.value === ''}
+			{#if mode.value === BIBLE_MODES.READING}
 				<ChapterNavButtons
 					bind:mode
 					bind:pane

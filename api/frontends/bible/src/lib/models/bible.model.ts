@@ -1,5 +1,3 @@
-import type { chapter } from './chapter.model';
-
 /**
  *
  * BCV is an abbreviation for Book, Chapter, Verse[s]. BCV contains metadata
@@ -22,8 +20,7 @@ export interface BCV {
 	bibleLocationRef: string;
 }
 
-export async function jsonToChapter(jsonData: Promise<any>): Promise<Chapter> {
-	let data = await jsonData;
+export function jsonToChapter(data: any): Chapter {
 	let result: Chapter = {
 		number: data.number,
 		bookName: data.bookName,
@@ -47,6 +44,16 @@ export interface Chapter {
 	verses: Map<string, Verse>;
 	verseMap: Map<string, string>;
 	footnotes: Map<string, string>;
+}
+
+export function newChapter(): Chapter {
+	return {
+		number: 0,
+		bookName: '',
+		verses: new Map(),
+		verseMap: new Map(),
+		footnotes: new Map()
+	};
 }
 
 export interface Verse {
@@ -78,8 +85,23 @@ export function newAnnotation(): Annotations {
 	};
 }
 
+export async function jsonToAnnots(data: any): Promise<Annotations> {
+	let annots: Map<number, Map<number, WordAnnots>> = new Map();
+	for (let verseNumber of Object.keys(data.annots)) {
+		let a: Map<number, WordAnnots> = new Map();
+		for (let wordIdx of Object.keys(data.annots[verseNumber])) {
+			a.set(parseInt(wordIdx), JSON.parse(data.annots[verseNumber][wordIdx]));
+		}
+		annots.set(parseInt(verseNumber), a);
+	}
+	return {
+		version: data.version,
+		annots: annots
+	};
+}
+
 export interface BibleMode {
-	value: BibleModes;
+	value: BIBLE_MODES;
 
 	bibleLocationRef: string;
 	notePopup: NotePopup;
@@ -95,7 +117,7 @@ export interface NotePopup {
 
 export function newBibleMode(): BibleMode {
 	return {
-		value: BibleModes.EDIT,
+		value: BIBLE_MODES.READING,
 		colorAnnotation: 'bg-highlighta',
 		type: '',
 		bibleLocationRef: '73_1_1_1',
@@ -103,6 +125,7 @@ export function newBibleMode(): BibleMode {
 	};
 }
 
-export enum BibleModes {
-	EDIT = 1
+export enum BIBLE_MODES {
+	READING = 1,
+	EDIT
 }

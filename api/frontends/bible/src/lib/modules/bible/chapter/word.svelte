@@ -11,10 +11,11 @@
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import type { Pane } from '$lib/models/pane.model';
 	import {
-		BibleModes,
+		BIBLE_MODES,
 		type BibleMode,
 		type Verse,
-		type Word
+		type Word,
+		type WordAnnots
 	} from '$lib/models/bible.model';
 
 	// =============================== BINDINGS ================================
@@ -102,14 +103,14 @@
 		}
 	}
 
-	function updateMode(updMode: BibleModes) {
+	function updateMode(updMode: BIBLE_MODES) {
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		mode.bibleLocationRef = `${bookIDChapter}_${verse.number}_${wordIdx}`;
 		mode.value = updMode;
 	}
 
-	function initWordAnnotations(wordIndex: number) {
+	function initWordAnnotations(wordIndex: number): WordAnnots {
 		if (!annotations.annots[verse.number]) {
 			annotations.annots[verse.number] = {};
 		}
@@ -151,7 +152,7 @@
 	}
 
 	function isBibleModeEdit() {
-		return mode.value === BibleModes.EDIT;
+		return mode.value === BIBLE_MODES.EDIT;
 	}
 
 	function verseNumberClicked() {
@@ -206,38 +207,6 @@
 		return bookIDChapterVerse.replaceAll('_', '/');
 	}
 
-	function onMouseDownTouchStart() {
-		track[wordIdx] = {
-			startTime: Date.now(),
-			lastKnownScrollPosition: lastKnownScrollPosition,
-			finished: false
-		};
-
-		track[wordIdx].timeoutID = setTimeout(() => {
-			if (track[wordIdx].finished) {
-				return;
-			}
-
-			if (track[wordIdx].lastKnownScrollPosition != lastKnownScrollPosition) {
-				delete track[wordIdx];
-				return;
-			}
-
-			updateMode(BibleModes.EDIT);
-
-			track[wordIdx].finished = true;
-		}, pressThresholdInMilliseconds);
-	}
-
-	function onMouseUpTouchEnd() {
-		if (track[wordIdx]) {
-			const differenceInMilliseconds = Date.now() - track[wordIdx].startTime;
-			if (differenceInMilliseconds < pressThresholdInMilliseconds) {
-				clearTimeout(track[wordIdx].timeoutID);
-			}
-		}
-	}
-
 	function onEditClick() {
 		if (isWordAVerseNumber()) {
 			applyAnnotationToVerse();
@@ -266,14 +235,14 @@
 		updateAnnotation(w);
 	}
 
-	function clearAnnotation(w: Word) {
+	function clearAnnotation(w: WordAnnots) {
 		let indexOf = getExistingAnnotationIndex(w);
 		if (indexOf !== undefined) {
 			removeAnnotation(w.class, indexOf);
 		}
 	}
 
-	function updateAnnotation(w: Word) {
+	function updateAnnotation(w: WordAnnots) {
 		let indexOf = getExistingAnnotationIndex(w);
 		if (indexOf !== undefined) {
 			removeAnnotation(w.class, indexOf);
@@ -282,7 +251,7 @@
 		}
 	}
 
-	function getExistingAnnotationIndex(w: Word): number | undefined {
+	function getExistingAnnotationIndex(w: WordAnnots): number | undefined {
 		let indexOf: number | undefined;
 		w.class?.forEach((c: string, idx: number) => {
 			if (c.startsWith(mode.type)) {
@@ -292,10 +261,7 @@
 		return indexOf;
 	}
 
-	function removeAnnotation(cls: string[] | null, indexOf: number) {
-		if (!cls) {
-			return;
-		}
+	function removeAnnotation(cls: string[], indexOf: number) {
 		cls.splice(indexOf, 1);
 		removeClassDecorations(cls);
 	}
@@ -313,10 +279,7 @@
 		}
 	}
 
-	function addAnnotation(cls: string[] | null) {
-		if (cls === null) {
-			return;
-		}
+	function addAnnotation(cls: string[]) {
 		addColorAnnotation(cls);
 		addClassDecorations(cls);
 	}
@@ -345,6 +308,38 @@
 
 		mode.bibleLocationRef = `${bookIDChapter}_${verse.number}_${wordIdx}`;
 		mode.notePopup.show = true;
+	}
+
+	function onMouseDownTouchStart() {
+		track[wordIdx] = {
+			startTime: Date.now(),
+			lastKnownScrollPosition: lastKnownScrollPosition,
+			finished: false
+		};
+
+		track[wordIdx].timeoutID = setTimeout(() => {
+			if (track[wordIdx].finished) {
+				return;
+			}
+
+			if (track[wordIdx].lastKnownScrollPosition != lastKnownScrollPosition) {
+				delete track[wordIdx];
+				return;
+			}
+
+			updateMode(BIBLE_MODES.EDIT);
+
+			track[wordIdx].finished = true;
+		}, pressThresholdInMilliseconds);
+	}
+
+	function onMouseUpTouchEnd() {
+		if (track[wordIdx]) {
+			const differenceInMilliseconds = Date.now() - track[wordIdx].startTime;
+			if (differenceInMilliseconds < pressThresholdInMilliseconds) {
+				clearTimeout(track[wordIdx].timeoutID);
+			}
+		}
 	}
 </script>
 

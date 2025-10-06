@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { annotsApi } from '$lib/api/annots.api';
+	import { BIBLE_MODES } from '$lib/models/bible.model';
 	import { onMount } from 'svelte';
 
 	let { mode = $bindable(), annotations = $bindable() } = $props();
@@ -37,7 +38,7 @@
 	async function onClose() {
 		let data = await annotsApi.getAnnotations(annotations.id);
 		annotations = data;
-		mode.value = '';
+		mode.value = BIBLE_MODES.READING;
 	}
 
 	function updateColorAnnotation() {

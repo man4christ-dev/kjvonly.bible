@@ -8,7 +8,13 @@
 	import Verse from './verse.svelte';
 
 	// MODELS
-	import { type Verse as VerseModel } from '../../../models/bible.model';
+	import {
+		BIBLE_MODES,
+		newAnnotation,
+		type Annotations,
+		type BibleMode,
+		type Verse as VerseModel
+	} from '../../../models/bible.model';
 	import { type Chapter } from '../../../models/bible.model';
 
 	// SERVICES
@@ -23,16 +29,24 @@
 	// OTHER
 	import uuid4 from 'uuid4';
 	import { scrollTo, scrollToTop } from '$lib/utils/eventHandlers';
+	import type { Pane } from '$lib/models/pane.model';
 
 	// =============================== BINDINGS ================================
 
 	let {
-		bibleLocationRef = $bindable(),
-		id = $bindable(),
-		pane = $bindable(),
-		mode = $bindable(),
-		annotations = $bindable(),
+		bibleLocationRef = $bindable<string>(),
+		id = $bindable<string>(),
+		pane = $bindable<Pane>(),
+		mode = $bindable<BibleMode>(),
+		annotations = $bindable<Annotations>(),
 		lastKnownScrollPosition
+	}: {
+		bibleLocationRef: string;
+		id: string;
+		pane: Pane;
+		mode: BibleMode;
+		annotations: Annotations;
+		lastKnownScrollPosition: number;
 	} = $props();
 
 	// ================================= VARS ==================================
@@ -77,11 +91,11 @@
 	// ================================ FUNCS ==================================
 
 	function resetMode() {
-		mode.value = '';
+		mode.value = BIBLE_MODES.READING;
 	}
 
 	function resetAnnotations() {
-		annotations = {};
+		annotations = newAnnotation();
 	}
 
 	function setVerseRanges() {
