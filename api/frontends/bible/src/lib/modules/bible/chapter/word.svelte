@@ -122,30 +122,34 @@
 
 	// ============================== CLICK FUNCS ==============================
 
-	function onWordClicked(e: Event, word: any) {
+	function onWordClicked(e: Event) {
 		e.stopPropagation();
-
-		let crossRef = getBibleCrossReference();
-
 		if (isWordAVerseNumber()) {
-			let refs = extractAllVerseRefs();
-			let strongsWords = extractStrongsWords();
-
-			paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
-				footnotes: footnotes,
-				currentVerseRef: crossRef,
-				refs: refs,
-				strongsWords: strongsWords
-			});
+			verseNumberClicked();
 		} else {
-			paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
-				word: word,
-				footnotes: footnotes,
-				currentVerseRef: crossRef
-			});
+			nonVerseNumberClicked();
 		}
 	}
 
+	function verseNumberClicked() {
+		let refs = extractAllVerseRefs();
+		let strongsWords = extractStrongsWords();
+
+		paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
+			footnotes: footnotes,
+			currentVerseRef: getBibleCrossReference(),
+			refs: refs,
+			strongsWords: strongsWords
+		});
+	}
+
+	function nonVerseNumberClicked() {
+		paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
+			word: word,
+			footnotes: footnotes,
+			currentVerseRef: getBibleCrossReference()
+		});
+	}
 	function isWordAVerseNumber(): boolean {
 		return wordIdx === 0;
 	}
@@ -317,7 +321,7 @@
 					track[wordIdx].finished = true;
 				}
 
-				onWordClicked(e, word);
+				onWordClicked(e);
 			}}
 			ontouchstart={onMouseDownTouchStart}
 			ontouchend={onMouseUpTouchEnd}
