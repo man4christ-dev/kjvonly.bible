@@ -13,6 +13,7 @@
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { chapterService } from '$lib/services/bible/chapter.service';
 	import { notesService } from '$lib/services/notes.service';
 	import { syncService } from '$lib/services/sync.service';
 
@@ -22,7 +23,6 @@
 	// OTHER
 	import uuid4 from 'uuid4';
 	import { scrollTo, scrollToTop } from '$lib/utils/eventHandlers';
-	import { chapterService } from '$lib/services/bible/chapter.service';
 
 	// =============================== BINDINGS ================================
 
@@ -39,7 +39,7 @@
 
 	let notesID = uuid4();
 
-	let footnotes: any = $state();
+	let footnotes: Map<string, string> = $state(new Map());
 	let hasVerseRange: boolean = $state(false);
 
 	let notes: any = $state();
@@ -49,7 +49,7 @@
 
 	let chapter: Chapter | undefined = $state();
 	let verses: Map<string, VerseModel> = $state(new Map());
-	let versesToShow: string[] = $state([]);
+	let versesNumbersToShow: string[] = $state([]);
 
 	// =============================== LIFECYCLE ===============================
 
@@ -131,6 +131,7 @@
 	function unsubscribeToNotes() {
 		notesService.unsubscribe(id);
 	}
+
 	async function loadNotes() {
 		notesService.searchNotes(
 			notesID,
@@ -148,13 +149,13 @@
 
 	function setChapterVersesToShow() {
 		if (hasVerseRange) {
-			versesToShow = verses
+			versesNumbersToShow = verses
 				.keys()
 				.toArray()
 				.sort((a, b) => (Number(a) < Number(b) ? -1 : 1))
 				.slice(verseRangeStartIndex, verseRangeEndIndex);
 		} else {
-			versesToShow = verses
+			versesNumbersToShow = verses
 				.keys()
 				.toArray()
 				.sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
@@ -173,7 +174,7 @@
 </script>
 
 <div class="px-4 leading-loose">
-	{#each versesToShow as k, idx}
+	{#each versesNumbersToShow as k, idx}
 		<span class="whitespace-normal" id={`${id}-vno-${idx + 1}`}>
 			<Verse
 				bind:pane

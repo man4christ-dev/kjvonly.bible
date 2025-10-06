@@ -1,18 +1,16 @@
 <script lang="ts">
-	import { onMount, untrack } from 'svelte';
 	import Word from './word.svelte';
+
 	let {
-		lastKnownScrollPosition,
+		annotations = $bindable(),
+		pane = $bindable(),
+		mode = $bindable(),
+		notes = $bindable(),
 		bibleLocationRef,
 		footnotes,
-		verse,
-		pane = $bindable(),
-		annotations = $bindable(),
-		notes = $bindable(),
-		mode = $bindable()
+		lastKnownScrollPosition,
+		verse
 	} = $props();
-
-	function a() {}
 </script>
 
 {#if verse}

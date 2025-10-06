@@ -1,122 +1,132 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// SVELTE
+	import { onMount } from 'svelte';
+
+	// MODELS
 	import { Modules } from '$lib/models/modules.model';
+
+	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { onMount, untrack } from 'svelte';
+	import type { Pane } from '$lib/models/pane.model';
+	import type { Verse, Word } from '$lib/models/bible.model';
+
+	// =============================== BINDINGS ================================
 
 	let {
-		wordIdx,
-		lastKnownScrollPosition,
-		word,
-		verse,
-		footnotes,
-		bibleLocationRef,
-		pane = $bindable(),
 		annotations = $bindable(),
+		pane = $bindable(),
+		mode = $bindable(),
 		notes = $bindable(),
-		mode = $bindable()
+		bibleLocationRef,
+		footnotes,
+		lastKnownScrollPosition,
+		verse,
+		word,
+		wordIdx
+	}: {
+		annotations: any;
+		pane: Pane;
+		mode: any;
+		notes: any;
+		bibleLocationRef: string;
+		footnotes: Map<string, string>;
+		lastKnownScrollPosition: number;
+		verse: Verse;
+		word: Word;
+		wordIdx: number;
 	} = $props();
 
-	let track: any = {};
-	let verseNumber = $state(0);
-	let wordAnnotations: any = $state();
-	let notesAnnotations: any = $state(false);
-	let hasVerseReferences = $state(false);
+	// ================================= VARS ==================================
 
-	onMount(() => {
-		verseNumber = verse['number'];
-	});
+	let track: any = {};
+	let wordAnnotations: any = $state();
+	let wordHasNotes: boolean = $state(false);
+	let wordHasVerseReferences = $state(false);
+	let pressThresholdInMilliseconds = 1000;
+
+	// =============================== LIFECYCLE ===============================
 
 	$effect(() => {
 		annotations;
-		wordAnnotations = getWordAnnotations();
+		setWordAnnotations();
 	});
 
 	$effect(() => {
 		notes;
-		if (notes) {
-			wordHasNotes();
-		}
+		setWordHasNotes();
 	});
 
-	$effect(() => {
-		word;
-		untrack(() => {
-			hasVerseReferences = false;
-			if (wordIdx === 0) {
-				verse?.words?.forEach((w: any) => {
-					if (hasVerseReferences) {
+	onMount(() => {
+		setWordHasVerseReferences();
+	});
+
+	// ================================ FUNCS ==================================
+
+	function setWordHasVerseReferences() {
+		if (wordIdx === 0) {
+			for (let w of verse.words) {
+				for (var h of w.href || []) {
+					if (h.includes('/')) {
+						wordHasVerseReferences = true;
 						return;
 					}
-					w.href?.forEach((h: any) => {
-						if (h.includes('/')) {
-							hasVerseReferences = true;
-							return;
-						}
-					});
-				});
+				}
 			}
-		});
-	});
-
-	function updateMode(m: string) {
-		let bookIDChapter =
-			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
-		mode.bibleLocationRef = `${bookIDChapter}_${verse['number']}_${wordIdx}`;
-		mode.value = m;
+		}
+		wordHasVerseReferences = false;
 	}
 
-	function getWordAnnotations() {
-		verseNumber = verse['number'];
-
-		if (!annotations.annots) {
-			return;
+	function setWordAnnotations() {
+		if (
+			annotations.annots &&
+			annotations.annots[verse.number] &&
+			annotations.annots[verse.number][wordIdx]
+		) {
+			wordAnnotations = annotations.annots[verse.number][wordIdx];
 		}
-
-		if (!annotations.annots[verseNumber]) {
-			return;
-		}
-
-		if (!annotations.annots[verseNumber][wordIdx]) {
-			return;
-		}
-
-		return annotations.annots[verseNumber][wordIdx];
 	}
 
-	function wordHasNotes() {
+	function setWordHasNotes() {
+		if (notes) {
+			let bookIDChapter =
+				bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
+
+			let wordKey = `${bookIDChapter}_${verse.number}_${wordIdx}`;
+			wordHasNotes = wordKey in notes;
+		}
+	}
+
+	function updateMode(updMode: string) {
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
-
-		let verseNumber = verse['number'];
-		let wordKey = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
-		notesAnnotations = notes[wordKey];
+		mode.bibleLocationRef = `${bookIDChapter}_${verse.number}_${wordIdx}`;
+		mode.value = updMode;
 	}
 
 	function initWordAnnotations(wordIndex: number) {
-		verseNumber = verse['number'];
-
-		if (!annotations.annots[verseNumber]) {
-			annotations.annots[verseNumber] = {};
+		if (!annotations.annots[verse.number]) {
+			annotations.annots[verse.number] = {};
 		}
 
-		if (!annotations.annots[verseNumber][wordIndex]) {
-			annotations.annots[verseNumber][wordIndex] = {};
+		if (!annotations.annots[verse.number][wordIndex]) {
+			annotations.annots[verse.number][wordIndex] = {};
 		}
 
-		if (!annotations.annots[verseNumber][wordIndex].class) {
-			annotations.annots[verseNumber][wordIndex].class = [];
+		if (!annotations.annots[verse.number][wordIndex].class) {
+			annotations.annots[verse.number][wordIndex].class = [];
 		}
 
-		return annotations.annots[verseNumber][wordIndex];
+		return annotations.annots[verse.number][wordIndex];
 	}
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onWordClicked(e: Event, word: any) {
 		e.stopPropagation();
 
-		pane.buffer.bag.lastVerse = verse.number;
-		let verseNumber = verse['number'];
-		let ref = bibleLocationRef.replaceAll('_', '/') + '/' + verseNumber;
+		let crossRef = getBibleCrossReference();
 
 		if (word.class.includes('vno')) {
 			let refs: string[] = [];
@@ -135,7 +145,7 @@
 
 			paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
 				footnotes: footnotes,
-				currentVerseRef: ref,
+				currentVerseRef: crossRef,
 				refs: refs,
 				strongsWords: strongsWords
 			});
@@ -143,12 +153,17 @@
 			paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
 				word: word,
 				footnotes: footnotes,
-				currentVerseRef: ref
+				currentVerseRef: crossRef
 			});
 		}
 	}
 
-	let pressThresholdInMilliseconds = 1000;
+	function getBibleCrossReference(): string {
+		let bookIDChapter =
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
+		let bookIDChapterVerse = `${bookIDChapter}_${verse.number}`;
+		return bookIDChapterVerse.replaceAll('_', '/');
+	}
 
 	function onMouseDownTouchStart() {
 		track[wordIdx] = {
@@ -239,12 +254,12 @@
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 
-		mode.bibleLocationRef = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
+		mode.bibleLocationRef = `${bookIDChapter}_${verse.number}_${wordIdx}`;
 		mode.notePopup.show = true;
 	}
 </script>
 
-{#if notesAnnotations}
+{#if wordHasNotes}
 	<span class={wordAnnotations?.class?.join(' ')}>
 		&nbsp;<button
 			onclick={onNotesClicked}
@@ -294,7 +309,7 @@
 			ontouchend={onMouseUpTouchEnd}
 			onmousedown={onMouseDownTouchStart}
 			onmouseup={onMouseUpTouchEnd}
-			class="{word.class?.join(' ')} {hasVerseReferences &&
+			class="{word.class?.join(' ')} {wordHasVerseReferences &&
 			word.class.includes('vno')
 				? 'vno-refs'
 				: ''} ">{word.text}</span
