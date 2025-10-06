@@ -270,14 +270,14 @@
 
 <!-- typescript will optimize these out if not used. Must keep them in dom -->
 
-<span class="hidded text-highlighta"></span>
-<span class="hidded text-highlightb"></span>
-<span class="hidded text-highlightc"></span>
-<span class="hidded text-highlightd"></span>
-<span class="hidded text-highlighte"></span>
+<span class="text-highlighta hidden"></span>
+<span class="text-highlightb hidden"></span>
+<span class="text-highlightc hidden"></span>
+<span class="text-highlightd hidden"></span>
+<span class="text-highlighte hidden"></span>
 
-<span class="hidded decoration-highlighta underline"></span>
-<span class="hidded decoration-highlightb underline"></span>
-<span class="hidded decoration-highlightc underline"></span>
-<span class="hidded decoration-highlightd underline"></span>
-<span class="hidded decoration-highlighte underline"></span>
+<span class="decoration-highlighta hidden underline"></span>
+<span class="decoration-highlightb hidden underline"></span>
+<span class="decoration-highlightc hidden underline"></span>
+<span class="decoration-highlightd hidden underline"></span>
+<span class="decoration-highlighte hidden underline"></span>

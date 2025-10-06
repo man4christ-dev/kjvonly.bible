@@ -374,20 +374,21 @@
 	</span>
 {/if}{#if word && word.class && (word.class.includes('xref') || word.class.includes('FOOTNO') || word.class.includes('vno'))}
 	<span class={wordAnnotations?.class?.join(' ')}>
-		<span class="">&nbsp;</span
+		<span class={wordAnnotations?.class?.join(' ')}>&nbsp;</span
 		><!-- svelte-ignore a11y_no_static_element_interactions --><!-- svelte-ignore a11y_click_events_have_key_events --><span
 			onclick={onWordClicked}
 			ontouchstart={onMouseDownTouchStart}
 			ontouchend={onMouseUpTouchEnd}
 			onmousedown={onMouseDownTouchStart}
 			onmouseup={onMouseUpTouchEnd}
-			class="{word.class?.join(' ')} {verseHasReferences ? 'vno-refs' : ''} "
-			>{word.text}</span
+			class="{word.class?.join(' ')} {verseHasReferences
+				? 'vno-refs'
+				: ''} {wordAnnotations?.class?.join(' ')}">{word.text}</span
 		></span
 	>
 {:else}
 	<span class=" {wordAnnotations?.class?.join(' ')}">
-		<span class="">&nbsp;</span><span
+		<span class={wordAnnotations?.class?.join(' ')}>&nbsp;</span><span
 			tabindex="-1"
 			role="button"
 			onkeydown={() => {}}
@@ -396,7 +397,8 @@
 			onmousedown={onMouseDownTouchStart}
 			onmouseup={onMouseUpTouchEnd}
 			onclick={onEditClick}
-			class={word.class?.join(' ')}>{word.text}</span
+			class="{word.class?.join(' ')} {wordAnnotations?.class?.join(' ')}"
+			>{word.text}</span
 		></span
 	>
 {/if}
@@ -418,7 +420,7 @@
 	}
 
 	.vno {
-		@apply cursor-pointer text-neutral-700;
+		@apply cursor-pointer;
 	}
 
 	.vno-refs {
