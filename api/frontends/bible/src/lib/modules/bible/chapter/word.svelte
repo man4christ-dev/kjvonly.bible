@@ -85,6 +85,10 @@
 		verseHasReferences = false;
 	}
 
+	function isWordAVerseNumber(): boolean {
+		return wordIdx === 0;
+	}
+
 	function setWordAnnotations() {
 		if (
 			annotations.annots &&
@@ -109,18 +113,6 @@
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		mode.bibleLocationRef = `${bookIDChapter}_${verse.number}_${wordIdx}`;
 		mode.value = updMode;
-	}
-
-	function initWordAnnotations(wordIndex: number): WordAnnots {
-		if (!annotations.annots[verse.number]) {
-			annotations.annots[verse.number] = {};
-		}
-
-		if (!annotations.annots[verse.number][wordIndex]) {
-			annotations.annots[verse.number][wordIndex] = { class: [] };
-		}
-
-		return annotations.annots[verse.number][wordIndex];
 	}
 
 	// ============================== CLICK FUNCS ==============================
@@ -152,6 +144,14 @@
 		return mode.value === BIBLE_MODES.EDIT;
 	}
 
+	function onEditClick() {
+		if (isWordAVerseNumber()) {
+			applyAnnotationToVerse();
+		} else {
+			applyAnnotationToWord();
+		}
+	}
+
 	function verseNumberClicked() {
 		let refs = extractAllVerseRefs();
 		let strongsWords = extractStrongsWords();
@@ -170,46 +170,6 @@
 			footnotes: footnotes,
 			currentVerseRef: getBibleCrossReference()
 		});
-	}
-	function isWordAVerseNumber(): boolean {
-		return wordIdx === 0;
-	}
-
-	function extractAllVerseRefs(): string[] {
-		return verse.words
-			.flatMap((w: Word) => {
-				return w.href;
-			})
-			.filter((s: string | null) => {
-				return s !== null;
-			});
-	}
-
-	function extractStrongsWords(): string[] {
-		return verse.words
-			.filter((w: Word) => {
-				return w.href?.find((ref: string) => {
-					return ref.startsWith('G') || ref.startsWith('H');
-				});
-			})
-			.map((w: Word) => {
-				return w.text;
-			});
-	}
-
-	function getBibleCrossReference(): string {
-		let bookIDChapter =
-			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
-		let bookIDChapterVerse = `${bookIDChapter}_${verse.number}`;
-		return bookIDChapterVerse.replaceAll('_', '/');
-	}
-
-	function onEditClick() {
-		if (isWordAVerseNumber()) {
-			applyAnnotationToVerse();
-		} else {
-			applyAnnotationToWord();
-		}
 	}
 
 	function applyAnnotationToVerse() {
@@ -232,20 +192,16 @@
 		updateAnnotation(w);
 	}
 
-	function clearAnnotation(w: WordAnnots) {
-		let indexOf = getExistingAnnotationIndex(w);
-		if (indexOf !== undefined) {
-			removeAnnotation(w.class, indexOf);
+	function initWordAnnotations(wordIndex: number): WordAnnots {
+		if (!annotations.annots[verse.number]) {
+			annotations.annots[verse.number] = {};
 		}
-	}
 
-	function updateAnnotation(w: WordAnnots) {
-		let indexOf = getExistingAnnotationIndex(w);
-		if (indexOf !== undefined) {
-			removeAnnotation(w.class, indexOf);
-		} else {
-			addAnnotation(w.class);
+		if (!annotations.annots[verse.number][wordIndex]) {
+			annotations.annots[verse.number][wordIndex] = { class: [] };
 		}
+
+		return annotations.annots[verse.number][wordIndex];
 	}
 
 	function getExistingAnnotationIndex(w: WordAnnots): number | undefined {
@@ -256,6 +212,21 @@
 			}
 		});
 		return indexOf;
+	}
+
+	function getWordIndexesToEdit(): number[] {
+		let wordIndexes = [];
+		for (let i = 0; i < verse.words.length; i++) {
+			wordIndexes.push(i);
+		}
+		return wordIndexes;
+	}
+
+	function clearAnnotation(w: WordAnnots) {
+		let indexOf = getExistingAnnotationIndex(w);
+		if (indexOf !== undefined) {
+			removeAnnotation(w.class, indexOf);
+		}
 	}
 
 	function removeAnnotation(cls: string[], indexOf: number) {
@@ -291,12 +262,42 @@
 		}
 	}
 
-	function getWordIndexesToEdit(): number[] {
-		let wordIndexes = [];
-		for (let i = 0; i < verse.words.length; i++) {
-			wordIndexes.push(i);
+	function updateAnnotation(w: WordAnnots) {
+		let indexOf = getExistingAnnotationIndex(w);
+		if (indexOf !== undefined) {
+			removeAnnotation(w.class, indexOf);
+		} else {
+			addAnnotation(w.class);
 		}
-		return wordIndexes;
+	}
+
+	function extractAllVerseRefs(): string[] {
+		return verse.words
+			.flatMap((w: Word) => {
+				return w.href;
+			})
+			.filter((s: string | null) => {
+				return s !== null;
+			});
+	}
+
+	function extractStrongsWords(): string[] {
+		return verse.words
+			.filter((w: Word) => {
+				return w.href?.find((ref: string) => {
+					return ref.startsWith('G') || ref.startsWith('H');
+				});
+			})
+			.map((w: Word) => {
+				return w.text;
+			});
+	}
+
+	function getBibleCrossReference(): string {
+		let bookIDChapter =
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
+		let bookIDChapterVerse = `${bookIDChapter}_${verse.number}`;
+		return bookIDChapterVerse.replaceAll('_', '/');
 	}
 
 	function onNotesClicked() {
@@ -368,8 +369,10 @@
 	</span>
 {/if}{#if word && word.class && (word.class.includes('xref') || word.class.includes('FOOTNO') || word.class.includes('vno'))}
 	<span class={wordAnnotations?.class?.join(' ')}>
-		<span class={wordAnnotations?.class?.join(' ')}>&nbsp;</span
-		><!-- svelte-ignore a11y_no_static_element_interactions --><!-- svelte-ignore a11y_click_events_have_key_events --><span
+		<span class={wordAnnotations?.class?.join(' ')}>&nbsp;</span><span
+			role="button"
+			tabindex="-1"
+			onkeydown={() => {}}
 			onclick={onWordClicked}
 			ontouchstart={onMouseDownTouchStart}
 			ontouchend={onMouseUpTouchEnd}
