@@ -1,14 +1,28 @@
 <script lang="ts">
-	import { annotsApi } from '$lib/api/annots.api';
-	import { BIBLE_MODES } from '$lib/models/bible.model';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount } from 'svelte';
 
-	let { mode = $bindable(), annotations = $bindable() } = $props();
+	// MODEL
+	import {
+		BIBLE_MODES,
+		type Annotations,
+		type BibleMode
+	} from '$lib/models/bible.model';
 
-	onMount(() => {
-		mode.colorAnnotation = 'bg-highlighta';
-		mode.type = 'bg';
-	});
+	// API
+	import { annotsApi } from '$lib/api/annots.api';
+
+	// =============================== BINDINGS ================================
+	let {
+		mode = $bindable<BibleMode>(),
+		annotations = $bindable<Annotations>()
+	}: {
+		mode: BibleMode;
+		annotations: Annotations;
+	} = $props();
+
+	// ================================= VARS ==================================
 
 	let selectedColor = $state('a');
 	let selectedAnnotation = $state('bg');
@@ -17,6 +31,15 @@
 	let underlineColor = $state(5);
 	let textColor = $state(5);
 	let highlighterColor = $state(0);
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		mode.colorAnnotation = 'bg-highlighta';
+		mode.type = 'bg';
+	});
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onSelectColor(color: string) {
 		selectedColor = color;
@@ -32,7 +55,6 @@
 			annotations.version = resp.version;
 			annotations = resp;
 		}
-		mode.value = '';
 	}
 
 	async function onClose() {
@@ -149,7 +171,7 @@
 			onclick={() => {
 				onSave();
 				mode.notePopup.bibleLocationRef = mode.bibleLocationRef;
-				mode.value = '';
+				mode.value = BIBLE_MODES.READING;
 				mode.notePopup.show = true;
 			}}
 			aria-label="note"

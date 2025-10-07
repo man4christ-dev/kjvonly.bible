@@ -1,11 +1,17 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// MODELS
 	import {
 		type Annotations,
 		type BibleMode,
 		type Verse
 	} from '$lib/models/bible.model';
 	import type { Pane } from '$lib/models/pane.model';
+
+	// Components
 	import Word from './word.svelte';
+
+	// =============================== BINDINGS ================================
 
 	let {
 		annotations = $bindable<Annotations>(),
@@ -29,6 +35,8 @@
 </script>
 
 {#if verse}
+	<!-- Group verse number and first word so the verse number is never at the 
+	 	 end of a line -->
 	<span class="inline-block">
 		{#each verse.words.slice(0, 2) as word, idx}
 			<Word

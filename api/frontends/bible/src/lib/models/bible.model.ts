@@ -74,6 +74,7 @@ export interface WordAnnots {
 }
 
 export interface Annotations {
+	id: string;
 	version: number;
 	annots: Annots;
 }
@@ -82,6 +83,7 @@ export type Annots = { [verse: number]: { [wordIdx: number]: WordAnnots } };
 
 export function newAnnotation(): Annotations {
 	return {
+		id: '',
 		version: 0,
 		annots: {}
 	};
@@ -99,6 +101,7 @@ export interface BibleMode {
 }
 
 export interface NotePopup {
+	bibleLocationRef: string;
 	show: boolean;
 }
 
@@ -108,7 +111,10 @@ export function newBibleMode(): BibleMode {
 		colorAnnotation: 'bg-highlighta',
 		type: '',
 		bibleLocationRef: '73_1_1_1',
-		notePopup: { show: false }
+		notePopup: {
+			show: false,
+			bibleLocationRef: '73_1_1_1'
+		}
 	};
 }
 
