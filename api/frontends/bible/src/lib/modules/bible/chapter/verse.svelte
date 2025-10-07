@@ -1,15 +1,30 @@
 <script lang="ts">
+	import {
+		type Annotations,
+		type BibleMode,
+		type Verse
+	} from '$lib/models/bible.model';
+	import type { Pane } from '$lib/models/pane.model';
 	import Word from './word.svelte';
 
 	let {
-		annotations = $bindable(),
-		pane = $bindable(),
-		mode = $bindable(),
-		notes = $bindable(),
+		annotations = $bindable<Annotations>(),
+		pane = $bindable<Pane>(),
+		mode = $bindable<BibleMode>(),
+		notes = $bindable<any>(),
 		bibleLocationRef,
 		footnotes,
 		lastKnownScrollPosition,
 		verse
+	}: {
+		annotations: Annotations;
+		pane: Pane;
+		mode: BibleMode;
+		notes: any;
+		bibleLocationRef: string;
+		footnotes: Map<string, string>;
+		lastKnownScrollPosition: number;
+		verse: Verse;
 	} = $props();
 </script>
 

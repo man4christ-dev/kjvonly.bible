@@ -75,28 +75,15 @@ export interface WordAnnots {
 
 export interface Annotations {
 	version: number;
-	annots: Map<number, Map<number, WordAnnots>>;
+	annots: Annots;
 }
+
+export type Annots = { [verse: number]: { [wordIdx: number]: WordAnnots } };
 
 export function newAnnotation(): Annotations {
 	return {
 		version: 0,
-		annots: new Map()
-	};
-}
-
-export async function jsonToAnnots(data: any): Promise<Annotations> {
-	let annots: Map<number, Map<number, WordAnnots>> = new Map();
-	for (let verseNumber of Object.keys(data.annots)) {
-		let a: Map<number, WordAnnots> = new Map();
-		for (let wordIdx of Object.keys(data.annots[verseNumber])) {
-			a.set(parseInt(wordIdx), JSON.parse(data.annots[verseNumber][wordIdx]));
-		}
-		annots.set(parseInt(verseNumber), a);
-	}
-	return {
-		version: data.version,
-		annots: annots
+		annots: {}
 	};
 }
 

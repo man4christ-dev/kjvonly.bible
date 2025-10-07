@@ -195,7 +195,7 @@
 				bind:annotations
 				bind:notes
 				bind:mode
-				verse={chapter?.verses.get(k)}
+				verse={chapter?.verses.get(k) as VerseModel}
 				{bibleLocationRef}
 				{footnotes}
 				{lastKnownScrollPosition}

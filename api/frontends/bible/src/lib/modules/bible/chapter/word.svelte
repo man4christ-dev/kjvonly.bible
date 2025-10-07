@@ -12,6 +12,7 @@
 	import type { Pane } from '$lib/models/pane.model';
 	import {
 		BIBLE_MODES,
+		type Annotations,
 		type BibleMode,
 		type Verse,
 		type Word,
@@ -21,7 +22,7 @@
 	// =============================== BINDINGS ================================
 
 	let {
-		annotations = $bindable(),
+		annotations = $bindable<Annotations>(),
 		pane = $bindable(),
 		mode = $bindable<BibleMode>(),
 		notes = $bindable(),
@@ -32,7 +33,7 @@
 		word,
 		wordIdx
 	}: {
-		annotations: any;
+		annotations: Annotations;
 		pane: Pane;
 		mode: BibleMode;
 		notes: any;
@@ -116,11 +117,7 @@
 		}
 
 		if (!annotations.annots[verse.number][wordIndex]) {
-			annotations.annots[verse.number][wordIndex] = {};
-		}
-
-		if (!annotations.annots[verse.number][wordIndex].class) {
-			annotations.annots[verse.number][wordIndex].class = [];
+			annotations.annots[verse.number][wordIndex] = { class: [] };
 		}
 
 		return annotations.annots[verse.number][wordIndex];
