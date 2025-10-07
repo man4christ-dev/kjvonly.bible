@@ -17,15 +17,23 @@
 
 	// OTHER
 	import { attachEvents } from '$lib/utils/eventHandlers';
+	import type { BibleMode } from '$lib/models/bible.model';
+	import type { Pane } from '$lib/models/pane.model';
 
 	// =============================== BINDINGS ================================
 
 	let {
-		mode = $bindable(),
-		pane = $bindable(),
-		bibleLocationRef = $bindable(),
-		showNavButtons = $bindable(),
+		mode = $bindable<BibleMode>(),
+		pane = $bindable<Pane>(),
+		bibleLocationRef = $bindable<string>(),
+		showNavButtons = $bindable<boolean>(),
 		ID
+	}: {
+		mode: BibleMode;
+		pane: Pane;
+		bibleLocationRef: string;
+		showNavButtons: boolean;
+		ID: string;
 	} = $props();
 
 	// ================================= VARS ==================================
@@ -70,20 +78,18 @@
 
 	// ============================== CLICK FUNCS ==============================
 
-	async function _nextPlanChapter() {
-		let plan: NavReadings = mode.navReadings;
-		let ci = plan.currentNavReadingsIndex;
+	async function _nextPlanChapter(nr: NavReadings) {
+		let ci = nr.currentNavReadingsIndex;
 		let nextIndex = ci + 1;
-		if (nextIndex > plan.readings.bcvs.length - 1) {
+		if (nextIndex > nr.readings.bcvs.length - 1) {
 			pane.updateBuffer(Modules.PLANS);
 		} else {
-			plan.currentNavReadingsIndex = nextIndex;
-			bibleLocationRef = plan.readings.bcvs[nextIndex].bibleLocationRef;
+			nr.currentNavReadingsIndex = nextIndex;
+			bibleLocationRef = nr.readings.bcvs[nextIndex].bibleLocationRef;
 		}
 	}
 
-	async function _previousPlanChapter() {
-		let nr: NavReadings = mode.navReadings;
+	async function _previousPlanChapter(nr: NavReadings) {
 		let ci = nr.currentNavReadingsIndex;
 		let nextIndex = ci - 1;
 		if (nextIndex >= 0) {
@@ -95,7 +101,7 @@
 	async function _nextChapter(e: Event) {
 		e.stopPropagation();
 		if (mode.navReadings) {
-			_nextPlanChapter();
+			_nextPlanChapter(mode.navReadings);
 			return;
 		}
 		if (bibleLocationRef) {
@@ -106,7 +112,7 @@
 	async function _previousChapter(e: Event) {
 		e.stopPropagation();
 		if (mode.navReadings) {
-			_previousPlanChapter();
+			_previousPlanChapter(mode.navReadings);
 			return;
 		}
 

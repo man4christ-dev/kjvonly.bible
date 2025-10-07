@@ -1,7 +1,6 @@
 <script lang="ts">
 	// ================================ IMPORTS ================================
 	// SVELTE
-
 	import { onDestroy, onMount } from 'svelte';
 
 	// COMPONENTS

@@ -1,17 +1,39 @@
 <script lang="ts">
-	import { annotsApi } from '$lib/api/annots.api';
+	// ================================ IMPORTS ================================
+
+	//MODELS
 	import { Modules } from '$lib/models/modules.model';
+
+	// SERVICES
 	import { notesService } from '$lib/services/notes.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { searchService } from '$lib/services/search.service';
 	import { toastService } from '$lib/services/toast.service';
+
+	// API
+	import { annotsApi } from '$lib/api/annots.api';
+
+	// COMPONENTS
+	import Close from '$lib/components/buttons/close.svelte';
+
+	// OTHER
 	import { deepMerge } from '$lib/utils/deepmerge';
 
+	// =============================== BINDINGS ================================
+
 	let {
-		showActionsDropdown = $bindable(),
-		showCopyVersePopup = $bindable(),
+		showActionsDropdown = $bindable<boolean>(),
+		showCopyVersePopup = $bindable<boolean>(),
 		paneID
+	}: {
+		showActionsDropdown: boolean;
+		showCopyVersePopup: boolean;
+		paneID: string;
 	} = $props();
+
+	// ================================= VARS ==================================
+
+	let clientHeight = $state(0);
+	let headerHeight = $state(0);
 
 	let actions: any = {
 		'copy verses': () => {
@@ -42,8 +64,6 @@
 			onClosePane();
 		}
 	};
-
-	let actionsOrder = [];
 
 	function onSplitVertical(): void {
 		paneService.onSplitPane(paneID, 'v', Modules.MODULES, {});
@@ -79,6 +99,8 @@
 		document.body.removeChild(element);
 		toastService.showToast('finished export data');
 	}
+
+	// ================================ FUNCS ==================================
 
 	// pulled from https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
 	/**
@@ -174,36 +196,19 @@
 		element.click();
 	}
 
-	let clientHeight = $state(0);
-	let headerHeight = $state(0);
+	function onCloseActionsDropdown() {
+		showActionsDropdown = false;
+	}
 </script>
 
 <div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
-	<div class="w-full justify-center md:max-w-lg">
+	<div class="w-full max-w-lg justify-center">
 		<header
 			bind:clientHeight={headerHeight}
 			class="sticky top-0 w-full flex-col border-b-2 bg-neutral-100 text-neutral-700"
 		>
 			<div class="flex w-full justify-end p-2">
-				<button
-					aria-label="close"
-					onclick={() => {
-						showActionsDropdown = false;
-					}}
-					class="h-12 w-12 px-2 pt-2 text-neutral-700"
-				>
-					<svg
-						xmlns="http://www.w3.org/2000/svg"
-						viewBox="0 0 24 24"
-						width="100%"
-						height="100%"
-					>
-						<path
-							class="fill-neutral-700"
-							d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
-						/>
-					</svg>
-				</button>
+				<Close onClose={onCloseActionsDropdown}></Close>
 			</div>
 		</header>
 
