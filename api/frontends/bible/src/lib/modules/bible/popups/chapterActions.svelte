@@ -124,7 +124,7 @@
 			onclick={(e) => {
 				onBookChapterClick(e);
 			}}
-			class="m-0 text-center font-bold text-neutral-700 md:text-base lg:text-lg"
+			class="m-0 text-center text-neutral-700"
 		>
 			<span class="bookChapter flex items-center text-center"
 				><span>
@@ -204,7 +204,7 @@
 
 <style>
 	@reference "../../../../app.css";
-	.bookChapter {
+	/* .bookChapter {
 		font-size: min(5cqw, 1rem);
-	}
+	} */
 </style>

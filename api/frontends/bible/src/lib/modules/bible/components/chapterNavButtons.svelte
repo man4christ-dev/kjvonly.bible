@@ -1,12 +1,24 @@
 <script lang="ts">
-	import LeftChevron from '$lib/components/buttons/chevrons/leftChevron.svelte';
-	import RightChevron from '$lib/components/buttons/chevrons/rightChevron.svelte';
-	import { Modules } from '$lib/models/modules.model';
-	import type { NavReadings } from '$lib/models/plans.model';
-	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
-	import { attachEvents } from '$lib/utils/eventHandlers';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount } from 'svelte';
 	import { fade } from 'svelte/transition';
+
+	// MODELS
+	import { Modules } from '$lib/models/modules.model';
+	import type { NavReadings } from '$lib/models/plans.model';
+
+	// SERVICES
+	import { bibleNavigationService } from '$lib/services/bible/bibleNavigation.service';
+
+	// COMPONENTS
+	import LeftChevron from '$lib/components/buttons/chevrons/leftChevron.svelte';
+	import RightChevron from '$lib/components/buttons/chevrons/rightChevron.svelte';
+
+	// OTHER
+	import { attachEvents } from '$lib/utils/eventHandlers';
+
+	// =============================== BINDINGS ================================
 
 	let {
 		mode = $bindable(),
@@ -15,6 +27,12 @@
 		showNavButtons = $bindable(),
 		ID
 	} = $props();
+
+	// ================================= VARS ==================================
+
+	const REACHED_BOTTOM_THRESHOLD = 40;
+
+	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
 		attachScrolls();
@@ -35,14 +53,15 @@
 			return;
 		}
 
+		/** this runs before the container has time to render */
 		if (el.scrollHeight + el.clientHeight + el.scrollTop === 0) {
 			return;
 		}
 		showNavButtons = false;
 
-		const threshold = 40; // Adjust this value as needed
-		const isReachBottom =
-			el.scrollHeight - el.clientHeight - el.scrollTop <= threshold;
+		let isReachBottom =
+			el.scrollHeight - el.clientHeight - el.scrollTop <=
+			REACHED_BOTTOM_THRESHOLD;
 
 		if (isReachBottom) {
 			showNavButtons = true;
