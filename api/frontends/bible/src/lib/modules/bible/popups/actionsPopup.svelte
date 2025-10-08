@@ -11,6 +11,9 @@
 
 	// COMPONENTS
 	import Close from '$lib/components/buttons/close.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -79,30 +82,25 @@
 	}
 </script>
 
-<div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
-	<div class="w-full max-w-lg justify-center">
-		<header
-			bind:clientHeight={headerHeight}
-			class="sticky top-0 w-full flex-col border-b-2 bg-neutral-100 text-neutral-700"
-		>
-			<div class="flex w-full justify-end p-2">
-				<Close onClose={onCloseActionsDropdown}></Close>
-			</div>
-		</header>
-
-		<div
-			style="height: {clientHeight - headerHeight}px"
-			class="flex w-full flex-col overflow-y-scroll border"
-		>
-			{#each Object.keys(actions) as a}
-				<div class="w-full">
-					<button
-						onclick={(event) => actions[a]()}
-						class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize"
-						>{a}</button
-					>
-				</div>
-			{/each}
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		<div class="flex w-full justify-end">
+			<Close onClose={onCloseActionsDropdown}></Close>
 		</div>
-	</div>
-</div>
+	</BufferHeader>
+	<BufferBody
+		bind:clientHeight
+		bind:headerHeight
+		classes={'remove-default-class'}
+	>
+		{#each Object.keys(actions) as a}
+			<div class="w-full">
+				<button
+					onclick={(event) => actions[a]()}
+					class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize hover:cursor-pointer"
+					>{a}</button
+				>
+			</div>
+		{/each}
+	</BufferBody>
+</BufferContainer>
