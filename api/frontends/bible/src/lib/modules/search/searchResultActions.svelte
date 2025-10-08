@@ -25,11 +25,7 @@
 </script>
 
 <div class="flex flex-row justify-end space-x-4">
-	<Copy
-		onCopy={() => {
-			onCopyToClipboard();
-		}}
-	></Copy>
+	<Copy onCopy={onCopyToClipboard}></Copy>
 
 	<HorizontalSplit
 		bind:paneID

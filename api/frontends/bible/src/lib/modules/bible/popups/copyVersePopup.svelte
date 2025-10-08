@@ -1,7 +1,10 @@
 <script lang="ts">
-	import { chapterApi } from '$lib/api/chapters.api';
+	import Close from '$lib/components/buttons/close.svelte';
+	import Copy from '$lib/components/buttons/copy.svelte';
+	import type { Verse } from '$lib/models/bible.model';
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { chapterService } from '$lib/services/bible/chapter.service';
+	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import { toastService } from '$lib/services/toast.service';
 	import { onMount } from 'svelte';
@@ -10,29 +13,48 @@
 		$props();
 
 	let verseKeys: string[] = $state([]);
-	let verses: any = $state({});
-	let booknames: any;
+	let checkedByVerseNumber: { [key: string]: { checked: boolean } } = $state(
+		{}
+	);
+	let verses: Map<string, Verse> = $state(new Map());
 	let checkAll = $state(false);
 
 	let title = $state('');
-	onMount(() => {
+	onMount(async () => {
 		closePopupOnInvalidBibleLocationReference();
-
-		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
-		let shortBookName = shortBookNamesByIDService.get(bookID);
-		let chapterNumber =
-			bibleLocationReferenceService.extractChapter(bibleLocationRef);
-
-		(async () => {
-			let chapter = await chapterService.get(bibleLocationRef);
-			verses = chapter.verses;
-			verseKeys = Object.keys(chapter.verseMap).sort((a, b) => {
-				return parseInt(a) - parseInt(b);
-			});
-			title = `${shortBookName} ${chapterNumber}`;
-		})();
+		setTitle();
+		await loadVerses();
+		initializeCheckedVersesByIdMap();
+		setSortedAscVersesKeys();
 	});
 
+	async function loadVerses() {
+		let chapter = await chapterService.get(bibleLocationRef);
+		verses = chapter.verses;
+	}
+
+	function setSortedAscVersesKeys() {
+		verseKeys = verses
+			.keys()
+			.toArray()
+			.sort((a, b) => {
+				return parseInt(a) - parseInt(b);
+			});
+	}
+
+	function initializeCheckedVersesByIdMap() {
+		verses.forEach((verse: Verse) => {
+			checkedByVerseNumber[String(verse.number)] = { checked: false };
+		});
+	}
+
+	function setTitle() {
+		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
+		let bookName = bookNamesByIDService.get(bookID);
+		let chapterNumber =
+			bibleLocationReferenceService.extractChapter(bibleLocationRef);
+		title = `${bookName} ${chapterNumber}`;
+	}
 	function closePopupOnInvalidBibleLocationReference() {
 		if (bibleLocationRef.split('_') < 2) {
 			showCopyVersePopup = false;
@@ -41,8 +63,8 @@
 
 	function onCopy() {
 		let checked: any = [];
-		Object.keys(verses).map((v: any) => {
-			if (verses[v].checked) {
+		verses.map((v: any) => {
+			if (checkedByVerseNumber[v].checked) {
 				checked.push(verses[v].number);
 			}
 		});
@@ -88,7 +110,7 @@
 			}
 
 			r.forEach((v) => {
-				text += `${verses[v].text}\n`;
+				text += `${verses.get(v)?.text}\n`;
 			});
 
 			text += '\n';
@@ -100,13 +122,17 @@
 	}
 
 	function toggleSelects() {
-		Object.keys(verses).forEach((v) => {
-			verses[v].checked = checkAll;
+		verses.forEach((v: Verse) => {
+			checkedByVerseNumber[`${v.number}`].checked = checkAll;
 		});
 	}
 
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
+
+	function onClose() {
+		showCopyVersePopup = false;
+	}
 </script>
 
 <div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
@@ -120,56 +146,11 @@
 					bind:clientHeight={headerHeight}
 					class=" flex w-full max-w-lg flex-row items-center justify-between bg-neutral-100 text-neutral-700"
 				>
-					<button
-						aria-label="save"
-						onclick={() => {
-							onCopy();
-						}}
-						class="h-12 w-12 px-2 pt-2 text-neutral-700"
-					>
-						<svg
-							version="1.1"
-							id="svg2"
-							width="100%"
-							height="100%"
-							viewBox="0 0 106.96539 106.83998"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<defs id="defs6" />
-							<g id="g8" transform="translate(-9.1541294,-7.1649487)">
-								<path
-									class="fill-neutral-700"
-									style="stroke:none;stroke-width:1.33333"
-									d="M 9.2233551,92.567516 H 19.890021 V 17.900849 H 94.55669 V 7.2341829 l -57.333069,0.004 c -7.420266,0.018 -17.579333,-1.0826537 -23.3292,4.6670661 -5.7497329,5.749867 -4.6490529,15.908934 -4.6670529,23.3292 l -0.004,57.333067 M 38.105088,31.106449 c -5.949867,3.266267 -7.0848,9.945334 -7.402,16.15 -0.7004,13.7028 -0.224533,27.591334 -0.133467,41.31 0.0428,6.435867 -0.4952,14.477741 3.859334,19.780261 4.1912,5.1036 11.393466,5.3456 17.4684,5.49387 12.426933,0.30333 24.895195,0.1036 37.325465,0.0529 6.182,-0.0252 13.5064,0.54933 19.1188,-2.5316 5.94987,-3.26627 7.0848,-9.94532 7.402,-16.149994 0.7004,-13.7028 0.22454,-27.591333 0.13347,-41.31 -0.0428,-6.435867 0.4952,-14.477733 -3.85933,-19.780267 -4.1912,-5.1036 -11.39347,-5.3456 -17.46841,-5.493866 -12.42693,-0.303334 -24.895195,-0.1036 -37.325462,-0.05293 -6.182,0.0252 -13.5064,-0.549333 -19.1188,2.5316 m 67.118272,8.127734 V 103.23419 H 41.223355 V 39.234183 Z"
-									id="path1212"
-								/>
-							</g>
-						</svg>
-					</button>
-					<!-- svelte-ignore a11y_click_events_have_key_events -->
-					<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-					<p onclick={() => {}} class="hover:cursor-pointer">
-						<span class="inline-block font-bold">{title}</span>
+					<Copy onCopy></Copy>
+					<p>
+						<span>{title}</span>
 					</p>
-					<button
-						aria-label="close"
-						onclick={() => {
-							showCopyVersePopup = false;
-						}}
-						class="h-12 w-12 px-2 pt-2 text-neutral-700"
-					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							viewBox="0 0 24 24"
-							width="100%"
-							height="100%"
-						>
-							<path
-								class="fill-neutral-700"
-								d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
-							/>
-						</svg>
-					</button>
+					<Close onClose></Close>
 				</header>
 			</div>
 		</header>
@@ -192,27 +173,16 @@
 					<div>
 						<input
 							type="checkbox"
-							class="accent-support-a-500 mx-4 mt-5 h-5 w-5"
-							bind:checked={verses[k].checked}
+							class="accent-support-a-500 mx-4 h-5 w-5"
+							bind:checked={checkedByVerseNumber[k].checked}
 						/>
 					</div>
 					<p>
-						<span class="vno">{verses[k].text.split(' ')[0]}</span>
-						{verses[k].text.split(' ').slice(1).join(' ')}
+						<span class="vno">{verses.get(k)?.text.split(' ')[0]}</span>
+						{verses.get(k)?.text.split(' ').slice(1).join(' ')}
 					</p>
 				</div>
 			{/each}
 		</div>
 	</div>
 </div>
-
-<style>
-	@reference "../../../../app.css";
-	.vno {
-		vertical-align: baseline;
-		position: relative;
-		top: -0.6em;
-		cursor: pointer;
-		@apply text-xs text-neutral-700 sm:text-base;
-	}
-</style>
