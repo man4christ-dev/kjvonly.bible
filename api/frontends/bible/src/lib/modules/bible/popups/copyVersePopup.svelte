@@ -1,25 +1,44 @@
 <script lang="ts">
-	import Close from '$lib/components/buttons/close.svelte';
-	import Copy from '$lib/components/buttons/copy.svelte';
-	import type { Verse } from '$lib/models/bible.model';
-	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
-	import { chapterService } from '$lib/services/bible/chapter.service';
-	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
-	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
-	import { toastService } from '$lib/services/toast.service';
+	// ================================ IMPORTS ================================
+	//SVELTE
 	import { onMount } from 'svelte';
 
-	let { bibleLocationRef = $bindable(), showCopyVersePopup = $bindable() } =
-		$props();
+	//MODELS
+	import type { Verse } from '$lib/models/bible.model';
 
-	let verseKeys: string[] = $state([]);
-	let checked: boolean[] = $state([]);
-	let verses: Map<string, Verse> = $state(new Map());
-	let checkAll = $state(false);
+	// SERVICES
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
+	import { chapterService } from '$lib/services/bible/chapter.service';
+	import { toastService } from '$lib/services/toast.service';
+
+	// COMPONENTS
+	import Close from '$lib/components/buttons/close.svelte';
+	import Copy from '$lib/components/buttons/copy.svelte';
+
+	// =============================== BINDINGS ================================
+
+	let {
+		bibleLocationRef = $bindable<string>(),
+		showCopyVersePopup = $bindable<boolean>()
+	}: {
+		bibleLocationRef: string;
+		showCopyVersePopup: boolean;
+	} = $props();
+
+	// ================================= VARS ==================================
+	// DOM
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 
+	let allChecked = $state(false);
+	let checked: boolean[] = $state([]);
+	let verseKeys: string[] = $state([]);
+	let verses: Map<string, Verse> = $state(new Map());
 	let title = $state('');
+
+	// =============================== LIFECYCLE ===============================
+
 	onMount(async () => {
 		closePopupOnInvalidBibleLocationReference();
 		setTitle();
@@ -27,6 +46,8 @@
 		initializeCheckedVersesByIdMap();
 		setSortedAscVersesKeys();
 	});
+
+	// ================================ FUNCS ==================================
 
 	async function loadVerses() {
 		let chapter = await chapterService.get(bibleLocationRef);
@@ -55,15 +76,9 @@
 	}
 
 	function closePopupOnInvalidBibleLocationReference() {
-		if (bibleLocationRef.split('_') < 2) {
+		if (bibleLocationRef.split('_').length < 2) {
 			showCopyVersePopup = false;
 		}
-	}
-
-	function onCopy() {
-		let copyText = getAllVerseRangeText();
-		navigator.clipboard.writeText(copyText);
-		toastService.showToast('Copied Verses');
 	}
 
 	function getAllVerseRangeText(): string {
@@ -159,7 +174,15 @@
 	}
 
 	function toggleSelects() {
-		checked = Array(verses.size).fill(checkAll);
+		checked = Array(verses.size).fill(allChecked);
+	}
+
+	// ============================== CLICK FUNCS ==============================
+
+	function onCopy() {
+		let copyText = getAllVerseRangeText();
+		navigator.clipboard.writeText(copyText);
+		toastService.showToast('Copied Verses');
 	}
 
 	function onClose() {
@@ -194,7 +217,7 @@
 				<input
 					type="checkbox"
 					class="accent-support-a-500 mx-4 mt-5 h-5 w-5"
-					bind:checked={checkAll}
+					bind:checked={allChecked}
 					onchange={() => {
 						toggleSelects();
 					}}

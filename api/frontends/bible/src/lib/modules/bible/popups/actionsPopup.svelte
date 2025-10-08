@@ -28,6 +28,7 @@
 	} = $props();
 
 	// ================================= VARS ==================================
+
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 

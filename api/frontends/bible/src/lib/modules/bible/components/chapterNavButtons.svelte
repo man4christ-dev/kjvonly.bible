@@ -46,6 +46,8 @@
 		attachScrolls();
 	});
 
+	// ================================ FUNCS ==================================
+
 	function attachScrolls() {
 		attachEvents(`${ID}-scroll-container`, 'scroll', handleNavButtonVisibility);
 	}
