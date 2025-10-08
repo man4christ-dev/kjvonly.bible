@@ -53,6 +53,7 @@
 			bibleLocationReferenceService.extractChapter(bibleLocationRef);
 		title = `${bookName} ${chapterNumber}`;
 	}
+
 	function closePopupOnInvalidBibleLocationReference() {
 		if (bibleLocationRef.split('_') < 2) {
 			showCopyVersePopup = false;
@@ -60,29 +61,41 @@
 	}
 
 	function onCopy() {
-		let checkedVerseNumbers: number[] = getCheckedVerses();
-
-		let copyText = '';
-		let verseRangesToCopy = groupSequentialVerseRanges(checkedVerseNumbers);
-
-		verseRangesToCopy.forEach((verseRange) => {
-			let [start, end] = getStartAndEndVerseNumbers(verseRange);
-			let text = getVerseRangeTitle(start, end);
-			let versesToCopy = Array.from(
-				{ length: end - start + 1 },
-				(_, i) => start + i
-			);
-
-			versesToCopy.forEach((verseNumber: number) => {
-				text += `${verses.get(String(verseNumber))?.text}\n`;
-			});
-
-			text += '\n';
-			copyText += text;
-		});
-
+		let copyText = getAllVerseRangeText();
 		navigator.clipboard.writeText(copyText);
 		toastService.showToast('Copied Verses');
+	}
+
+	function getAllVerseRangeText(): string {
+		let checkedVerseNumbers: number[] = getCheckedVerses();
+		let verseRangesToCopy = groupConsecutiveVerseRanges(checkedVerseNumbers);
+		let allVerseRangeText = verseRangesToCopy.map((verseRange) => {
+			return getVerseRangeText(verseRange);
+		});
+		return concatVerseRangeText(allVerseRangeText);
+	}
+
+	function concatVerseRangeText(allVerseRangeText: string[]) {
+		return allVerseRangeText
+			.map((vrt: string) => {
+				return `${vrt}\n`;
+			})
+			.join('');
+	}
+
+	function getVerseRangeText(verseRange: number[]): string {
+		let [start, end] = getStartAndEndVerseNumbers(verseRange);
+		let verseRangeText = getVerseRangeTitle(start, end);
+		let versesToCopy = Array.from(
+			{ length: end - start + 1 },
+			(_, i) => start + i
+		);
+
+		versesToCopy.forEach((verseNumber: number) => {
+			verseRangeText += `${verses.get(String(verseNumber))?.text}\n`;
+		});
+
+		return verseRangeText;
 	}
 
 	function getStartAndEndVerseNumbers(r: number[]): number[] {
@@ -110,12 +123,23 @@
 		return checkedVerses;
 	}
 
-	function groupSequentialVerseRanges(checkedVerses: number[]): number[][] {
+	/**
+	 * We want to group consecutive verse numbers like this:
+	 * [[1,3], [5, 5], [18,21]]
+	 * meaning verses 1, 2, and 3 were selected,
+	 * 		   verse 5 was selected
+	 *         verses 18, 19, 20, and 21 were selected
+	 *
+	 *  [5, 5] means verse 5 was selected without verse 4 and 6
+	 *
+	 * @param checkedVerses the verseNumber checked by the user to copy
+	 */
+	function groupConsecutiveVerseRanges(checkedVerses: number[]): number[][] {
 		let groupedVerseRanges: number[][] = [];
 		let verseRange: number[] = [checkedVerses[0]];
 		let lastVerseNumber = checkedVerses[0];
 		for (let currentVerseNumber of checkedVerses) {
-			if (isNotConsecutive(lastVerseNumber, currentVerseNumber)) {
+			if (isInconsecutive(lastVerseNumber, currentVerseNumber)) {
 				verseRange.push(lastVerseNumber);
 				groupedVerseRanges.push(verseRange);
 				verseRange = [currentVerseNumber];
@@ -127,7 +151,7 @@
 		return groupedVerseRanges;
 	}
 
-	function isNotConsecutive(
+	function isInconsecutive(
 		lastVerseNumber: number,
 		currentVerseNumber: number
 	) {
