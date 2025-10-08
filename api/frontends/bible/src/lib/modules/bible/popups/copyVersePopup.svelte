@@ -13,11 +13,11 @@
 		$props();
 
 	let verseKeys: string[] = $state([]);
-	let checkedByVerseNumber: { [key: string]: { checked: boolean } } = $state(
-		{}
-	);
+	let checked: boolean[] = $state([]);
 	let verses: Map<string, Verse> = $state(new Map());
 	let checkAll = $state(false);
+	let clientHeight = $state(0);
+	let headerHeight = $state(0);
 
 	let title = $state('');
 	onMount(async () => {
@@ -43,9 +43,7 @@
 	}
 
 	function initializeCheckedVersesByIdMap() {
-		verses.forEach((verse: Verse) => {
-			checkedByVerseNumber[String(verse.number)] = { checked: false };
-		});
+		checked = Array<boolean>(verses.size);
 	}
 
 	function setTitle() {
@@ -62,55 +60,21 @@
 	}
 
 	function onCopy() {
-		let checked: any = [];
-		verses.map((v: any) => {
-			if (checkedByVerseNumber[v].checked) {
-				checked.push(verses[v].number);
-			}
-		});
-
-		let sortedKeys: any = [];
-		if (checked.length > 1) {
-			sortedKeys = checked.sort((a: any, b: any) => {
-				return parseInt(a) - parseInt(b);
-			});
-		} else {
-			sortedKeys = checked;
-		}
-
-		let startKey = sortedKeys[0];
-		let lastKey = sortedKeys[0];
+		let checkedVerseNumbers: number[] = getCheckedVerses();
 
 		let copyText = '';
+		let verseRangesToCopy = groupSequentialVerseRanges(checkedVerseNumbers);
 
-		let buckets = [];
-		let range: string[] = [];
-		sortedKeys.forEach((k: any) => {
-			if (k - lastKey > 1) {
-				buckets.push(range);
-				range = [k];
-				lastKey = k;
-			} else {
-				range.push(k);
-				lastKey = k;
-			}
-		});
+		verseRangesToCopy.forEach((verseRange) => {
+			let [start, end] = getStartAndEndVerseNumbers(verseRange);
+			let text = getVerseRangeTitle(start, end);
+			let versesToCopy = Array.from(
+				{ length: end - start + 1 },
+				(_, i) => start + i
+			);
 
-		buckets.push(range);
-
-		buckets.forEach((r) => {
-			let first = r[0];
-			let last = r[r.length - 1];
-
-			let text = '';
-			if (first === last) {
-				text = `${title}:${first}\n`;
-			} else {
-				text = `${title}:${first}-${last}\n`;
-			}
-
-			r.forEach((v) => {
-				text += `${verses.get(v)?.text}\n`;
+			versesToCopy.forEach((verseNumber: number) => {
+				text += `${verses.get(String(verseNumber))?.text}\n`;
 			});
 
 			text += '\n';
@@ -121,14 +85,58 @@
 		toastService.showToast('Copied Verses');
 	}
 
-	function toggleSelects() {
-		verses.forEach((v: Verse) => {
-			checkedByVerseNumber[`${v.number}`].checked = checkAll;
-		});
+	function getStartAndEndVerseNumbers(r: number[]): number[] {
+		return [r[0], r[r.length - 1]];
 	}
 
-	let clientHeight = $state(0);
-	let headerHeight = $state(0);
+	function getVerseRangeTitle(start: number, end: number): string {
+		let rangeTitle = '';
+		if (start === end) {
+			rangeTitle = `${title}:${start}\n`;
+		} else {
+			rangeTitle = `${title}:${start}-${end}\n`;
+		}
+
+		return rangeTitle;
+	}
+
+	function getCheckedVerses(): number[] {
+		let checkedVerses: number[] = [];
+		checked.forEach((c, idx) => {
+			if (c) {
+				checkedVerses.push(idx + 1);
+			}
+		});
+		return checkedVerses;
+	}
+
+	function groupSequentialVerseRanges(checkedVerses: number[]): number[][] {
+		let groupedVerseRanges: number[][] = [];
+		let verseRange: number[] = [checkedVerses[0]];
+		let lastVerseNumber = checkedVerses[0];
+		for (let currentVerseNumber of checkedVerses) {
+			if (isNotConsecutive(lastVerseNumber, currentVerseNumber)) {
+				verseRange.push(lastVerseNumber);
+				groupedVerseRanges.push(verseRange);
+				verseRange = [currentVerseNumber];
+			}
+			lastVerseNumber = currentVerseNumber;
+		}
+		verseRange.push(lastVerseNumber);
+		groupedVerseRanges.push(verseRange);
+		return groupedVerseRanges;
+	}
+
+	function isNotConsecutive(
+		lastVerseNumber: number,
+		currentVerseNumber: number
+	) {
+		return currentVerseNumber - lastVerseNumber > 1;
+	}
+
+	function toggleSelects() {
+		checked = Array(verses.size).fill(checkAll);
+	}
 
 	function onClose() {
 		showCopyVersePopup = false;
@@ -146,11 +154,11 @@
 					bind:clientHeight={headerHeight}
 					class=" flex w-full max-w-lg flex-row items-center justify-between bg-neutral-100 text-neutral-700"
 				>
-					<Copy onCopy></Copy>
+					<Copy {onCopy}></Copy>
 					<p>
 						<span>{title}</span>
 					</p>
-					<Close onClose></Close>
+					<Close {onClose}></Close>
 				</header>
 			</div>
 		</header>
@@ -168,13 +176,13 @@
 					}}
 				/>
 			</div>
-			{#each verseKeys as k}
+			{#each verseKeys as k, idx}
 				<div class="flex flex-row items-start space-y-4">
 					<div>
 						<input
 							type="checkbox"
 							class="accent-support-a-500 mx-4 h-5 w-5"
-							bind:checked={checkedByVerseNumber[k].checked}
+							bind:checked={checked[idx]}
 						/>
 					</div>
 					<p>
