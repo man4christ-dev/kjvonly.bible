@@ -5,18 +5,12 @@
 	import { Modules } from '$lib/models/modules.model';
 
 	// SERVICES
-	import { notesService } from '$lib/services/notes.service';
+	import { exporterService } from '$lib/services/importExport/exporter.service';
+	import { importerService } from '$lib/services/importExport/importer.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { toastService } from '$lib/services/toast.service';
-
-	// API
-	import { annotsApi } from '$lib/api/annots.api';
 
 	// COMPONENTS
 	import Close from '$lib/components/buttons/close.svelte';
-
-	// OTHER
-	import { deepMerge } from '$lib/utils/deepmerge';
 
 	// =============================== BINDINGS ================================
 
@@ -31,7 +25,6 @@
 	} = $props();
 
 	// ================================= VARS ==================================
-
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 
@@ -55,15 +48,17 @@
 			onSplitHorizontal();
 		},
 		'export data': () => {
-			onExport();
+			exporterService.export();
 		},
 		'import data': () => {
-			onImport();
+			importerService.import();
 		},
 		close: () => {
 			onClosePane();
 		}
 	};
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onSplitVertical(): void {
 		paneService.onSplitPane(paneID, 'v', Modules.MODULES, {});
@@ -77,123 +72,6 @@
 
 	function onClosePane() {
 		paneService.onDeletePane(paneService.rootPane, paneID);
-	}
-
-	async function onExport() {
-		toastService.showToast('starting export data');
-		let data = await annotsApi.getAllAnnotations();
-
-		var element = document.createElement('a');
-		element.setAttribute(
-			'href',
-			'data:application/json;charset=utf-8,' +
-				encodeURIComponent(JSON.stringify(data))
-		);
-		element.setAttribute('download', 'annotations');
-
-		element.style.display = 'none';
-		document.body.appendChild(element);
-
-		element.click();
-
-		document.body.removeChild(element);
-		toastService.showToast('finished export data');
-	}
-
-	// ================================ FUNCS ==================================
-
-	// pulled from https://stackoverflow.com/questions/27936772/how-to-deep-merge-instead-of-shallow-merge
-	/**
-	 * Simple object check.
-	 * @param item
-	 * @returns {boolean}
-	 */
-	export function isObject(item: any) {
-		return item && typeof item === 'object' && !Array.isArray(item);
-	}
-
-	/**
-	 * Deep merge two objects.
-	 * @param target
-	 * @param ...sources
-	 */
-	export function mergeDeep(target: any, ...sources: any) {
-		if (!sources.length) return target;
-		const source = sources.shift();
-
-		if (isObject(target) && isObject(source)) {
-			for (const key in source) {
-				if (isObject(source[key])) {
-					if (!target[key]) Object.assign(target, { [key]: {} });
-					mergeDeep(target[key], source[key]);
-				} else {
-					Object.assign(target, { [key]: source[key] });
-				}
-			}
-		}
-
-		return mergeDeep(target, ...sources);
-	}
-
-	function doImport(e: any) {
-		const reader = new FileReader();
-		reader.onload = (e2) => {
-			let result: any = e2?.target?.result;
-			(async () => {
-				try {
-					toastService.showToast('starting import data');
-					let newAnnotations = JSON.parse(result);
-					let annotations = await annotsApi.getAllAnnotations();
-
-					if (!annotations) {
-						annotations = {};
-					}
-					let annotationsMap: any = {};
-
-					annotations.forEach((a: any) => {
-						annotationsMap[a.id] = a;
-					});
-
-					let newAnnotationsMap: any = {};
-
-					newAnnotations.forEach((a: any) => {
-						newAnnotationsMap[a.id] = a;
-					});
-
-					// order of params mater, (target, source) source will update target.
-					//const merged = mergeDeep(annotationsMap, newAnnotations);
-					const merged = deepMerge(annotationsMap, newAnnotationsMap, {
-						arrays: 'replace'
-					});
-					let mergedList: any[] = [];
-					Object.keys(merged).forEach((k) => {
-						mergedList.push(merged[k]);
-					});
-
-					await annotsApi.putAllAnnotations(mergedList);
-					notesService.init();
-					document.getElementById('kjvonly-import')?.remove();
-					toastService.showToast('finished import data');
-				} catch (ex) {
-					console.log(`error importing file ${e.target.files[0]}`, ex);
-					document.getElementById('kjvonly-import')?.remove();
-				}
-			})();
-		};
-		reader.readAsText(e.target.files[0]);
-	}
-
-	async function onImport() {
-		var element = document.createElement('input');
-		element.setAttribute('id', 'kjvonly-import');
-		element.setAttribute('type', 'file');
-		element.setAttribute('accept', '.json');
-		element.onchange = doImport;
-
-		element.style.display = 'none';
-		document.body.appendChild(element);
-
-		element.click();
 	}
 
 	function onCloseActionsDropdown() {
