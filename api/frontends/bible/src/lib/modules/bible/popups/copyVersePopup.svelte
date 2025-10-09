@@ -203,9 +203,13 @@
 	// ============================== CLICK FUNCS ==============================
 
 	function onCopy() {
-		let copyText = getAllVerseRangeText();
-		navigator.clipboard.writeText(copyText);
-		toastService.showToast('Copied Verses');
+		if (checked.filter((c) => c).length > 0) {
+			let copyText = getAllVerseRangeText();
+			navigator.clipboard.writeText(copyText);
+			toastService.showToast('Copied Verses');
+		} else {
+			toastService.showToast('No Verses Selected');
+		}
 	}
 
 	function onClose() {
