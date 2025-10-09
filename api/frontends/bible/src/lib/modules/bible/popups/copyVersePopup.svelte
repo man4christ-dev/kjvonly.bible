@@ -18,15 +18,20 @@
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
+	import HorizontalSplit from '$lib/components/buttons/horizontalSplit.svelte';
+	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
+	import { Modules } from '$lib/models/modules.model';
 
 	// =============================== BINDINGS ================================
 
 	let {
 		bibleLocationRef = $bindable<string>(),
-		showCopyVersePopup = $bindable<boolean>()
+		showCopyVersePopup = $bindable<boolean>(),
+		paneID
 	}: {
 		bibleLocationRef: string;
 		showCopyVersePopup: boolean;
+		paneID: string;
 	} = $props();
 
 	// ================================= VARS ==================================
@@ -36,7 +41,7 @@
 
 	let allChecked = $state(false);
 	let checked: boolean[] = $state([]);
-	let verseKeys: string[] = $state([]);
+	let verseNumbers: string[] = $state([]);
 	let verses: Map<string, Verse> = $state(new Map());
 	let title = $state('');
 
@@ -58,7 +63,7 @@
 	}
 
 	function setSortedAscVersesKeys() {
-		verseKeys = verses
+		verseNumbers = verses
 			.keys()
 			.toArray()
 			.sort((a, b) => {
@@ -184,6 +189,17 @@
 		allChecked = checked.filter((c) => c).length == checked.length;
 	}
 
+	function getVerseBibleLocationReference(verseNumber: number) {
+		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
+		let chapter =
+			bibleLocationReferenceService.extractChapter(bibleLocationRef);
+		return bibleLocationReferenceService.makeBibleLocationRef(
+			bookID,
+			chapter,
+			verseNumber
+		);
+	}
+
 	// ============================== CLICK FUNCS ==============================
 
 	function onCopy() {
@@ -200,13 +216,38 @@
 		checked[idx] = !checked[idx];
 		areAllVersesChecked();
 	}
+
+	function onCopyVerseClicked(verseNumber: number) {
+		let verseRange = [verseNumber, verseNumber];
+		let copyText = getVerseRangeText(verseRange);
+		navigator.clipboard.writeText(copyText);
+		toastService.showToast('Copied Verses');
+	}
 </script>
+
+{#snippet actions(verseNumber: number)}
+	<div class="flex flex-row justify-end space-x-4">
+		<Copy onCopy={() => onCopyVerseClicked(verseNumber)}></Copy>
+
+		<HorizontalSplit
+			bind:paneID
+			module={Modules.BIBLE}
+			data={{ bibleLocationRef: getVerseBibleLocationReference(verseNumber) }}
+		></HorizontalSplit>
+
+		<VerticalSplit
+			bind:paneID
+			module={Modules.BIBLE}
+			data={{ bibleLocationRef: getVerseBibleLocationReference(verseNumber) }}
+		></VerticalSplit>
+	</div>
+{/snippet}
 
 {#snippet body()}
 	<div class=" sticky top-0 p-2">
 		<label
 			for="showCompleted"
-			class="has-checked:bg-support-a-500 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent]"
+			class="has-checked:bg-support-a-600 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent]"
 		>
 			<input
 				bind:checked={allChecked}
@@ -222,26 +263,29 @@
 		</label>
 	</div>
 
-	{#each verseKeys as k, idx}
+	{#each verseNumbers as verseNumber, idx}
 		<div
 			role="button"
 			tabindex="-1"
 			onkeydown={() => {}}
 			onclick={() => onVerseClicked(idx)}
-			class="hover:bg-primary-200 flex flex-row items-center justify-center py-6 hover:cursor-pointer"
+			class="hover:bg-primary-100 flex flex-row items-center justify-center py-6 leading-loose hover:cursor-pointer"
 		>
 			<div class="flex min-w-16 justify-center">
 				<input
 					type="checkbox"
-					class="accent-support-a-500 h-5 w-5"
+					class="accent-support-a-600 h-5 w-5"
 					bind:checked={checked[idx]}
 					onchange={areAllVersesChecked}
 				/>
 			</div>
-			<span class=" ps-2">
-				<span class="vno">{verses.get(k)?.text.split(' ')[0]}</span>
-				{verses.get(k)?.text.split(' ').slice(1).join(' ')}
-			</span>
+			<div class="flex flex-col px-4">
+				<span class="whitespace-normal">
+					{verses.get(verseNumber)?.text}
+				</span>
+				<span class="flex-fill flex"></span>
+				{@render actions(parseInt(verseNumber))}
+			</div>
 		</div>
 	{/each}
 {/snippet}

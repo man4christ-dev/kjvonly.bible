@@ -29,10 +29,10 @@
 
 	// ================================== VARS =================================
 
-	let showBookChapterPopup: Boolean = $state(false);
-	let showNavReadingsPopup: Boolean = $state(false);
-	let showSettingsPopup: Boolean = $state(false);
-	let showActionsPopup: Boolean = $state(false);
+	let showBookChapterPopup: boolean = $state(false);
+	let showNavReadingsPopup: boolean = $state(false);
+	let showSettingsPopup: boolean = $state(false);
+	let showActionsPopup: boolean = $state(false);
 	let showCopyVersePopup: boolean = $state(false);
 	let verses: string = $state('');
 	let bookName: string = $state('');
@@ -196,7 +196,7 @@
 		{/if}
 
 		{#if showCopyVersePopup}
-			<CopyVersePopup bind:showCopyVersePopup bind:bibleLocationRef
+			<CopyVersePopup {paneID} bind:showCopyVersePopup bind:bibleLocationRef
 			></CopyVersePopup>
 		{/if}
 	</div>

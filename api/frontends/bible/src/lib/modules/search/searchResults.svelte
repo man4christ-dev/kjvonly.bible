@@ -176,7 +176,7 @@
 			}}
 		>
 			<div class="text-left whitespace-normal hover:cursor-pointer">
-				<span class="py-2 text-left font-bold"
+				<span class="py-2 text-left"
 					>{sr.bookName} {sr.number}:{sr.verseNumber}</span
 				>
 				<span class="flex-fill flex"></span>

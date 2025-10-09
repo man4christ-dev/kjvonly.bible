@@ -93,6 +93,14 @@ class BibleLocationReferenceService {
 	hasVerse(ref: string) {
 		return ref.split('_').length > 2;
 	}
+
+	makeBibleLocationRef(
+		bookID: string,
+		chapter: number,
+		verseNumber: number
+	): string {
+		return `${bookID}_${chapter}_${verseNumber}`;
+	}
 }
 
 export const bibleLocationReferenceService =
