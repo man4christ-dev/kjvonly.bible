@@ -15,6 +15,9 @@
 	// COMPONENTS
 	import Close from '$lib/components/buttons/close.svelte';
 	import Copy from '$lib/components/buttons/copy.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -177,6 +180,10 @@
 		checked = Array(verses.size).fill(allChecked);
 	}
 
+	function areAllVersesChecked() {
+		allChecked = checked.filter((c) => c).length == checked.length;
+	}
+
 	// ============================== CLICK FUNCS ==============================
 
 	function onCopy() {
@@ -190,6 +197,62 @@
 	}
 </script>
 
+{#snippet body()}
+	<div class="p-2">
+		<label
+			for="showCompleted"
+			class="has-checked:bg-support-a-500 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent]"
+		>
+			<!-- <input
+				type="checkbox"
+				class="accent-support-a-500 mx-4 mt-5 h-5 w-5"
+				bind:checked={allChecked}
+				onchange={() => {
+					toggleSelects();
+				}}
+			/> -->
+			<input
+				bind:checked={allChecked}
+				onchange={toggleSelects}
+				type="checkbox"
+				id="showCompleted"
+				class="peer sr-only"
+			/>
+
+			<span
+				class="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-neutral-100 transition-[inset-inline-start] peer-checked:start-6"
+			></span>
+		</label>
+	</div>
+	{#each verseKeys as k, idx}
+		<div class="flex flex-row items-start space-y-4">
+			<div>
+				<input
+					type="checkbox"
+					class="accent-support-a-500 mx-4 h-5 w-5"
+					bind:checked={checked[idx]}
+					onchange={areAllVersesChecked}
+				/>
+			</div>
+			<p>
+				<span class="vno">{verses.get(k)?.text.split(' ')[0]}</span>
+				{verses.get(k)?.text.split(' ').slice(1).join(' ')}
+			</p>
+		</div>
+	{/each}
+{/snippet}
+
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		<Copy {onCopy}></Copy>
+		<span class="m-auto text-center">{title}</span>
+		<Close {onClose}></Close>
+	</BufferHeader>
+	<BufferBody bind:clientHeight>
+		{@render body()}
+	</BufferBody>
+</BufferContainer>
+<!-- 
 <div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
 	<div class="w-full max-w-lg">
 		<header
@@ -201,11 +264,7 @@
 					bind:clientHeight={headerHeight}
 					class=" flex w-full max-w-lg flex-row items-center justify-between bg-neutral-100 text-neutral-700"
 				>
-					<Copy {onCopy}></Copy>
-					<p>
-						<span>{title}</span>
-					</p>
-					<Close {onClose}></Close>
+			
 				</header>
 			</div>
 		</header>
@@ -240,4 +299,4 @@
 			{/each}
 		</div>
 	</div>
-</div>
+</div> -->
