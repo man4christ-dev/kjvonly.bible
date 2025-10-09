@@ -195,22 +195,19 @@
 	function onClose() {
 		showCopyVersePopup = false;
 	}
+
+	function onVerseClicked(idx: number) {
+		checked[idx] = !checked[idx];
+		areAllVersesChecked();
+	}
 </script>
 
 {#snippet body()}
-	<div class="p-2">
+	<div class=" sticky top-0 p-2">
 		<label
 			for="showCompleted"
 			class="has-checked:bg-support-a-500 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent]"
 		>
-			<!-- <input
-				type="checkbox"
-				class="accent-support-a-500 mx-4 mt-5 h-5 w-5"
-				bind:checked={allChecked}
-				onchange={() => {
-					toggleSelects();
-				}}
-			/> -->
 			<input
 				bind:checked={allChecked}
 				onchange={toggleSelects}
@@ -224,20 +221,27 @@
 			></span>
 		</label>
 	</div>
+
 	{#each verseKeys as k, idx}
-		<div class="flex flex-row items-start space-y-4">
-			<div>
+		<div
+			role="button"
+			tabindex="-1"
+			onkeydown={() => {}}
+			onclick={() => onVerseClicked(idx)}
+			class="hover:bg-primary-200 flex flex-row items-center justify-center py-6 hover:cursor-pointer"
+		>
+			<div class="flex min-w-16 justify-center">
 				<input
 					type="checkbox"
-					class="accent-support-a-500 mx-4 h-5 w-5"
+					class="accent-support-a-500 h-5 w-5"
 					bind:checked={checked[idx]}
 					onchange={areAllVersesChecked}
 				/>
 			</div>
-			<p>
+			<span class=" ps-2">
 				<span class="vno">{verses.get(k)?.text.split(' ')[0]}</span>
 				{verses.get(k)?.text.split(' ').slice(1).join(' ')}
-			</p>
+			</span>
 		</div>
 	{/each}
 {/snippet}
@@ -248,7 +252,7 @@
 		<span class="m-auto text-center">{title}</span>
 		<Close {onClose}></Close>
 	</BufferHeader>
-	<BufferBody bind:clientHeight>
+	<BufferBody bind:clientHeight bind:headerHeight classes="">
 		{@render body()}
 	</BufferBody>
 </BufferContainer>
