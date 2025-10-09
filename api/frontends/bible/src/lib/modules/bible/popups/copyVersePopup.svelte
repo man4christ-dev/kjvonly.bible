@@ -1,7 +1,7 @@
 <script lang="ts">
 	// ================================ IMPORTS ================================
 	//SVELTE
-	import { onMount } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	//MODELS
 	import type { Verse } from '$lib/models/bible.model';
@@ -44,6 +44,7 @@
 	let verseNumbers: string[] = $state([]);
 	let verses: Map<string, Verse> = $state(new Map());
 	let title = $state('');
+	let selectedVerseRangeText = $state('');
 
 	// =============================== LIFECYCLE ===============================
 
@@ -53,6 +54,14 @@
 		await loadVerses();
 		initializeCheckedVersesByIdMap();
 		setSortedAscVersesKeys();
+	});
+
+	$effect(() => {
+		checked;
+		console.log('clicked');
+		untrack(() => {
+			setSelectedVerses();
+		});
 	});
 
 	// ================================ FUNCS ==================================
@@ -158,6 +167,9 @@
 	 * @param checkedVerses the verseNumber checked by the user to copy
 	 */
 	function groupConsecutiveVerseRanges(checkedVerses: number[]): number[][] {
+		if (checkedVerses.length === 0) {
+			return [];
+		}
 		let groupedVerseRanges: number[][] = [];
 		let verseRange: number[] = [checkedVerses[0]];
 		let lastVerseNumber = checkedVerses[0];
@@ -200,6 +212,22 @@
 		);
 	}
 
+	function setSelectedVerses() {
+		let checkedVerseNumbers: number[] = getCheckedVerses();
+		let verseRanges = groupConsecutiveVerseRanges(checkedVerseNumbers);
+		selectedVerseRangeText = getSelectedVerseRangeVersesText(verseRanges);
+	}
+
+	function getSelectedVerseRangeVersesText(verseRanges: number[][]): string {
+		return verseRanges
+			?.map((vr) =>
+				vr[0] === vr[vr.length - 1]
+					? `${vr[0]}`
+					: `${vr[0]}-${vr[vr.length - 1]}`
+			)
+			.join();
+	}
+
 	// ============================== CLICK FUNCS ==============================
 
 	function onCopy() {
@@ -219,6 +247,7 @@
 	function onVerseClicked(idx: number) {
 		checked[idx] = !checked[idx];
 		areAllVersesChecked();
+		setSelectedVerses();
 	}
 
 	function onCopyVerseClicked(verseNumber: number) {
@@ -229,43 +258,8 @@
 	}
 </script>
 
-{#snippet actions(verseNumber: number)}
-	<div class="flex flex-row justify-end space-x-4">
-		<Copy onCopy={() => onCopyVerseClicked(verseNumber)}></Copy>
-
-		<HorizontalSplit
-			bind:paneID
-			module={Modules.BIBLE}
-			data={{ bibleLocationRef: getVerseBibleLocationReference(verseNumber) }}
-		></HorizontalSplit>
-
-		<VerticalSplit
-			bind:paneID
-			module={Modules.BIBLE}
-			data={{ bibleLocationRef: getVerseBibleLocationReference(verseNumber) }}
-		></VerticalSplit>
-	</div>
-{/snippet}
-
 {#snippet body()}
-	<div class=" sticky top-0 p-2">
-		<label
-			for="showCompleted"
-			class="has-checked:bg-support-a-600 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent]"
-		>
-			<input
-				bind:checked={allChecked}
-				onchange={toggleSelects}
-				type="checkbox"
-				id="showCompleted"
-				class="peer sr-only"
-			/>
-
-			<span
-				class="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-neutral-100 transition-[inset-inline-start] peer-checked:start-6"
-			></span>
-		</label>
-	</div>
+	{@render abc()}
 
 	{#each verseNumbers as verseNumber, idx}
 		<div
@@ -294,6 +288,54 @@
 	{/each}
 {/snippet}
 
+{#snippet abc()}
+	<div
+		class=" relative sticky top-0 flex flex-row justify-between bg-neutral-50"
+	>
+		<span class="absolute w-full">
+			<span class="flex-fill flex justify-center p-2 text-nowrap">
+				{selectedVerseRangeText}
+			</span>
+		</span>
+		<div class="p-2">
+			<label
+				for="showCompleted"
+				class="has-checked:bg-support-a-600 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent] hover:cursor-pointer"
+			>
+				<input
+					bind:checked={allChecked}
+					onchange={toggleSelects}
+					type="checkbox"
+					id="showCompleted"
+					class="peer sr-only"
+				/>
+
+				<span
+					class="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-neutral-100 transition-[inset-inline-start] peer-checked:start-6"
+				></span>
+			</label>
+		</div>
+	</div>
+{/snippet}
+
+{#snippet actions(verseNumber: number)}
+	<div class="flex flex-row justify-end space-x-4">
+		<Copy onCopy={() => onCopyVerseClicked(verseNumber)}></Copy>
+
+		<HorizontalSplit
+			bind:paneID
+			module={Modules.BIBLE}
+			data={{ bibleLocationRef: getVerseBibleLocationReference(verseNumber) }}
+		></HorizontalSplit>
+
+		<VerticalSplit
+			bind:paneID
+			module={Modules.BIBLE}
+			data={{ bibleLocationRef: getVerseBibleLocationReference(verseNumber) }}
+		></VerticalSplit>
+	</div>
+{/snippet}
+
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
 		<Copy {onCopy}></Copy>
@@ -304,51 +346,3 @@
 		{@render body()}
 	</BufferBody>
 </BufferContainer>
-<!-- 
-<div bind:clientHeight class="flex h-full w-full justify-center bg-neutral-50">
-	<div class="w-full max-w-lg">
-		<header
-			bind:clientHeight={headerHeight}
-			class="sticky top-0 w-full flex-col border-b-2 bg-neutral-100 text-neutral-700"
-		>
-			<div class="flex w-full justify-between p-2">
-				<header
-					bind:clientHeight={headerHeight}
-					class=" flex w-full max-w-lg flex-row items-center justify-between bg-neutral-100 text-neutral-700"
-				>
-			
-				</header>
-			</div>
-		</header>
-		<div
-			style="height: {clientHeight - headerHeight}px"
-			class="flex w-full flex-col overflow-y-scroll border"
-		>
-			<div>
-				<input
-					type="checkbox"
-					class="accent-support-a-500 mx-4 mt-5 h-5 w-5"
-					bind:checked={allChecked}
-					onchange={() => {
-						toggleSelects();
-					}}
-				/>
-			</div>
-			{#each verseKeys as k, idx}
-				<div class="flex flex-row items-start space-y-4">
-					<div>
-						<input
-							type="checkbox"
-							class="accent-support-a-500 mx-4 h-5 w-5"
-							bind:checked={checked[idx]}
-						/>
-					</div>
-					<p>
-						<span class="vno">{verses.get(k)?.text.split(' ')[0]}</span>
-						{verses.get(k)?.text.split(' ').slice(1).join(' ')}
-					</p>
-				</div>
-			{/each}
-		</div>
-	</div>
-</div> -->
