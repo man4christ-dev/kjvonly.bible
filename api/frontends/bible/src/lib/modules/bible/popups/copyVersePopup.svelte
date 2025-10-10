@@ -4,6 +4,7 @@
 	import { onMount, untrack } from 'svelte';
 
 	//MODELS
+	import { Modules } from '$lib/models/modules.model';
 	import type { Verse } from '$lib/models/bible.model';
 
 	// SERVICES
@@ -20,7 +21,8 @@
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import HorizontalSplit from '$lib/components/buttons/horizontalSplit.svelte';
 	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
-	import { Modules } from '$lib/models/modules.model';
+
+	//OTHER
 	import { scrollTo } from '$lib/utils/eventHandlers';
 	import uuid4 from 'uuid4';
 
@@ -264,41 +266,32 @@
 	}
 </script>
 
-{#snippet body()}
-	{@render abc()}
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		{@render header()}
+	</BufferHeader>
+	<BufferBody bind:clientHeight bind:headerHeight classes="">
+		{@render body()}
+	</BufferBody>
+</BufferContainer>
 
-	<div>
-		{@render horizontalVerses()}
-	</div>
-	{#each verseNumbers as verseNumber, idx}
-		<div
-			id="{ID}-vno-{idx}"
-			role="button"
-			tabindex="-1"
-			onkeydown={() => {}}
-			onclick={() => onVerseClicked(idx)}
-			class="hover:bg-primary-100 flex flex-row items-center justify-center py-6 leading-loose hover:cursor-pointer"
-		>
-			<div class="flex min-w-16 justify-center">
-				<input
-					type="checkbox"
-					class="accent-support-a-600 h-5 w-5"
-					bind:checked={checked[idx]}
-					onchange={areAllVersesChecked}
-				/>
-			</div>
-			<div class="flex flex-col px-4">
-				<span class="whitespace-normal">
-					{verses.get(verseNumber)?.text}
-				</span>
-				<span class="flex-fill flex"></span>
-				{@render actions(parseInt(verseNumber))}
-			</div>
-		</div>
-	{/each}
+<!-- ================================ HEADER =============================== -->
+
+{#snippet header()}
+	<Copy {onCopy}></Copy>
+	<span class="m-auto text-center">{title}</span>
+	<Close {onClose}></Close>
 {/snippet}
 
-{#snippet abc()}
+<!-- ================================= BODY ================================ -->
+
+{#snippet body()}
+	{@render toggleAndSelectedVerseText()}
+	{@render horizontalVerses()}
+	{@render checkboxAndVerse()}
+{/snippet}
+
+{#snippet toggleAndSelectedVerseText()}
 	<div class="sticky top-0 flex flex-row justify-between bg-neutral-50">
 		<div class="p-2">
 			<label
@@ -344,13 +337,36 @@
 		</div>
 		<div class="min-w-14 bg-neutral-50"></div>
 	</div>
-	<!-- <div style="width: 300px" class="max-w-lg min-w-lg overflow-hidden">
-		<div class="flex flex-row overflow-x-scroll">
-
-		</div>
-	</div> -->
 {/snippet}
 
+{#snippet checkboxAndVerse()}
+	{#each verseNumbers as verseNumber, idx}
+		<div
+			id="{ID}-vno-{idx}"
+			role="button"
+			tabindex="-1"
+			onkeydown={() => {}}
+			onclick={() => onVerseClicked(idx)}
+			class="hover:bg-primary-100 flex flex-row items-center justify-center py-6 leading-loose hover:cursor-pointer"
+		>
+			<div class="flex min-w-16 justify-center">
+				<input
+					type="checkbox"
+					class="accent-support-a-600 h-5 w-5"
+					bind:checked={checked[idx]}
+					onchange={areAllVersesChecked}
+				/>
+			</div>
+			<div class="flex flex-col px-4">
+				<span class="whitespace-normal">
+					{verses.get(verseNumber)?.text}
+				</span>
+				<span class="flex-fill flex"></span>
+				{@render actions(parseInt(verseNumber))}
+			</div>
+		</div>
+	{/each}
+{/snippet}
 {#snippet actions(verseNumber: number)}
 	<div class="flex flex-row justify-end space-x-4">
 		<Copy onCopy={() => onCopyVerseClicked(verseNumber)}></Copy>
@@ -368,14 +384,3 @@
 		></VerticalSplit>
 	</div>
 {/snippet}
-
-<BufferContainer bind:clientHeight>
-	<BufferHeader bind:headerHeight>
-		<Copy {onCopy}></Copy>
-		<span class="m-auto text-center">{title}</span>
-		<Close {onClose}></Close>
-	</BufferHeader>
-	<BufferBody bind:clientHeight bind:headerHeight classes="">
-		{@render body()}
-	</BufferBody>
-</BufferContainer>
