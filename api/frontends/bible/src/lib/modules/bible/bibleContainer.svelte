@@ -45,6 +45,11 @@
 	let bibleLocationRef: string = $state('');
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
+	/** since the {@link header} snippet is part of the body we don't
+	 * want to reduce the body height by the header height. This zero
+	 * value state will ensure the body is at 100%  {@link BufferContainer}
+	 */
+	let zeroHeaderHeight = $state(0);
 	let id = $state(uuid4());
 	const LAST_BIBLE_LOCATION_REF = 'lastBibleLocationReference';
 	let mode: any = $state(newBibleMode());
@@ -159,6 +164,7 @@
 					bind:pane
 					bind:mode
 					bind:annotations
+					bind:headerHeight
 					{lastKnownScrollPosition}
 				></Chapter>
 			</div>
@@ -200,7 +206,7 @@
 	<BufferBody
 		ID={id}
 		bind:clientHeight
-		bind:headerHeight
+		bind:headerHeight={zeroHeaderHeight}
 		classes="clear-default-classes"
 	>
 		{#if bibleLocationRef}

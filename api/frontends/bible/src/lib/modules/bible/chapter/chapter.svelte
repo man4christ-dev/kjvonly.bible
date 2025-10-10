@@ -1,7 +1,7 @@
 <script lang="ts">
 	// ================================ IMPORTS ================================
 	// SVELTE
-	import { onDestroy, onMount } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 
 	// COMPONENTS
 	import Verse from './verse.svelte';
@@ -63,6 +63,11 @@
 	let verseRangeEndIndex: number = 0;
 
 	let chapter: Chapter | undefined = $state();
+	/**
+	 * svelte isn't updating annotations on chapter change. Need to toggle
+	 * to update annotations
+	 */
+	let toggleVersesView: boolean = $state(true);
 	let verses: Map<string, VerseModel> = $state(new Map());
 	let versesNumbersToShow: string[] = $state([]);
 
@@ -80,17 +85,23 @@
 
 	$effect(() => {
 		bibleLocationRef;
-		resetMode();
-		setVerseRanges();
-		scrollToVerse();
-		resetAnnotations();
-		loadAnnotations();
-		loadNotes();
-		loadChapter();
+		untrack(() => {
+			resetMode();
+			resetAnnotations();
+			toggleVersesViewFn();
+			setVerseRanges();
+			scrollToVerse();
+			loadAnnotations();
+			loadNotes();
+			loadChapter();
+		});
 	});
 
 	// ================================ FUNCS ==================================
 
+	function toggleVersesViewFn() {
+		toggleVersesView = !toggleVersesView;
+	}
 	function resetMode() {
 		mode.value = BIBLE_MODES.READING;
 	}
@@ -188,8 +199,7 @@
 	}
 </script>
 
-<span style="height: {headerHeight}px">&nbsp;</span>
-<div class="px-4 leading-loose">
+{#snippet versesView()}
 	{#each versesNumbersToShow as k, idx}
 		<span class="whitespace-normal" id={`${id}-vno-${idx + 1}`}>
 			<Verse
@@ -204,5 +214,14 @@
 			></Verse>
 		</span>
 	{/each}
+{/snippet}
+
+<p style="min-height: {headerHeight + 5}px">&nbsp;</p>
+<div class="px-4 leading-loose">
+	{#if toggleVersesView}
+		{@render versesView()}
+	{:else}
+		{@render versesView()}
+	{/if}
 	<div class="mt-18"></div>
 </div>

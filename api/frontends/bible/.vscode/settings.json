@@ -6,5 +6,8 @@
 	"editor.fontWeight": "100",
 	"editor.fontSize": 14,
 	"css.customData": [".vscode/css_custom_data.json"],
-	"css.lint.unknownAtRules": "ignore"
+	"css.lint.unknownAtRules": "ignore",
+	"[xml]": {
+		"editor.defaultFormatter": "redhat.vscode-xml"
+	}
 }
