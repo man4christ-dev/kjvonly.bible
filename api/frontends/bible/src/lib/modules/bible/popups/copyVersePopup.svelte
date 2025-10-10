@@ -21,6 +21,8 @@
 	import HorizontalSplit from '$lib/components/buttons/horizontalSplit.svelte';
 	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
 	import { Modules } from '$lib/models/modules.model';
+	import { scrollTo } from '$lib/utils/eventHandlers';
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
 
@@ -38,7 +40,7 @@
 	// DOM
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
-
+	let ID = uuid4();
 	let allChecked = $state(false);
 	let checked: boolean[] = $state([]);
 	let verseNumbers: string[] = $state([]);
@@ -225,9 +227,13 @@
 					? `${vr[0]}`
 					: `${vr[0]}-${vr[vr.length - 1]}`
 			)
-			.join();
+			.join(', ');
 	}
 
+	function scrollToVerse(idx: number) {
+		let id = `${ID}-vno-${idx}`;
+		scrollTo(id, () => {});
+	}
 	// ============================== CLICK FUNCS ==============================
 
 	function onCopy() {
@@ -261,8 +267,12 @@
 {#snippet body()}
 	{@render abc()}
 
+	<div>
+		{@render horizontalVerses()}
+	</div>
 	{#each verseNumbers as verseNumber, idx}
 		<div
+			id="{ID}-vno-{idx}"
 			role="button"
 			tabindex="-1"
 			onkeydown={() => {}}
@@ -289,18 +299,11 @@
 {/snippet}
 
 {#snippet abc()}
-	<div
-		class=" relative sticky top-0 flex flex-row justify-between bg-neutral-50"
-	>
-		<span class="absolute w-full">
-			<span class="flex-fill flex justify-center p-2 text-nowrap">
-				{selectedVerseRangeText}
-			</span>
-		</span>
+	<div class="sticky top-0 flex flex-row justify-between bg-neutral-50">
 		<div class="p-2">
 			<label
 				for="showCompleted"
-				class="has-checked:bg-support-a-600 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent] hover:cursor-pointer"
+				class="has-checked:bg-support-a-600 relative block h-8 max-w-14 min-w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent] hover:cursor-pointer"
 			>
 				<input
 					bind:checked={allChecked}
@@ -315,7 +318,37 @@
 				></span>
 			</label>
 		</div>
+		<span class="flex items-center justify-center px-2 text-center"
+			>{selectedVerseRangeText}</span
+		>
+		<span class="w-full max-w-14 min-w-14"></span>
 	</div>
+{/snippet}
+
+{#snippet horizontalVerses()}
+	<div class="flex max-w-lg flex-row">
+		<div class="min-w-20 bg-neutral-50"></div>
+		<div class="w-lg overflow-x-scroll">
+			<div class="whitespace-nowrap">
+				{#each verseNumbers as vn, idx}
+					<button
+						onclick={() => scrollToVerse(idx)}
+						class="inline-block h-10 w-16 border hover:cursor-pointer"
+					>
+						<span class="flex h-full items-center justify-center">
+							<span>{vn}</span>
+						</span>
+					</button>
+				{/each}
+			</div>
+		</div>
+		<div class="min-w-14 bg-neutral-50"></div>
+	</div>
+	<!-- <div style="width: 300px" class="max-w-lg min-w-lg overflow-hidden">
+		<div class="flex flex-row overflow-x-scroll">
+
+		</div>
+	</div> -->
 {/snippet}
 
 {#snippet actions(verseNumber: number)}
