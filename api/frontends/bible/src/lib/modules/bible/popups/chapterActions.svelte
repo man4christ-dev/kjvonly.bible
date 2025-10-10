@@ -16,8 +16,8 @@
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
-	import DownChevron from '$lib/components/buttons/chevrons/downChevron.svelte';
 	import Gear from '$lib/components/gear.svelte';
+	import DownChevron from '$lib/components/buttons/chevrons/downChevron.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -26,6 +26,7 @@
 		annotations = $bindable<Annotations>(),
 		bibleLocationRef = $bindable(),
 		clientHeight = $bindable<number>(),
+		headerHeight = $bindable<number>(),
 		paneID
 	} = $props();
 
@@ -91,45 +92,47 @@
 </script>
 
 <!-- book chapter selection -->
+{#snippet separator(classes: string)}
+	<span class="{classes} h-full border-s-2 border-neutral-300">&nbsp;</span>
+{/snippet}
 
-<div class="max-w-lg leading-tight">
-	<!-- svelte-ignore a11y_click_events_have_key_events -->
-	<!-- svelte-ignore a11y_no_static_element_interactions -->
-	<span
-		class="flex items-center
-		justify-between rounded-s-full rounded-e-full bg-neutral-100 px-1 text-neutral-700 hover:cursor-pointer"
+{#snippet bookChapterVerseButton()}
+	<button
+		onclick={onBookChapterClick}
+		class="border-x-2 border-neutral-300 px-1 text-center text-neutral-700"
 	>
-		<Gear
-			btnClasses="pe-1 py-1 hover:cursor-pointer"
-			onClick={onSettingsClick}
-			svgClasses="ml-2 h-5 w-5"
-		></Gear>
-
-		<span class="ml-2 h-[100%] border-s-2 border-neutral-300">&nbsp;</span>
-		<span
-			onclick={(e) => {
-				onBookChapterClick(e);
-			}}
-			class="m-0 text-center text-neutral-700"
-		>
-			<span class="bookChapter flex items-center text-center"
-				><span>
-					{#if bookName && bookChapter}
-						{bookName} {bookChapter}{verses}
-					{/if}
-				</span><span> </span></span
-			>
+		<span class="kjvonly-noselect mx-2 flex items-center text-center">
+			{#if bookName && bookChapter}
+				{bookName} {bookChapter}{verses}
+			{/if}
 		</span>
-		<span class="mr-2 h-[100%] border-e-2 border-neutral-300">&nbsp;</span>
+	</button>
+{/snippet}
+{#snippet settingsButton()}
+	<Gear btnClasses="px-2 py-1" onClick={onSettingsClick} svgClasses="h-5 w-5"
+	></Gear>
+{/snippet}
+{#snippet bibleActionsMenuButton()}
+	<DownChevron
+		onClick={onActionClick}
+		svgClasses="h-5 w-5"
+		btnClasses="px-2 py-1"
+	></DownChevron>
+{/snippet}
+{#snippet actionsHeader()}
+	<div bind:clientHeight={headerHeight} class="absolute max-w-lg leading-tight">
+		<span
+			class="flex items-center
+		justify-between rounded-s-full rounded-e-full bg-neutral-100 px-1 text-neutral-700 hover:cursor-pointer"
+		>
+			{@render settingsButton()}
+			{@render bookChapterVerseButton()}
+			{@render bibleActionsMenuButton()}
+		</span>
+	</div>
+{/snippet}
 
-		<DownChevron
-			onClick={onActionClick}
-			svgClasses="mr-2 h-5 w-5"
-			btnClasses="hover:cursor-pointer"
-		></DownChevron>
-		<span onclick={onActionClick}> </span>
-	</span>
-</div>
+{@render actionsHeader()}
 {#if showBookChapterPopup || showNavReadingsPopup || showSettingsPopup || showActionsPopup || mode.notePopup.show || showCopyVersePopup}
 	<div
 		style="height: {clientHeight}px"

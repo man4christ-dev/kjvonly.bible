@@ -135,12 +135,13 @@
 <!-- ================================ HEADER =============================== -->
 
 {#snippet header()}
-	<div class="sticky top-0 z-[1500] flex w-full justify-center">
+	<div class="relative sticky top-0 z-[1500] flex w-full justify-center">
 		<ChapterActions
 			bind:mode
 			bind:bibleLocationRef
 			bind:annotations
 			bind:clientHeight
+			bind:headerHeight
 			{paneID}
 		></ChapterActions>
 	</div>

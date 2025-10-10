@@ -35,6 +35,7 @@
 	let {
 		bibleLocationRef = $bindable<string>(),
 		id = $bindable<string>(),
+		headerHeight = $bindable<number>(),
 		pane = $bindable<Pane>(),
 		mode = $bindable<BibleMode>(),
 		annotations = $bindable<Annotations>(),
@@ -42,6 +43,7 @@
 	}: {
 		bibleLocationRef: string;
 		id: string;
+		headerHeight: number;
 		pane: Pane;
 		mode: BibleMode;
 		annotations: Annotations;
@@ -186,6 +188,7 @@
 	}
 </script>
 
+<span style="height: {headerHeight}px">&nbsp;</span>
 <div class="px-4 leading-loose">
 	{#each versesNumbersToShow as k, idx}
 		<span class="whitespace-normal" id={`${id}-vno-${idx + 1}`}>
