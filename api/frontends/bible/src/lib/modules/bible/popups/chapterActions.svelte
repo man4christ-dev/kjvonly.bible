@@ -18,6 +18,8 @@
 	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
 	import Gear from '$lib/components/gear.svelte';
 	import DownChevron from '$lib/components/buttons/chevrons/downChevron.svelte';
+	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
+	import Search from '$lib/components/buttons/search.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -115,9 +117,17 @@
 {#snippet bibleActionsMenuButton()}
 	<DownChevron
 		onClick={onActionClick}
-		svgClasses="h-5 w-5"
 		btnClasses="px-2 py-1"
+		svgClasses="h-5 w-5"
 	></DownChevron>
+{/snippet}
+{#snippet editButton()}
+	<EditPencil onClick={() => {}} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
+	></EditPencil>
+{/snippet}
+{#snippet searchButton()}
+	<Search onClick={() => {}} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
+	></Search>
 {/snippet}
 {#snippet actionsHeader()}
 	<div bind:clientHeight={headerHeight} class="absolute max-w-lg leading-tight">
@@ -125,8 +135,10 @@
 			class="flex items-center
 		justify-between rounded-s-full rounded-e-full bg-neutral-100 px-1 text-neutral-700 hover:cursor-pointer"
 		>
+			{@render editButton()}
 			{@render settingsButton()}
 			{@render bookChapterVerseButton()}
+			{@render searchButton()}
 			{@render bibleActionsMenuButton()}
 		</span>
 	</div>
