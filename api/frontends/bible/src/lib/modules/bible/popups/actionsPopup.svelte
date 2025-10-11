@@ -86,7 +86,7 @@
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
 		<div class="flex w-full justify-end">
-			<Close onClose={onCloseActionsDropdown}></Close>
+			<Close onClick={onCloseActionsDropdown}></Close>
 		</div>
 	</BufferHeader>
 	<BufferBody

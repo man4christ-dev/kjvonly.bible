@@ -66,7 +66,7 @@
 	<div class="flex w-full items-center justify-between">
 		<span class="w-12"></span>
 		<span class="flex-1 text-center">Search</span>
-		<Close classes="h-12 w-12" onClose={applyOnClose}></Close>
+		<Close btnClasses="h-12 w-12" onClick={applyOnClose}></Close>
 	</div>
 {/snippet}
 

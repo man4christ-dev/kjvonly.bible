@@ -280,7 +280,7 @@
 {#snippet header()}
 	<Copy {onCopy}></Copy>
 	<span class="m-auto text-center">{title}</span>
-	<Close {onClose}></Close>
+	<Close onClick={onClose}></Close>
 {/snippet}
 
 <!-- ================================= BODY ================================ -->

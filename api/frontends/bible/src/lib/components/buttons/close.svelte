@@ -1,15 +1,20 @@
 <script lang="ts">
-	let { onClose, classes = 'h-12 w-12' } = $props();
+	let {
+		onClick,
+		btnClasses = 'h-12 w-12  px-2 text-neutral-700',
+		svgClasses = ''
+	} = $props();
 </script>
 
 <button
 	aria-label="close"
 	onclick={() => {
-		onClose();
+		onClick();
 	}}
-	class="{classes} px-2 text-neutral-700 hover:cursor-pointer"
+	class={btnClasses}
 >
 	<svg
+		class={svgClasses}
 		xmlns="http://www.w3.org/2000/svg"
 		viewBox="0 0 24 24"
 		width="100%"

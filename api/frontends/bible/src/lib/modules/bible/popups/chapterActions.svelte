@@ -11,7 +11,11 @@
 	import Settings from '../../settings/settings.svelte';
 
 	// MODELS
-	import { BIBLE_MODES, type Annotations } from '$lib/models/bible.model';
+	import {
+		BIBLE_MODES,
+		ToolbarItems,
+		type Annotations
+	} from '$lib/models/bible.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
@@ -21,6 +25,9 @@
 	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
 	import Search from '$lib/components/buttons/search.svelte';
 	import { paneService } from '$lib/services/pane.service.svelte';
+	import Close from '$lib/components/buttons/close.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import Menu from '$lib/components/svgs/menu.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -43,6 +50,15 @@
 	let verses: string = $state('');
 	let bookName: string = $state('');
 	let bookChapter: number = $state(0);
+
+	let toolbar = [
+		ToolbarItems.EDIT,
+		ToolbarItems.SETTINGS,
+		ToolbarItems.BOOK_CHAPTER_VERSE,
+		ToolbarItems.SEARCH,
+		ToolbarItems.MENU,
+		ToolbarItems.Close
+	];
 
 	// =============================== LIFECYCLE ===============================
 
@@ -97,7 +113,6 @@
 		e.stopPropagation();
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
-
 		let verseNumber =
 			bibleLocationReferenceService.extractVersesOrOne(bibleLocationRef);
 		let wordIdx =
@@ -105,19 +120,23 @@
 		mode.bibleLocationRef = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
 		mode.value = BIBLE_MODES.EDIT;
 	}
+
+	function onCloseClick() {
+		paneService.onDeletePane(paneID);
+	}
 </script>
 
-<!-- book chapter selection -->
-{#snippet separator(classes: string)}
-	<span class="{classes} h-full border-s-2 border-neutral-300">&nbsp;</span>
+{#snippet closeButton()}
+	<Close
+		onClick="{onCloseClick}}"
+		btnClasses="text-neutral-700 px-2 py-1"
+		svgClasses="h-6 w-6 "
+	></Close>
 {/snippet}
 
 {#snippet bookChapterVerseButton()}
-	<button
-		onclick={onBookChapterClick}
-		class="border-x-2 border-neutral-300 px-1 text-center text-neutral-700"
-	>
-		<span class="kjvonly-noselect mx-2 flex items-center text-center">
+	<button onclick={onBookChapterClick} class=" text-center text-neutral-700">
+		<span class="kjvonly-noselect flex items-center px-2 py-1 text-center">
 			{#if bookName && bookChapter}
 				{bookName} {bookChapter}{verses}
 			{/if}
@@ -129,11 +148,9 @@
 	></Gear>
 {/snippet}
 {#snippet bibleActionsMenuButton()}
-	<DownChevron
-		onClick={onActionClick}
-		btnClasses="px-2 py-1"
-		svgClasses="h-5 w-5"
-	></DownChevron>
+	<KJVButton onClick={onActionClick} classes="">
+		<Menu classes="h-5 w-5"></Menu>
+	</KJVButton>
 {/snippet}
 {#snippet editButton()}
 	<EditPencil onClick={onEditClick} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
@@ -146,14 +163,28 @@
 {#snippet actionsHeader()}
 	<div bind:clientHeight={headerHeight} class="absolute max-w-lg leading-tight">
 		<span
-			class="flex items-center
-		justify-between rounded-s-full rounded-e-full bg-neutral-100 px-1 text-neutral-700 hover:cursor-pointer"
+			class="grid grid-cols-6 place-items-center rounded-s-full rounded-e-full bg-neutral-100 px-1 text-neutral-700 hover:cursor-pointer"
 		>
-			{@render editButton()}
-			{@render settingsButton()}
-			{@render bookChapterVerseButton()}
-			{@render searchButton()}
-			{@render bibleActionsMenuButton()}
+			{#each toolbar as item, idx}
+				{#if item === ToolbarItems.EDIT}
+					{@render editButton()}
+				{/if}
+				{#if item === ToolbarItems.SETTINGS}
+					{@render settingsButton()}
+				{/if}
+				{#if item === ToolbarItems.BOOK_CHAPTER_VERSE}
+					{@render bookChapterVerseButton()}
+				{/if}
+				{#if item === ToolbarItems.SEARCH}
+					{@render searchButton()}
+				{/if}
+				{#if item === ToolbarItems.MENU}
+					{@render bibleActionsMenuButton()}
+				{/if}
+				{#if item === ToolbarItems.Close}
+					{@render closeButton()}
+				{/if}
+			{/each}
 		</span>
 	</div>
 {/snippet}

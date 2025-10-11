@@ -47,7 +47,7 @@
 	<div class="flex items-center justify-center">
 		<h1 class="text-start">Settings</h1>
 	</div>
-	<Close {onClose}></Close>
+	<Close onClick={onClose}></Close>
 {/snippet}
 
 <!-- ================================= BODY =============================+== -->

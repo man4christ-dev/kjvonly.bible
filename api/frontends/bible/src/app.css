@@ -147,6 +147,9 @@
 		button {
 			@apply hover:cursor-pointer;
 		}
+		svg {
+			@apply fill-neutral-700;
+		}
 	}
 }
 
