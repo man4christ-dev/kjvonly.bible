@@ -21,13 +21,15 @@
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
 	import Gear from '$lib/components/gear.svelte';
-	import DownChevron from '$lib/components/buttons/chevrons/downChevron.svelte';
+
 	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
-	import Search from '$lib/components/buttons/search.svelte';
+
+	import Search from '$lib/components/svgs/search.svelte';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import Close from '$lib/components/buttons/close.svelte';
+	import Close from '$lib/components/svgs/close.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import Menu from '$lib/components/svgs/menu.svelte';
+	import { Modules } from '$lib/models/modules.model';
 
 	// =============================== BINDINGS ================================
 
@@ -122,16 +124,18 @@
 	}
 
 	function onCloseClick() {
-		paneService.onDeletePane(paneID);
+		paneService.onDeletePane(paneService.rootPane, paneID);
+	}
+
+	function onSearchClick() {
+		paneService.onSplitPane(paneID, 'h', Modules.SEARCH, {});
 	}
 </script>
 
 {#snippet closeButton()}
-	<Close
-		onClick="{onCloseClick}}"
-		btnClasses="text-neutral-700 px-2 py-1"
-		svgClasses="h-6 w-6 "
-	></Close>
+	<KJVButton onClick={onCloseClick} classes="">
+		<Close classes="h-5 w-5"></Close>
+	</KJVButton>
 {/snippet}
 
 {#snippet bookChapterVerseButton()}
@@ -152,18 +156,22 @@
 		<Menu classes="h-5 w-5"></Menu>
 	</KJVButton>
 {/snippet}
+
 {#snippet editButton()}
 	<EditPencil onClick={onEditClick} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
 	></EditPencil>
 {/snippet}
+
 {#snippet searchButton()}
-	<Search onClick={() => {}} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
-	></Search>
+	<KJVButton onClick={onSearchClick} classes="">
+		<Search classes="h-5 w-5"></Search>
+	</KJVButton>
 {/snippet}
+
 {#snippet actionsHeader()}
 	<div bind:clientHeight={headerHeight} class="absolute max-w-lg leading-tight">
 		<span
-			class="grid grid-cols-6 place-items-center rounded-s-full rounded-e-full bg-neutral-100 px-1 text-neutral-700 hover:cursor-pointer"
+			class="grid grid-cols-6 place-items-center bg-neutral-100 px-1 text-neutral-700"
 		>
 			{#each toolbar as item, idx}
 				{#if item === ToolbarItems.EDIT}

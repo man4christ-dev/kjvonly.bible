@@ -1,3 +1,5 @@
+import type { BibleMode } from '$lib/models/bible.model';
+import type { Modules } from '$lib/models/modules.model';
 import type { Pane } from '$lib/models/pane.model';
 
 export class PaneService {
@@ -37,8 +39,13 @@ export class PaneService {
 		localStorage.setItem('pane', JSON.stringify(this.rootPane));
 	}
 
-	onDeletePane: Function = () => {};
-	onSplitPane: Function = () => {};
+	onDeletePane: (pane: Pane, paneID: string) => void = (): void => {};
+	onSplitPane: (
+		paneID: string,
+		orientation: string,
+		module: Modules,
+		data: any
+	) => void = () => {};
 
 	subscribers: any = [];
 
