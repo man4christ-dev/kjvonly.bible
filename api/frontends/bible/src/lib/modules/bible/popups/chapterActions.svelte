@@ -11,7 +11,7 @@
 	import Settings from '../../settings/settings.svelte';
 
 	// MODELS
-	import type { Annotations } from '$lib/models/bible.model';
+	import { BIBLE_MODES, type Annotations } from '$lib/models/bible.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
@@ -91,6 +91,14 @@
 		console.log('clicked');
 		showActionsPopup = !showActionsPopup;
 	}
+
+	function onEditClick(e: Event) {
+		e.stopPropagation();
+		let bookIDChapter =
+			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
+		mode.bibleLocationRef = `${bookIDChapter}_1_0`;
+		mode.value = BIBLE_MODES.EDIT;
+	}
 </script>
 
 <!-- book chapter selection -->
@@ -122,7 +130,7 @@
 	></DownChevron>
 {/snippet}
 {#snippet editButton()}
-	<EditPencil onClick={() => {}} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
+	<EditPencil onClick={onEditClick} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
 	></EditPencil>
 {/snippet}
 {#snippet searchButton()}
