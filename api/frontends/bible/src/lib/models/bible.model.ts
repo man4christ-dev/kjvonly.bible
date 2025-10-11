@@ -128,10 +128,11 @@ export enum BIBLE_MODES {
 }
 
 export enum ToolbarItems {
-	EDIT = 1,
-	SETTINGS,
-	BOOK_CHAPTER_VERSE,
-	SEARCH,
+	BOOK_CHAPTER_VERSE = 1,
+	Close,
+	Copy,
 	MENU,
-	Close
+	EDIT,
+	SEARCH,
+	SETTINGS
 }

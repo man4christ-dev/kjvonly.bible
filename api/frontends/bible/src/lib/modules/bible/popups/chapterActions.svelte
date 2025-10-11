@@ -1,6 +1,6 @@
 <script lang="ts">
 	// SVELTE
-	import { onMount, untrack } from 'svelte';
+	import { onMount, untrack, type Component, type Snippet } from 'svelte';
 
 	// COMPONENTS
 	import ActionDropdown from './actionsPopup.svelte';
@@ -30,6 +30,9 @@
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import Menu from '$lib/components/svgs/menu.svelte';
 	import { Modules } from '$lib/models/modules.model';
+	import Copy from '$lib/components/svgs/copy.svelte';
+	import { get } from 'svelte/store';
+	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 
 	// =============================== BINDINGS ================================
 
@@ -49,13 +52,16 @@
 	let showSettingsPopup: boolean = $state(false);
 	let showActionsPopup: boolean = $state(false);
 	let showCopyVersePopup: boolean = $state(false);
-	let verses: string = $state('');
+
 	let bookName: string = $state('');
 	let bookChapter: number = $state(0);
+	let verses: string = $state('');
+	let headerGridCols = $state(7);
 
 	let toolbar = [
 		ToolbarItems.EDIT,
 		ToolbarItems.SETTINGS,
+		ToolbarItems.Copy,
 		ToolbarItems.BOOK_CHAPTER_VERSE,
 		ToolbarItems.SEARCH,
 		ToolbarItems.MENU,
@@ -84,7 +90,7 @@
 
 	function setBookNameAndChapter() {
 		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
-		bookName = bookNamesByIDService.get(bookID);
+		bookName = shortBookNamesByIDService.get(bookID);
 		bookChapter =
 			bibleLocationReferenceService.extractChapter(bibleLocationRef);
 	}
@@ -130,7 +136,18 @@
 	function onSearchClick() {
 		paneService.onSplitPane(paneID, 'h', Modules.SEARCH, {});
 	}
+
+	function onCopyClick() {
+		showCopyVersePopup = true;
+	}
 </script>
+
+{#snippet noButton()}{/snippet}
+{#snippet copyButton()}
+	<KJVButton onClick={onCopyClick} classes="">
+		<Copy classes="h-5 w-5"></Copy>
+	</KJVButton>
+{/snippet}
 
 {#snippet closeButton()}
 	<KJVButton onClick={onCloseClick} classes="">
@@ -140,7 +157,7 @@
 
 {#snippet bookChapterVerseButton()}
 	<button onclick={onBookChapterClick} class=" text-center text-neutral-700">
-		<span class="kjvonly-noselect flex items-center px-2 py-1 text-center">
+		<span class="kjvonly-noselect flex items-center text-center">
 			{#if bookName && bookChapter}
 				{bookName} {bookChapter}{verses}
 			{/if}
@@ -169,13 +186,20 @@
 {/snippet}
 
 {#snippet actionsHeader()}
-	<div bind:clientHeight={headerHeight} class="absolute max-w-lg leading-tight">
+	<div
+		bind:clientHeight={headerHeight}
+		class="absolute w-full max-w-lg leading-tight"
+	>
 		<span
-			class="grid grid-cols-6 place-items-center bg-neutral-100 px-1 text-neutral-700"
+			class="grid {'grid-cols-' +
+				headerGridCols} place-items-center bg-neutral-100 text-neutral-700"
 		>
-			{#each toolbar as item, idx}
+			{#each toolbar as item}
 				{#if item === ToolbarItems.EDIT}
 					{@render editButton()}
+				{/if}
+				{#if item === ToolbarItems.Copy}
+					{@render copyButton()}
 				{/if}
 				{#if item === ToolbarItems.SETTINGS}
 					{@render settingsButton()}
