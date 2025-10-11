@@ -188,7 +188,7 @@
 {#snippet actionsHeader()}
 	<div
 		bind:clientHeight={headerHeight}
-		class="absolute w-full max-w-lg border-b-1 border-neutral-400 leading-tight"
+		class="absolute w-full max-w-lg leading-tight outline outline-neutral-400"
 	>
 		<span
 			class="grid {'grid-cols-' +

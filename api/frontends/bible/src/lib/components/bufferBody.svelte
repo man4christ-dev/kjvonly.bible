@@ -13,7 +13,7 @@
 <div
 	id="{ID}-scroll-container"
 	style="height: {clientHeight - headerHeight}px"
-	class="flex w-full max-w-lg flex-col overflow-y-scroll border border-neutral-400 {classes}"
+	class="flex w-full max-w-lg flex-col overflow-y-scroll {classes}"
 >
 	{@render children?.()}
 </div>

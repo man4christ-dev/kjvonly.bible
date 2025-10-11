@@ -263,7 +263,7 @@
 	<div style="max-height: 100vh; min-width: 1px; {template};" class="w-full">
 		{#each paneIds as paneID}
 			{#if !deletedPaneIds[paneID]}
-				<div class="outline" style="grid-area: {paneID};">
+				<div class="outline outline-neutral-400" style="grid-area: {paneID};">
 					<PaneContainer {paneID}></PaneContainer>
 				</div>
 			{/if}
@@ -275,7 +275,7 @@
 	<div class="fixed end-4 bottom-4 z-[10000] flex flex-col">
 		{#each [...toasts].reverse() as t}
 			<aside
-				class="my-2 flex items-center justify-center gap-4 rounded-lg border bg-neutral-100 px-5 py-3"
+				class="my-2 flex items-center justify-center gap-4 rounded-lg border bg-neutral-400 px-5 py-3"
 			>
 				{t}
 			</aside>

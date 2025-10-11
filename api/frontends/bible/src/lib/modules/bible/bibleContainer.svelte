@@ -203,7 +203,7 @@
 <BufferContainer bind:clientHeight>
 	<BufferHeader
 		bind:headerHeight
-		classes="flex w-full justify-between border-s-1 border-e-1 border-t-1 border-neutral-400 text-neutral-700"
+		classes="flex w-full justify-between outline outline-neutral-400 text-neutral-700"
 	>
 		{#if bibleLocationRef}
 			{@render header()}
