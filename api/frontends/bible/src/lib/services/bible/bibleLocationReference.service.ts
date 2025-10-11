@@ -58,7 +58,7 @@ class BibleLocationReferenceService {
 		return ref;
 	}
 
-	extractVerses(ref: string): number[] {
+	extractVersesOrOne(ref: string): number[] {
 		let bcv = ref.split('_');
 		if (bcv.length > 2) {
 			let verses = bcv[2].split('-');
@@ -88,6 +88,21 @@ class BibleLocationReferenceService {
 			verse = verse.split('-')[0];
 		}
 		return parseInt(verse, 10);
+	}
+
+	extractWordIndexOrDefault(
+		bibleLocationRef: string,
+		defaultWordIndex?: string | undefined
+	): string {
+		if (!defaultWordIndex) {
+			defaultWordIndex = '0';
+		}
+		let refs = bibleLocationRef.split('_');
+		if (refs.length === 4) {
+			return refs[3];
+		}
+
+		return defaultWordIndex;
 	}
 
 	hasVerse(ref: string) {

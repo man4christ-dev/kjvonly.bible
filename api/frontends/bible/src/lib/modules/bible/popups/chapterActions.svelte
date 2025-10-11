@@ -20,6 +20,7 @@
 	import DownChevron from '$lib/components/buttons/chevrons/downChevron.svelte';
 	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
 	import Search from '$lib/components/buttons/search.svelte';
+	import { paneService } from '$lib/services/pane.service.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -54,7 +55,7 @@
 		untrack(() => {
 			setBookNameAndChapter();
 			let [start, end] =
-				bibleLocationReferenceService.extractVerses(bibleLocationRef);
+				bibleLocationReferenceService.extractVersesOrOne(bibleLocationRef);
 			if (start + end > 0) {
 				verses = `:${start + 1}-${end}`;
 			} else {
@@ -96,7 +97,12 @@
 		e.stopPropagation();
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
-		mode.bibleLocationRef = `${bookIDChapter}_1_0`;
+
+		let verseNumber =
+			bibleLocationReferenceService.extractVersesOrOne(bibleLocationRef);
+		let wordIdx =
+			bibleLocationReferenceService.extractWordIndexOrDefault(bibleLocationRef);
+		mode.bibleLocationRef = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
 		mode.value = BIBLE_MODES.EDIT;
 	}
 </script>

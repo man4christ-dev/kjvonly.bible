@@ -12,3 +12,4 @@ note needed with h-full on the bufferContainer
 ◊ get all annotations does not include unsynced annots
 ◊ import and export need to be refactored with new indexedDB stores
 ◊ add strongs ref split pane to search
+◊ update title in notes for verse notes to display the book chapter and verse

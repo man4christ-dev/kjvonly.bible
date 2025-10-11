@@ -112,7 +112,7 @@
 
 	function setVerseRanges() {
 		let [start, end] =
-			bibleLocationReferenceService.extractVerses(bibleLocationRef);
+			bibleLocationReferenceService.extractVersesOrOne(bibleLocationRef);
 		hasVerseRange = start + end > 0;
 		verseRangeStartIndex = start;
 		verseRangeEndIndex = end;

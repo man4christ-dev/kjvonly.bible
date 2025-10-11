@@ -109,16 +109,22 @@
 	}
 
 	function updateMode(updMode: BIBLE_MODES) {
+		updateBibleLocationRef();
+		mode.value = updMode;
+	}
+
+	function updateBibleLocationRef() {
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		mode.bibleLocationRef = `${bookIDChapter}_${verse.number}_${wordIdx}`;
-		mode.value = updMode;
 	}
 
 	// ============================== CLICK FUNCS ==============================
 
 	function onWordClicked(e: Event) {
 		e.stopPropagation();
+
+		updateBibleLocationRef();
 
 		if (isBibleModeEdit()) {
 			onEditClick();
