@@ -33,6 +33,7 @@
 	import Copy from '$lib/components/svgs/copy.svelte';
 	import { get } from 'svelte/store';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
+	import PopupContainer from './popupContainer.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -221,47 +222,73 @@
 	</div>
 {/snippet}
 
-{@render actionsHeader()}
-{#if showBookChapterPopup || showNavReadingsPopup || showSettingsPopup || showActionsPopup || mode.notePopup.show || showCopyVersePopup}
-	<div
-		style="height: {clientHeight}px"
-		class="absolute z-[10000] h-full w-full max-w-lg"
-	>
-		{#if showBookChapterPopup}
+{#snippet bookChapterPopup()}
+	{#if showBookChapterPopup}
+		<PopupContainer bind:clientHeight>
 			<BookChapterPopup bind:showBookChapterPopup bind:bibleLocationRef
 			></BookChapterPopup>
-		{/if}
-		{#if showNavReadingsPopup}
+		</PopupContainer>
+	{/if}
+{/snippet}
+
+{#snippet navReadingsPopup()}
+	{#if showNavReadingsPopup}
+		<PopupContainer bind:clientHeight>
 			<NavReadingsList
 				bind:showNavReadingsPopup
 				bind:navReadings={mode.navReadings}
 				bind:bibleLocationRef
-			></NavReadingsList>
-		{/if}
-		{#if showSettingsPopup}
+			></NavReadingsList></PopupContainer
+		>
+	{/if}
+{/snippet}
+
+{#snippet settingsPopup()}
+	{#if showSettingsPopup}
+		<PopupContainer bind:clientHeight>
 			<Settings
 				onClose={() => {
 					showSettingsPopup = false;
 				}}
-			></Settings>
-		{/if}
+			></Settings></PopupContainer
+		>
+	{/if}
+{/snippet}
 
-		{#if showActionsPopup}
+{#snippet actionsPopup()}
+	{#if showActionsPopup}
+		<PopupContainer bind:clientHeight>
 			<ActionDropdown
 				{paneID}
 				bind:showCopyVersePopup
 				bind:showActionsDropdown={showActionsPopup}
-			></ActionDropdown>
-		{/if}
+			></ActionDropdown></PopupContainer
+		>
+	{/if}
+{/snippet}
 
-		{#if mode.notePopup.show}
+{#snippet notePopup()}
+	{#if mode.notePopup.show}
+		<PopupContainer bind:clientHeight>
 			<NotesContainer bind:mode allNotes={false} bind:annotations
 			></NotesContainer>
-		{/if}
+		</PopupContainer>
+	{/if}
+{/snippet}
 
-		{#if showCopyVersePopup}
+{#snippet copyVersePopup()}
+	{#if showCopyVersePopup}
+		<PopupContainer bind:clientHeight>
 			<CopyVersePopup {paneID} bind:showCopyVersePopup bind:bibleLocationRef
 			></CopyVersePopup>
-		{/if}
-	</div>
-{/if}
+		</PopupContainer>
+	{/if}
+{/snippet}
+
+{@render actionsHeader()}
+{@render bookChapterPopup()}
+{@render navReadingsPopup()}
+{@render settingsPopup()}
+{@render actionsPopup()}
+{@render notePopup()}
+{@render copyVersePopup()}
