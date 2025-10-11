@@ -1,6 +1,6 @@
 <script lang="ts">
 	// SVELTE
-	import { onMount, untrack, type Component, type Snippet } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 
 	// COMPONENTS
 	import ActionDropdown from './actionsPopup.svelte';
@@ -10,30 +10,30 @@
 	import NotesContainer from '../../notes/notesContainer.svelte';
 	import Settings from '../../settings/settings.svelte';
 
+	// TOOLBAR Components
+	import Close from '$lib/components/svgs/close.svelte';
+	import Copy from '$lib/components/svgs/copy.svelte';
+	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
+	import Gear from '$lib/components/gear.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import Menu from '$lib/components/svgs/menu.svelte';
+	import PopupContainer from './popupContainer.svelte';
+	import Search from '$lib/components/svgs/search.svelte';
+
 	// MODELS
+
 	import {
 		BIBLE_MODES,
 		ToolbarItems,
-		type Annotations
+		type Annotations,
+		type BibleMode
 	} from '$lib/models/bible.model';
+	import { Modules } from '$lib/models/modules.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
-	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
-	import Gear from '$lib/components/gear.svelte';
-
-	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
-
-	import Search from '$lib/components/svgs/search.svelte';
-	import { paneService } from '$lib/services/pane.service.svelte';
-	import Close from '$lib/components/svgs/close.svelte';
-	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import Menu from '$lib/components/svgs/menu.svelte';
-	import { Modules } from '$lib/models/modules.model';
-	import Copy from '$lib/components/svgs/copy.svelte';
-	import { get } from 'svelte/store';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
-	import PopupContainer from './popupContainer.svelte';
+	import { paneService } from '$lib/services/pane.service.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -44,6 +44,13 @@
 		clientHeight = $bindable<number>(),
 		headerHeight = $bindable<number>(),
 		paneID
+	}: {
+		mode: BibleMode;
+		annotations: Annotations;
+		bibleLocationRef: string;
+		clientHeight: number;
+		headerHeight: number;
+		paneID: string;
 	} = $props();
 
 	// ================================== VARS =================================
@@ -59,6 +66,8 @@
 	let verses: string = $state('');
 	let headerGridCols = $state(7);
 
+	// TODO this will become dynamic option allowing users to configure their
+	// toolbar to their liking
 	let toolbar = [
 		ToolbarItems.EDIT,
 		ToolbarItems.SETTINGS,
@@ -79,21 +88,27 @@
 		bibleLocationRef;
 		untrack(() => {
 			setBookNameAndChapter();
-			let [start, end] =
-				bibleLocationReferenceService.extractVersesOrOne(bibleLocationRef);
-			if (start + end > 0) {
-				verses = `:${start + 1}-${end}`;
-			} else {
-				verses = '';
-			}
+			setVerses();
 		});
 	});
+
+	// ================================ FUNCS ==================================
 
 	function setBookNameAndChapter() {
 		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
 		bookName = shortBookNamesByIDService.get(bookID);
 		bookChapter =
 			bibleLocationReferenceService.extractChapter(bibleLocationRef);
+	}
+
+	function setVerses() {
+		let [start, end] =
+			bibleLocationReferenceService.extractVersesOrOne(bibleLocationRef);
+		if (start + end > 0) {
+			verses = `:${start + 1}-${end}`;
+		} else {
+			verses = '';
+		}
 	}
 
 	// ============================== CLICK FUNCS ==============================
@@ -112,7 +127,7 @@
 		showSettingsPopup = !showSettingsPopup;
 	}
 
-	function onActionClick(e: Event) {
+	function onMenuClick(e: Event) {
 		e.stopPropagation();
 		console.log('clicked');
 		showActionsPopup = !showActionsPopup;
@@ -143,18 +158,7 @@
 	}
 </script>
 
-{#snippet noButton()}{/snippet}
-{#snippet copyButton()}
-	<KJVButton onClick={onCopyClick} classes="">
-		<Copy classes="h-5 w-5"></Copy>
-	</KJVButton>
-{/snippet}
-
-{#snippet closeButton()}
-	<KJVButton onClick={onCloseClick} classes="">
-		<Close classes="h-5 w-5"></Close>
-	</KJVButton>
-{/snippet}
+<!-- =============================== TOOLBAR =============================== -->
 
 {#snippet bookChapterVerseButton()}
 	<button onclick={onBookChapterClick} class=" text-center text-neutral-700">
@@ -165,13 +169,16 @@
 		</span>
 	</button>
 {/snippet}
-{#snippet settingsButton()}
-	<Gear btnClasses="px-2 py-1" onClick={onSettingsClick} svgClasses="h-5 w-5"
-	></Gear>
+
+{#snippet closeButton()}
+	<KJVButton onClick={onCloseClick} classes="">
+		<Close classes="h-5 w-5"></Close>
+	</KJVButton>
 {/snippet}
-{#snippet bibleActionsMenuButton()}
-	<KJVButton onClick={onActionClick} classes="">
-		<Menu classes="h-5 w-5"></Menu>
+
+{#snippet copyButton()}
+	<KJVButton onClick={onCopyClick} classes="">
+		<Copy classes="h-5 w-5"></Copy>
 	</KJVButton>
 {/snippet}
 
@@ -180,13 +187,24 @@
 	></EditPencil>
 {/snippet}
 
+{#snippet menuButton()}
+	<KJVButton onClick={onMenuClick} classes="">
+		<Menu classes="h-5 w-5"></Menu>
+	</KJVButton>
+{/snippet}
+
 {#snippet searchButton()}
 	<KJVButton onClick={onSearchClick} classes="">
 		<Search classes="h-5 w-5"></Search>
 	</KJVButton>
 {/snippet}
 
-{#snippet actionsHeader()}
+{#snippet settingsButton()}
+	<Gear btnClasses="px-2 py-1" onClick={onSettingsClick} svgClasses="h-5 w-5"
+	></Gear>
+{/snippet}
+
+{#snippet header()}
 	<div
 		bind:clientHeight={headerHeight}
 		class="absolute w-full max-w-lg leading-tight outline outline-neutral-400"
@@ -212,7 +230,7 @@
 					{@render searchButton()}
 				{/if}
 				{#if item === ToolbarItems.MENU}
-					{@render bibleActionsMenuButton()}
+					{@render menuButton()}
 				{/if}
 				{#if item === ToolbarItems.Close}
 					{@render closeButton()}
@@ -221,6 +239,8 @@
 		</span>
 	</div>
 {/snippet}
+
+<!-- =============================== POPUPS ================================ -->
 
 {#snippet bookChapterPopup()}
 	{#if showBookChapterPopup}
@@ -238,8 +258,8 @@
 				bind:showNavReadingsPopup
 				bind:navReadings={mode.navReadings}
 				bind:bibleLocationRef
-			></NavReadingsList></PopupContainer
-		>
+			></NavReadingsList>
+		</PopupContainer>
 	{/if}
 {/snippet}
 
@@ -250,8 +270,8 @@
 				onClose={() => {
 					showSettingsPopup = false;
 				}}
-			></Settings></PopupContainer
-		>
+			></Settings>
+		</PopupContainer>
 	{/if}
 {/snippet}
 
@@ -262,8 +282,8 @@
 				{paneID}
 				bind:showCopyVersePopup
 				bind:showActionsDropdown={showActionsPopup}
-			></ActionDropdown></PopupContainer
-		>
+			></ActionDropdown>
+		</PopupContainer>
 	{/if}
 {/snippet}
 
@@ -285,7 +305,9 @@
 	{/if}
 {/snippet}
 
-{@render actionsHeader()}
+<!-- =========================== POPUP CONTAINER =========================== -->
+
+{@render header()}
 {@render bookChapterPopup()}
 {@render navReadingsPopup()}
 {@render settingsPopup()}
