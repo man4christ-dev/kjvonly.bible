@@ -188,11 +188,11 @@
 {#snippet actionsHeader()}
 	<div
 		bind:clientHeight={headerHeight}
-		class="absolute w-full max-w-lg leading-tight"
+		class="absolute w-full max-w-lg border-b-1 border-neutral-400 leading-tight"
 	>
 		<span
 			class="grid {'grid-cols-' +
-				headerGridCols} place-items-center bg-neutral-100 text-neutral-700"
+				headerGridCols} w-full place-items-center bg-neutral-100 text-neutral-700"
 		>
 			{#each toolbar as item}
 				{#if item === ToolbarItems.EDIT}

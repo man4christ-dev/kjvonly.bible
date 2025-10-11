@@ -28,6 +28,7 @@
 
 	import { attachEvents, scrollTo } from '$lib/utils/eventHandlers';
 	import { bookIDByBookNameService } from '$lib/services/bibleMetadata/bookIDByBookName.service';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -140,16 +141,14 @@
 <!-- ================================ HEADER =============================== -->
 
 {#snippet header()}
-	<div class="relative sticky top-0 z-[1500] flex w-full justify-center">
-		<ChapterActions
-			bind:mode
-			bind:bibleLocationRef
-			bind:annotations
-			bind:clientHeight
-			bind:headerHeight
-			{paneID}
-		></ChapterActions>
-	</div>
+	<ChapterActions
+		bind:mode
+		bind:bibleLocationRef
+		bind:annotations
+		bind:clientHeight
+		bind:headerHeight
+		{paneID}
+	></ChapterActions>
 {/snippet}
 
 <!-- ================================= BODY ================================ -->
@@ -177,7 +176,6 @@
 {#snippet footer()}
 	<div class="flex w-full justify-center">
 		<div class="w-full max-w-6xl">
-			<!-- Need to type mode.value -->
 			{#if mode.value === BIBLE_MODES.READING}
 				<ChapterNavButtons
 					bind:mode
@@ -203,6 +201,14 @@
 <!-- ============================== CONTAINER ============================== -->
 
 <BufferContainer bind:clientHeight>
+	<BufferHeader
+		bind:headerHeight
+		classes="flex w-full justify-between border-s-1 border-e-1 border-t-1 border-neutral-400 text-neutral-700"
+	>
+		{#if bibleLocationRef}
+			{@render header()}
+		{/if}
+	</BufferHeader>
 	<BufferBody
 		ID={id}
 		bind:clientHeight
@@ -210,7 +216,6 @@
 		classes="clear-default-classes"
 	>
 		{#if bibleLocationRef}
-			{@render header()}
 			{@render body()}
 		{/if}
 	</BufferBody>
