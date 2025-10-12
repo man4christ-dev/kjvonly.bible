@@ -143,3 +143,8 @@ export interface BookGrouping {
 	bgcolor: string;
 	textcolor: string;
 }
+
+export interface Book {
+	id: string;
+	name: string;
+}

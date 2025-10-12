@@ -8,6 +8,7 @@
 	import { booksChaptersVerseCountByIDService } from '$lib/services/bibleMetadata/booksChaptersVerseCountByID.service';
 	import { onMount } from 'svelte';
 	import Books from './books.svelte';
+	import Chapters from './chapters.svelte';
 
 	let { bibleLocationRef = $bindable(), showBookChapterPopup = $bindable() } =
 		$props();
@@ -15,7 +16,7 @@
 	let bookNamesSorted: any[] = $state([]);
 	let filteredBooks: any[] = $state([]);
 	let filterText: string = $state('');
-	let selectedBook: any = $state();
+	let selectedBookID: string = $state('');
 	let group = $state(true);
 	let clientWidth = $state(0);
 	let bookGroups: { [bookID: string]: BookGrouping } = $state({});
@@ -23,7 +24,7 @@
 
 	function bookSelected(event: Event, bn: any) {
 		event.stopPropagation();
-		selectedBook = bn;
+		selectedBookID = bn;
 	}
 
 	let clientHeight = $state(0);
@@ -33,8 +34,8 @@
 		group = !group;
 	}
 	function onCloseClick(): void {
-		if (selectedBook) {
-			selectedBook === undefined;
+		if (selectedBookID) {
+			selectedBookID === undefined;
 		} else {
 			showBookChapterPopup = false;
 		}
@@ -42,7 +43,7 @@
 </script>
 
 {#snippet headerLeft()}
-	{#if !selectedBook}
+	{#if !selectedBookID}
 		{#if group}
 			<KJVButton classes="" onClick={onListClick}>
 				<List classes="h-5 w-5"></List>
@@ -53,7 +54,7 @@
 
 {#snippet headerCenter()}
 	<div class="flex items-center justify-center">
-		{#if selectedBook}
+		{#if selectedBookID}
 			<h1 class=" text-center">CHAPTER</h1>
 		{:else}
 			<h1 class=" text-center">Book</h1>
@@ -78,7 +79,7 @@
 			{@render headerRight()}
 		</div>
 
-		{#if selectedBook === undefined}
+		{#if selectedBookID === undefined}
 			<div class="p-2">
 				<label class="sr-only" for="name">Name</label>
 				<input
@@ -104,7 +105,7 @@
 				style="height: {clientHeight - headerHeight}px"
 				class="flex w-full flex-col overflow-y-scroll border"
 			>
-				{#if selectedBook}
+				{#if selectedBookID}
 					<div class="grid w-[100%] grid-cols-5">
 						{#each chapters as ch}
 							<button
@@ -147,4 +148,12 @@
 	</div>
 {/if}
 
-<Books bind:showBookChapterPopup></Books>
+{#if !selectedBookID}
+	<Books bind:selectedBookID bind:showBookChapterPopup></Books>
+{:else}
+	<Chapters
+		bind:bookID={selectedBookID}
+		bind:bibleLocationRef
+		bind:showBookChapterPopup
+	></Chapters>
+{/if}
