@@ -262,85 +262,85 @@ export class BookGroupingsService {
 		},
 		'51': {
 			name: 'Act',
-			group: 'history',
+			group: 'acts',
 			bgcolor: 'bg-bg-history',
 			textcolor: 'text-text-history'
 		},
 		'52': {
 			name: 'Rom',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'53': {
 			name: '1Co',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'54': {
 			name: '2Co',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'55': {
 			name: 'Gal',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'56': {
 			name: 'Eph',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'57': {
 			name: 'Phi',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'58': {
 			name: 'Col',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'59': {
 			name: '1Th',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'60': {
 			name: '2Th',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'61': {
 			name: '1Ti',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'62': {
 			name: '2Ti',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'63': {
 			name: 'Tit',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},
 		'64': {
 			name: 'Phm',
-			group: 'letter of Paul',
+			group: 'epistles of Paul',
 			bgcolor: 'bg-bg-poetry',
 			textcolor: 'text-text-poetry'
 		},

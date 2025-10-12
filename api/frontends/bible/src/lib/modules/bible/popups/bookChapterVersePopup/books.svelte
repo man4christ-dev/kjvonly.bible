@@ -43,6 +43,19 @@
 	let showBookByGroup: boolean = $state(true);
 	let showBookByList: boolean = $state(false);
 
+	let colorByGroupName: { [groupName: string]: { color: string } } = {
+		law: { color: 'decoration-primary-500' },
+		history: { color: 'decoration-support-a-500' },
+		poetry: { color: 'decoration-support-b-500' },
+		'major prophets': { color: 'decoration-primary-300' },
+		'minor prophets': { color: 'decoration-support-a-300' },
+		gospel: { color: 'decoration-support-b-300' },
+		acts: { color: 'decoration-primary-700' },
+		'epistles of Paul': { color: 'decoration-support-a-700' },
+		letters: { color: 'decoration-support-b-700' },
+		prophecy: { color: 'decoration-primary-500' }
+	};
+
 	// =============================== LIFECYCLE ===============================
 	onMount(async () => {
 		setBookGroupings();
@@ -156,7 +169,9 @@
 				<button
 					onclick={(event) => onBookSelected(event, b.id)}
 					class="cols-span-1 py-6 text-center text-wrap
-							{bookGroups[b.id].bgcolor}  {bookGroups[b.id].textcolor}
+							underline decoration-8 underline-offset-8 {colorByGroupName[
+						bookGroups[b.id].group
+					].color}
 							"
 				>
 					{bookGroups[b.id].name}

@@ -5,6 +5,9 @@
 	import Close from '$lib/components/svgs/close.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import { booksChaptersVerseCountByIDService } from '$lib/services/bibleMetadata/booksChaptersVerseCountByID.service';
+	import ChevronLeft from '$lib/components/svgs/chevronLeft.svelte';
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+	import { onMount } from 'svelte';
 
 	// ================================ IMPORTS ================================
 	// SVELTE
@@ -29,6 +32,11 @@
 	let chapters: string[] = $state([]);
 
 	// =============================== LIFECYCLE ===============================
+	onMount(() => {
+		setChapters();
+	});
+
+	// ================================ FUNCS ==================================
 
 	function setChapters(): void {
 		chapters = booksChaptersVerseCountByIDService
@@ -37,24 +45,40 @@
 			.toArray()
 			.sort((a, b) => Number(a) - Number(b));
 	}
-	function chapterSelected(ch: any) {
+
+	function chapterSelected(ch: any): void {
 		bibleLocationRef = `${bookID}_${ch}`;
 		showBookChapterPopup = false;
 	}
 
-	// ================================ FUNCS ==================================
 	// ============================== CLICK FUNCS ==============================
-	function onCloseClick(e: Event): void {}
+	function onBackClicked(e: Event): void {
+		e.stopPropagation();
+		bookID = '';
+	}
 </script>
 
 <!-- ================================ HEADER =============================== -->
 {#snippet header()}
-	<KJVButton classes="" onClick={onCloseClick}>
-		<Close classes=""></Close>
+	<KJVButton classes="" onClick={onBackClicked}>
+		<ArrowBack classes=""></ArrowBack>
 	</KJVButton>
 {/snippet}
 <!-- ================================= BODY ================================ -->
-{#snippet body()}{/snippet}
+{#snippet body()}
+	<div class="grid w-[100%] grid-cols-5">
+		{#each chapters as ch}
+			<button
+				class="hover:bg-primary-50 row-span-1 bg-neutral-50 p-4"
+				onclick={() => {
+					chapterSelected(ch);
+				}}
+			>
+				{ch}
+			</button>
+		{/each}
+	</div>
+{/snippet}
 <!-- ================================ FOOTER =============================== -->
 <!-- ============================== CONTAINER ============================== -->
 <BufferContainer bind:clientHeight>
