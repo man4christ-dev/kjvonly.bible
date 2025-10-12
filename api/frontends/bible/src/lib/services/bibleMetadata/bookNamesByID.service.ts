@@ -12,6 +12,13 @@ export class BookNamesByIDService {
 		return this.map.keys().toArray();
 	}
 
+	sortedKeys(): string[] {
+		return this.map
+			.keys()
+			.toArray()
+			.sort((a, b) => Number(a) - Number(b));
+	}
+
 	map = new Map([
 		['1', 'Genesis'],
 		['2', 'Exodus'],
