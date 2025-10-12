@@ -4,7 +4,7 @@
 
 	// COMPONENTS
 	import BibleMenuPopup from './popups/bibleMenuPopup.svelte';
-	import BookChapterPopup from './popups/bookChapterPopup.svelte';
+	import BookChapterPopup from './popups/bookChapterVersePopup/bookChapterPopup.svelte';
 	import CopyVersePopup from './popups/copyVersePopup.svelte';
 	import NavReadingsList from './plans/navReadingsList.svelte';
 	import NotesContainer from '../notes/notesContainer.svelte';
@@ -167,30 +167,29 @@
 
 {#snippet closeButton()}
 	<KJVButton onClick={onCloseClick} classes="">
-		<Close classes="h-5 w-5"></Close>
+		<Close classes=""></Close>
 	</KJVButton>
 {/snippet}
 
 {#snippet copyButton()}
 	<KJVButton onClick={onCopyClick} classes="">
-		<Copy classes="h-5 w-5"></Copy>
+		<Copy classes=""></Copy>
 	</KJVButton>
 {/snippet}
 
 {#snippet editButton()}
-	<EditPencil onClick={onEditClick} btnClasses="px-2 py-1" svgClasses="h-5 w-5"
-	></EditPencil>
+	<EditPencil onClick={onEditClick} btnClasses="" svgClasses=""></EditPencil>
 {/snippet}
 
 {#snippet menuButton()}
 	<KJVButton onClick={onMenuClick} classes="">
-		<Menu classes="h-5 w-5"></Menu>
+		<Menu classes=""></Menu>
 	</KJVButton>
 {/snippet}
 
 {#snippet searchButton()}
 	<KJVButton onClick={onSearchClick} classes="">
-		<Search classes="h-5 w-5"></Search>
+		<Search classes=""></Search>
 	</KJVButton>
 {/snippet}
 
