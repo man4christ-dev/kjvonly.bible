@@ -21,7 +21,6 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	import { onMount } from 'svelte';
 
 	// MODELS
-	import type { Annotations } from '$lib/models/bible.model';
 	import { Modules } from '$lib/models/modules.model';
 
 	// SERVICES
@@ -37,12 +36,7 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	import Quill from 'quill';
 	import uuid4 from 'uuid4';
 
-	let {
-		mode = $bindable(),
-		annotations = $bindable<Annotations>(),
-		allNotes,
-		noteIDToOpen = ''
-	} = $props();
+	let { mode = $bindable(), allNotes, noteIDToOpen = '' } = $props();
 
 	let clientHeight = $state(0);
 	let clientWidth = $state(0);

@@ -18,12 +18,12 @@
 	// =============================== BINDINGS ================================
 
 	let {
-		showActionsDropdown = $bindable<boolean>(),
-		showCopyVersePopup = $bindable<boolean>(),
+		showMenuPopup = $bindable<boolean>(),
+		showCopyVersesPopup = $bindable<boolean>(),
 		paneID
 	}: {
-		showActionsDropdown: boolean;
-		showCopyVersePopup: boolean;
+		showMenuPopup: boolean;
+		showCopyVersesPopup: boolean;
 		paneID: string;
 	} = $props();
 
@@ -34,8 +34,8 @@
 
 	let actions: any = {
 		'copy verses': () => {
-			showActionsDropdown = false;
-			showCopyVersePopup = true;
+			showMenuPopup = false;
+			showCopyVersesPopup = true;
 		},
 		search: () => {
 			let p = paneService.findNode(paneService.rootPane, paneID);
@@ -66,12 +66,12 @@
 
 	function onSplitVertical(): void {
 		paneService.onSplitPane(paneID, 'v', Modules.MODULES, {});
-		showActionsDropdown = false;
+		showMenuPopup = false;
 	}
 
 	function onSplitHorizontal() {
 		paneService.onSplitPane(paneID, 'h', Modules.MODULES, {});
-		showActionsDropdown = false;
+		showMenuPopup = false;
 	}
 
 	function onClosePane() {
@@ -79,7 +79,7 @@
 	}
 
 	function onCloseActionsDropdown() {
-		showActionsDropdown = false;
+		showMenuPopup = false;
 	}
 </script>
 
@@ -98,7 +98,7 @@
 			<div class="w-full">
 				<button
 					onclick={(event) => actions[a]()}
-					class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize hover:cursor-pointer"
+					class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize"
 					>{a}</button
 				>
 			</div>

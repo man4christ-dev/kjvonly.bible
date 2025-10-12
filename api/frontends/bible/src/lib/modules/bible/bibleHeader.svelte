@@ -3,29 +3,27 @@
 	import { onMount, untrack } from 'svelte';
 
 	// COMPONENTS
-	import ActionDropdown from './actionsPopup.svelte';
-	import BookChapterPopup from './bookChapterPopup.svelte';
-	import CopyVersePopup from './copyVersePopup.svelte';
-	import NavReadingsList from '../plans/navReadingsList.svelte';
-	import NotesContainer from '../../notes/notesContainer.svelte';
-	import Settings from '../../settings/settings.svelte';
+	import BibleMenuPopup from './popups/bibleMenuPopup.svelte';
+	import BookChapterPopup from './popups/bookChapterPopup.svelte';
+	import CopyVersePopup from './popups/copyVersePopup.svelte';
+	import NavReadingsList from './plans/navReadingsList.svelte';
+	import NotesContainer from '../notes/notesContainer.svelte';
+	import Settings from '../settings/settings.svelte';
 
-	// TOOLBAR Components
+	// // TOOLBAR
 	import Close from '$lib/components/svgs/close.svelte';
 	import Copy from '$lib/components/svgs/copy.svelte';
 	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
 	import Gear from '$lib/components/gear.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import Menu from '$lib/components/svgs/menu.svelte';
-	import PopupContainer from './popupContainer.svelte';
+	import PopupContainer from './popups/popupContainer.svelte';
 	import Search from '$lib/components/svgs/search.svelte';
 
 	// MODELS
-
 	import {
 		BIBLE_MODES,
 		ToolbarItems,
-		type Annotations,
 		type BibleMode
 	} from '$lib/models/bible.model';
 	import { Modules } from '$lib/models/modules.model';
@@ -39,14 +37,12 @@
 
 	let {
 		mode = $bindable(),
-		annotations = $bindable<Annotations>(),
 		bibleLocationRef = $bindable(),
 		clientHeight = $bindable<number>(),
 		headerHeight = $bindable<number>(),
 		paneID
 	}: {
 		mode: BibleMode;
-		annotations: Annotations;
 		bibleLocationRef: string;
 		clientHeight: number;
 		headerHeight: number;
@@ -58,8 +54,8 @@
 	let showBookChapterPopup: boolean = $state(false);
 	let showNavReadingsPopup: boolean = $state(false);
 	let showSettingsPopup: boolean = $state(false);
-	let showActionsPopup: boolean = $state(false);
-	let showCopyVersePopup: boolean = $state(false);
+	let showMenuPopup: boolean = $state(false);
+	let showCopyVersesPopup: boolean = $state(false);
 
 	let bookName: string = $state('');
 	let bookChapter: number = $state(0);
@@ -129,8 +125,7 @@
 
 	function onMenuClick(e: Event) {
 		e.stopPropagation();
-		console.log('clicked');
-		showActionsPopup = !showActionsPopup;
+		showMenuPopup = !showMenuPopup;
 	}
 
 	function onEditClick(e: Event) {
@@ -154,7 +149,7 @@
 	}
 
 	function onCopyClick() {
-		showCopyVersePopup = true;
+		showCopyVersesPopup = true;
 	}
 </script>
 
@@ -276,13 +271,10 @@
 {/snippet}
 
 {#snippet actionsPopup()}
-	{#if showActionsPopup}
+	{#if showMenuPopup}
 		<PopupContainer bind:clientHeight>
-			<ActionDropdown
-				{paneID}
-				bind:showCopyVersePopup
-				bind:showActionsDropdown={showActionsPopup}
-			></ActionDropdown>
+			<BibleMenuPopup {paneID} bind:showCopyVersesPopup bind:showMenuPopup
+			></BibleMenuPopup>
 		</PopupContainer>
 	{/if}
 {/snippet}
@@ -290,16 +282,18 @@
 {#snippet notePopup()}
 	{#if mode.notePopup.show}
 		<PopupContainer bind:clientHeight>
-			<NotesContainer bind:mode allNotes={false} bind:annotations
-			></NotesContainer>
+			<NotesContainer bind:mode allNotes={false}></NotesContainer>
 		</PopupContainer>
 	{/if}
 {/snippet}
 
 {#snippet copyVersePopup()}
-	{#if showCopyVersePopup}
+	{#if showCopyVersesPopup}
 		<PopupContainer bind:clientHeight>
-			<CopyVersePopup {paneID} bind:showCopyVersePopup bind:bibleLocationRef
+			<CopyVersePopup
+				{paneID}
+				bind:showCopyVersePopup={showCopyVersesPopup}
+				bind:bibleLocationRef
 			></CopyVersePopup>
 		</PopupContainer>
 	{/if}

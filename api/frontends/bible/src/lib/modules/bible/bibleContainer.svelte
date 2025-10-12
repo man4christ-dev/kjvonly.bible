@@ -7,7 +7,7 @@
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import Chapter from './chapter/chapter.svelte';
-	import ChapterActions from './popups/chapterActions.svelte';
+	import BibleHeader from './bibleHeader.svelte';
 	import ChapterNavButtons from './components/chapterNavButtons.svelte';
 	import EditOptions from './chapter/editOptions.svelte';
 
@@ -141,14 +141,13 @@
 <!-- ================================ HEADER =============================== -->
 
 {#snippet header()}
-	<ChapterActions
+	<BibleHeader
 		bind:mode
 		bind:bibleLocationRef
-		bind:annotations
 		bind:clientHeight
 		bind:headerHeight
 		{paneID}
-	></ChapterActions>
+	></BibleHeader>
 {/snippet}
 
 <!-- ================================= BODY ================================ -->
