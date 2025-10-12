@@ -13,3 +13,4 @@ note needed with h-full on the bufferContainer
 ◊ import and export need to be refactored with new indexedDB stores
 ◊ add strongs ref split pane to search
 ◊ update title in notes for verse notes to display the book chapter and verse
+◊ add icon size setting in settings apply via app.css

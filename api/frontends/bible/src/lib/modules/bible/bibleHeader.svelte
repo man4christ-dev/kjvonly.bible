@@ -13,8 +13,7 @@
 	// // TOOLBAR
 	import Close from '$lib/components/svgs/close.svelte';
 	import Copy from '$lib/components/svgs/copy.svelte';
-	import EditPencil from '$lib/components/buttons/edit-pencil.svelte';
-	import Gear from '$lib/components/gear.svelte';
+	import SettingsIcon from '$lib/components/svgs/settings.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import Menu from '$lib/components/svgs/menu.svelte';
 	import PopupContainer from './popups/popupContainer.svelte';
@@ -32,6 +31,7 @@
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
+	import Edit from '$lib/components/svgs/edit.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -178,7 +178,9 @@
 {/snippet}
 
 {#snippet editButton()}
-	<EditPencil onClick={onEditClick} btnClasses="" svgClasses=""></EditPencil>
+	<KJVButton onClick={onEditClick} classes="">
+		<Edit classes=""></Edit>
+	</KJVButton>
 {/snippet}
 
 {#snippet menuButton()}
@@ -194,14 +196,15 @@
 {/snippet}
 
 {#snippet settingsButton()}
-	<Gear btnClasses="px-2 py-1" onClick={onSettingsClick} svgClasses="h-5 w-5"
-	></Gear>
+	<KJVButton classes="" onClick={onSettingsClick}>
+		<SettingsIcon classes=""></SettingsIcon>
+	</KJVButton>
 {/snippet}
 
 {#snippet header()}
 	<div
 		bind:clientHeight={headerHeight}
-		class="absolute w-full max-w-lg leading-tight outline outline-neutral-400"
+		class="absolute w-full max-w-lg bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
 	>
 		<span
 			class="grid {'grid-cols-' +

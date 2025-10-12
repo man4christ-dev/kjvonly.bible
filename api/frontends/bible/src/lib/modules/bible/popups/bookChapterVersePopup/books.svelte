@@ -93,14 +93,14 @@
 
 <!-- ================================ HEADER =============================== -->
 {#snippet header()}
-	<div>
+	<div class="py-2">
 		{#if group}
 			<KJVButton classes="" onClick={onListClick}>
-				<List classes="h-24 w-24"></List>
+				<List classes=""></List>
 			</KJVButton>
 		{:else}
 			<KJVButton classes="" onClick={onListClick}>
-				<Grid classes="h-6 w-6"></Grid>
+				<Grid classes=""></Grid>
 			</KJVButton>
 		{/if}
 	</div>
