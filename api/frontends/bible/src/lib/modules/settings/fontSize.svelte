@@ -1,5 +1,6 @@
 <script lang="ts">
-	import Save from '$lib/components/buttons/save.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import Save from '$lib/components/svgs/save.svelte';
 	import type { Settings } from '$lib/models/settings.model';
 
 	// =============================== BINDINGS ================================
@@ -29,8 +30,7 @@
 
 	// ============================== CLICK FUNCS ==============================
 
-	function onSizeSelected(newFontSize: number) {
-		fontSize = newFontSize;
+	function onSizeSelected() {
 		settings.fontSize = fontSize;
 	}
 </script>
@@ -44,11 +44,9 @@
 				class="flex w-full p-2 text-center outline outline-neutral-400"
 				type="number"
 			/>
-			<Save
-				onClick={() => {
-					onSizeSelected(fontSize);
-				}}
-			></Save>
+			<KJVButton classes="ps-2" onClick={onSizeSelected}>
+				<Save classes=""></Save>
+			</KJVButton>
 		</div>
 	</div>
 	<div class="mt-4 outline outline-neutral-400">
