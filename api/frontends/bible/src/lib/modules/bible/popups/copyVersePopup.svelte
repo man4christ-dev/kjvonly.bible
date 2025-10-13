@@ -14,12 +14,13 @@
 	import { toastService } from '$lib/services/toast.service';
 
 	// COMPONENTS
-	import Close from '$lib/components/buttons/close.svelte';
-	import Copy from '$lib/components/buttons/copy.svelte';
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+	import Copy from '$lib/components/svgs/copy.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import HorizontalSplit from '$lib/components/buttons/horizontalSplit.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import VerticalSplit from '$lib/components/buttons/verticalSplit.svelte';
 
 	//OTHER
@@ -266,21 +267,18 @@
 	}
 </script>
 
-<BufferContainer bind:clientHeight>
-	<BufferHeader bind:headerHeight>
-		{@render header()}
-	</BufferHeader>
-	<BufferBody bind:clientHeight bind:headerHeight classes="">
-		{@render body()}
-	</BufferBody>
-</BufferContainer>
-
 <!-- ================================ HEADER =============================== -->
 
 {#snippet header()}
-	<Copy {onCopy}></Copy>
-	<span class="m-auto text-center">{title}</span>
-	<Close onClick={onClose}></Close>
+	<KJVButton classes="flex-1" onClick={onClose}>
+		<ArrowBack classes=""></ArrowBack>
+	</KJVButton>
+
+	<span class="text-center">{title}</span>
+
+	<KJVButton classes="flex-1 flex justify-end" onClick={onCopy}>
+		<Copy classes=""></Copy>
+	</KJVButton>
 {/snippet}
 
 <!-- ================================= BODY ================================ -->
@@ -369,7 +367,9 @@
 {/snippet}
 {#snippet actions(verseNumber: number)}
 	<div class="flex flex-row justify-end space-x-4">
-		<Copy onCopy={() => onCopyVerseClicked(verseNumber)}></Copy>
+		<KJVButton classes="" onClick={() => onCopyVerseClicked(verseNumber)}>
+			<Copy classes=""></Copy>
+		</KJVButton>
 
 		<HorizontalSplit
 			bind:paneID
@@ -384,3 +384,14 @@
 		></VerticalSplit>
 	</div>
 {/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
+
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		{@render header()}
+	</BufferHeader>
+	<BufferBody bind:clientHeight bind:headerHeight classes="">
+		{@render body()}
+	</BufferBody>
+</BufferContainer>

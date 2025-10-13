@@ -85,6 +85,8 @@
 	}
 </script>
 
+<!-- ============================== CONTAINER ============================== -->
+
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
 		<KJVButton onClick={onClose} classes="">
