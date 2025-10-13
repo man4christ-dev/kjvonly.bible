@@ -21,13 +21,17 @@
 	// =============================== BINDINGS ================================
 
 	let {
-		bookID = $bindable<string>(),
+		selectedBookID = $bindable<string>(),
+		selectedChapter = $bindable<string>(),
 		bibleLocationRef = $bindable<string>(),
-		showBookChapterPopup = $bindable<boolean>()
+		showBookChapterPopup = $bindable<boolean>(),
+		goToVerses = $bindable<boolean>()
 	}: {
-		bookID: string;
+		selectedBookID: string;
+		selectedChapter: string;
 		bibleLocationRef: string;
 		showBookChapterPopup: boolean;
+		goToVerses: boolean;
 	} = $props();
 
 	// ================================== VARS =================================
@@ -37,7 +41,6 @@
 
 	let bookName: string = $state('');
 	let chapters: string[] = $state([]);
-	let goToVerses: boolean = $state(false);
 
 	// =============================== LIFECYCLE ===============================
 
@@ -49,27 +52,31 @@
 	// ================================ FUNCS ==================================
 
 	function setBookName(): void {
-		bookName = bookNamesByIDService.get(bookID);
+		bookName = bookNamesByIDService.get(selectedBookID);
 	}
 
 	function setChapters(): void {
 		chapters = booksChaptersVerseCountByIDService
-			.get(bookID)
+			.get(selectedBookID)
 			?.keys()
 			.toArray()
 			.sort((a, b) => Number(a) - Number(b));
 	}
 
 	function chapterSelected(ch: any): void {
-		bibleLocationRef = `${bookID}_${ch}`;
-		showBookChapterPopup = false;
+		if (goToVerses) {
+			selectedChapter = ch;
+		} else {
+			bibleLocationRef = `${selectedBookID}_${ch}`;
+			showBookChapterPopup = false;
+		}
 	}
 
 	// ============================== CLICK FUNCS ==============================
 
 	function onBackClicked(e: Event): void {
 		e.stopPropagation();
-		bookID = '';
+		selectedBookID = '';
 	}
 
 	function onToggleGoToVerses(e: Event): void {
@@ -86,6 +93,7 @@
 		<KJVButton classes="flex-1" onClick={onBackClicked}>
 			<ArrowBack classes=""></ArrowBack>
 		</KJVButton>
+
 		<span class="text-center"
 			><span>{bookName} </span>
 			<span class="decoration-primary-500 underline underline-offset-12"

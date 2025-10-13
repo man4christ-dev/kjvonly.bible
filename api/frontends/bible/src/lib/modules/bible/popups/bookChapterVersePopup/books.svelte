@@ -123,19 +123,28 @@
 
 <!-- ================================ HEADER =============================== -->
 {#snippet header()}
-	{#if showBookByGroup}
-		<KJVButton classes="" onClick={onListClick}>
-			<List classes=""></List>
+	<div class="flex-1">
+		{#if showBookByGroup}
+			<KJVButton classes="" onClick={onListClick}>
+				<List classes=""></List>
+			</KJVButton>
+		{:else}
+			<KJVButton classes="" onClick={onGridClick}>
+				<Grid classes=""></Grid>
+			</KJVButton>
+		{/if}
+	</div>
+	<span class="text-center">
+		<span class="decoration-primary-500 underline underline-offset-10">
+			Book
+		</span>
+		<span>Chapter</span>
+	</span>
+	<div class="flex flex-1 justify-end">
+		<KJVButton classes="" onClick={onCloseClick}>
+			<Close classes=""></Close>
 		</KJVButton>
-	{:else}
-		<KJVButton classes="" onClick={onGridClick}>
-			<Grid classes=""></Grid>
-		</KJVButton>
-	{/if}
-
-	<KJVButton classes="" onClick={onCloseClick}>
-		<Close classes=""></Close>
-	</KJVButton>
+	</div>
 {/snippet}
 
 <!-- ================================= BODY ================================ -->
