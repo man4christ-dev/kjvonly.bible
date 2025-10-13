@@ -140,8 +140,6 @@ export enum ToolbarItems {
 export interface BookGrouping {
 	name: string;
 	group: string;
-	bgcolor: string;
-	textcolor: string;
 }
 
 export interface Book {

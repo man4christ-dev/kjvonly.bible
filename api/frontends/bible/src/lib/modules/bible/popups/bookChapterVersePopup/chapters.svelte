@@ -1,21 +1,25 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// SVELTE
+	import { onMount } from 'svelte';
+	// COMPONENTS
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import Close from '$lib/components/svgs/close.svelte';
-	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import { booksChaptersVerseCountByIDService } from '$lib/services/bibleMetadata/booksChaptersVerseCountByID.service';
-	import ChevronLeft from '$lib/components/svgs/chevronLeft.svelte';
-	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
-	import { onMount } from 'svelte';
 
-	// ================================ IMPORTS ================================
-	// SVELTE
-	// COMPONENTS
-	// MODELS
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+
+	// // SVGS
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+	import Toggle from '$lib/components/toggle.svelte';
+
 	// SERVICES
+	import { booksChaptersVerseCountByIDService } from '$lib/services/bibleMetadata/booksChaptersVerseCountByID.service';
+	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
+	import { toastService } from '$lib/services/toast.service';
+
 	// =============================== BINDINGS ================================
-	// ================================== VARS =================================
+
 	let {
 		bookID = $bindable<string>(),
 		bibleLocationRef = $bindable<string>(),
@@ -26,17 +30,27 @@
 		showBookChapterPopup: boolean;
 	} = $props();
 
+	// ================================== VARS =================================
+
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 
+	let bookName: string = $state('');
 	let chapters: string[] = $state([]);
+	let goToVerses: boolean = $state(false);
 
 	// =============================== LIFECYCLE ===============================
+
 	onMount(() => {
 		setChapters();
+		setBookName();
 	});
 
 	// ================================ FUNCS ==================================
+
+	function setBookName(): void {
+		bookName = bookNamesByIDService.get(bookID);
+	}
 
 	function setChapters(): void {
 		chapters = booksChaptersVerseCountByIDService
@@ -52,19 +66,45 @@
 	}
 
 	// ============================== CLICK FUNCS ==============================
+
 	function onBackClicked(e: Event): void {
 		e.stopPropagation();
 		bookID = '';
 	}
+
+	function onToggleGoToVerses(e: Event): void {
+		e.stopPropagation();
+		let message = goToVerses ? 'Go to verses enabled' : 'Go to verses disabled';
+		toastService.showToast(message);
+	}
 </script>
 
 <!-- ================================ HEADER =============================== -->
+
 {#snippet header()}
-	<KJVButton classes="" onClick={onBackClicked}>
-		<ArrowBack classes=""></ArrowBack>
-	</KJVButton>
+	<div class="flex w-full flex-row justify-between">
+		<KJVButton classes="flex-1" onClick={onBackClicked}>
+			<ArrowBack classes=""></ArrowBack>
+		</KJVButton>
+		<span class="text-center"
+			><span>{bookName} </span>
+			<span class="decoration-primary-500 underline underline-offset-12"
+				>Chapter</span
+			>
+			{#if goToVerses}
+				<span>Verse</span>
+			{/if}
+		</span>
+
+		<div class="flex flex-1 justify-end">
+			<Toggle onChange={onToggleGoToVerses} bind:isToggled={goToVerses}
+			></Toggle>
+		</div>
+	</div>
 {/snippet}
+
 <!-- ================================= BODY ================================ -->
+
 {#snippet body()}
 	<div class="grid w-[100%] grid-cols-5">
 		{#each chapters as ch}
@@ -79,8 +119,9 @@
 		{/each}
 	</div>
 {/snippet}
-<!-- ================================ FOOTER =============================== -->
+
 <!-- ============================== CONTAINER ============================== -->
+
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
 		{@render header()}
