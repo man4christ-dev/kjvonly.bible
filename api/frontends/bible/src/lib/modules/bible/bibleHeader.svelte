@@ -128,8 +128,12 @@
 		showMenuPopup = !showMenuPopup;
 	}
 
-	function onEditClick(e: Event) {
+	function onEditClick(e: Event): void {
 		e.stopPropagation();
+		if (mode.value === BIBLE_MODES.EDIT) {
+			mode.value = BIBLE_MODES.READING;
+			return;
+		}
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		let verseNumber =
@@ -137,6 +141,7 @@
 		let wordIdx =
 			bibleLocationReferenceService.extractWordIndexOrDefault(bibleLocationRef);
 		mode.bibleLocationRef = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
+
 		mode.value = BIBLE_MODES.EDIT;
 	}
 

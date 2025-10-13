@@ -127,9 +127,11 @@
 		updateBibleLocationRef();
 
 		if (isBibleModeEdit()) {
+			console.log('is bible mode edit', isBibleModeEdit());
 			onEditClick();
 			return;
 		}
+		console.log('skipped edit click');
 
 		if (track[wordIdx] && track[wordIdx].finished) {
 			return;
@@ -389,7 +391,7 @@
 				: ''} {wordAnnotations?.class?.join(' ')}">{word.text}</span
 		></span
 	>
-{:else}
+{:else if mode.value === BIBLE_MODES.EDIT}
 	<span class=" {wordAnnotations?.class?.join(' ')}">
 		<span class={wordAnnotations?.class?.join(' ')}>&nbsp;</span><span
 			tabindex="-1"
@@ -400,6 +402,20 @@
 			onmousedown={onMouseDownTouchStart}
 			onmouseup={onMouseUpTouchEnd}
 			onclick={onEditClick}
+			class="{word.class?.join(' ')} {wordAnnotations?.class?.join(' ')}"
+			>{word.text}</span
+		></span
+	>
+{:else}
+	<span class=" {wordAnnotations?.class?.join(' ')}">
+		<span class={wordAnnotations?.class?.join(' ')}>&nbsp;</span><span
+			tabindex="-1"
+			role="button"
+			onkeydown={() => {}}
+			ontouchstart={onMouseDownTouchStart}
+			ontouchend={onMouseUpTouchEnd}
+			onmousedown={onMouseDownTouchStart}
+			onmouseup={onMouseUpTouchEnd}
 			class="{word.class?.join(' ')} {wordAnnotations?.class?.join(' ')}"
 			>{word.text}</span
 		></span
