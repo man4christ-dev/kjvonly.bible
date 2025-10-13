@@ -7,7 +7,7 @@
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import Close from '$lib/components/buttons/close.svelte';
+	import Close from '$lib/components/svgs/close.svelte';
 	import SearchInput from './searchInput.svelte';
 	import SearchResults from './searchResults.svelte';
 
@@ -20,6 +20,7 @@
 
 	// OTHER
 	import uuid4 from 'uuid4';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -64,9 +65,13 @@
 
 {#snippet header()}
 	<div class="flex w-full items-center justify-between">
-		<span class="w-12"></span>
-		<span class="flex-1 text-center">Search</span>
-		<Close btnClasses="h-12 w-12" onClick={applyOnClose}></Close>
+		<span class="flex-1"></span>
+		<span class="text-center">Search</span>
+		<div class="flex flex-1 justify-end">
+			<KJVButton classes="" onClick={applyOnClose}>
+				<Close classes=""></Close>
+			</KJVButton>
+		</div>
 	</div>
 {/snippet}
 
