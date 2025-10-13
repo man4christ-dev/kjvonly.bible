@@ -10,10 +10,12 @@
 	import { paneService } from '$lib/services/pane.service.svelte';
 
 	// COMPONENTS
-	import Close from '$lib/components/buttons/close.svelte';
+	import Close from '$lib/components/svgs/close.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -78,16 +80,16 @@
 		paneService.onDeletePane(paneService.rootPane, paneID);
 	}
 
-	function onCloseActionsDropdown() {
+	function onClose() {
 		showMenuPopup = false;
 	}
 </script>
 
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
-		<div class="flex w-full justify-end">
-			<Close onClick={onCloseActionsDropdown}></Close>
-		</div>
+		<KJVButton onClick={onClose} classes="">
+			<ArrowBack classes=""></ArrowBack>
+		</KJVButton>
 	</BufferHeader>
 	<BufferBody
 		bind:clientHeight
@@ -97,8 +99,8 @@
 		{#each Object.keys(actions) as a}
 			<div class="w-full">
 				<button
-					onclick={(event) => actions[a]()}
-					class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize"
+					onclick={() => actions[a]()}
+					class="hover:bg-primary-100 w-full bg-neutral-50 p-4 text-start capitalize"
 					>{a}</button
 				>
 			</div>

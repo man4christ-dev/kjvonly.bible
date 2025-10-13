@@ -155,7 +155,7 @@
 {/snippet}
 
 {#snippet filterInput()}
-	<div bind:clientWidth class="sticky top-0 bg-neutral-50 py-2">
+	<div bind:clientWidth class="sticky top-0 bg-neutral-50 px-4 py-2">
 		<label class="sr-only" for="name">Name</label>
 		<input
 			class=" border-primary-500 w-full border-b-1 outline-none"
@@ -181,7 +181,7 @@
 							underline decoration-8 underline-offset-8 {colorByGroupName[
 						bookGroups[b.id].group
 					].color}
-							"
+							hover:bg-primary-100"
 				>
 					{bookGroups[b.id].name}
 				</button>
@@ -196,7 +196,7 @@
 			<div class="w-full">
 				<button
 					onclick={(event) => onBookSelected(event, bn)}
-					class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start"
+					class="hover:bg-primary-100 w-full bg-neutral-50 p-4 text-start"
 					>{bn.name}</button
 				>
 			</div>
@@ -210,7 +210,7 @@
 	<BufferHeader bind:headerHeight>
 		{@render header()}
 	</BufferHeader>
-	<BufferBody bind:clientHeight bind:headerHeight>
+	<BufferBody classes="" bind:clientHeight bind:headerHeight>
 		{@render body()}
 	</BufferBody>
 </BufferContainer>
