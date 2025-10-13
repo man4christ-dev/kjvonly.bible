@@ -46,8 +46,8 @@
 	{#each fontFamilies as ff}
 		<button
 			class="font-{ff.fontFamily} {ff.fontFamily === settings?.fontFamily
-				? 'bg-primary-500 text-neutral-100'
-				: ''} border border-1 p-2 hover:cursor-pointer"
+				? 'bg-primary-500 text-neutral-50'
+				: ''} border border-1 border-neutral-400 p-2"
 			onclick={() => onFontFamilySelected(ff.fontFamily)}
 		>
 			{ff.name}

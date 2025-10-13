@@ -14,7 +14,7 @@
 	import { toastService } from '$lib/services/toast.service';
 
 	// COMPONENTS
-	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+	import Close from '$lib/components/svgs/close.svelte';
 	import Copy from '$lib/components/svgs/copy.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
@@ -270,14 +270,14 @@
 <!-- ================================ HEADER =============================== -->
 
 {#snippet header()}
-	<KJVButton classes="flex-1" onClick={onClose}>
-		<ArrowBack classes=""></ArrowBack>
+	<KJVButton classes="flex-1" onClick={onCopy}>
+		<Copy classes=""></Copy>
 	</KJVButton>
 
 	<span class="text-center">{title}</span>
 
-	<KJVButton classes="flex-1 flex justify-end" onClick={onCopy}>
-		<Copy classes=""></Copy>
+	<KJVButton classes="flex-1  flex justify-end" onClick={onClose}>
+		<Close classes=""></Close>
 	</KJVButton>
 {/snippet}
 

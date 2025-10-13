@@ -14,13 +14,18 @@
 
 	$effect(() => {
 		settings;
+		updateFontSize();
+	});
 
+	// ================================ FUNCS ==================================
+
+	function updateFontSize(): void {
 		let fs = parseInt(settings?.fontSize);
 
 		if (fs) {
 			fontSize = fs;
 		}
-	});
+	}
 
 	// ============================== CLICK FUNCS ==============================
 
@@ -36,7 +41,7 @@
 		<div class="flex flex-row pt-4">
 			<input
 				bind:value={fontSize}
-				class="flex w-full border border-2 p-2 text-center"
+				class="flex w-full p-2 text-center outline outline-neutral-400"
 				type="number"
 			/>
 			<Save
@@ -46,7 +51,7 @@
 			></Save>
 		</div>
 	</div>
-	<div class="mt-4 outline">
+	<div class="mt-4 outline outline-neutral-400">
 		<p class="p-4" style="font-size: {fontSize}px">
 			Ephesians 2:8 <br />For by grace are ye saved through faith; and that not
 			of yourselves: it is the gift of God:

@@ -103,35 +103,6 @@
 	/* neutral 100 */
 	--color-header-title: hsl(360deg 82% 89%);
 
-	/*
-	 * colored groups for chapter select light mode
-     */
-
-	/* primary 700 */
-	--color-law: hsl(360deg 67% 44%);
-	/* neutral 50 */
-	--color-text-law: hsl(40deg 23% 97%);
-
-	/* support-a 700 */
-	--color-history: hsl(185deg 81% 29%);
-	/* neutral 50 */
-	--color-text-history: hsl(40deg 23% 97%);
-
-	/* supportb 700 */
-	--color-poetry: hsl(8deg 74% 27%);
-	/* neutral 50 */
-	--color-text-poetry: hsl(40deg 23% 97%);
-
-	/* vivida 700 */
-	--color-major-prophets: hsl(29deg 80% 44%);
-	/* neutral 50 */
-	--color-text-major-prophets: hsl(40deg 23% 97%);
-
-	/* vividb 700 */
-	--color-minor-prophets: hsl(100deg 20% 44%);
-	/* neutral 50 */
-	--color-text-minor-prophets: hsl(40deg 23% 97%);
-
 	/* Highlights */
 
 	--color-highlighta: hsl(360deg 77% 78%);
