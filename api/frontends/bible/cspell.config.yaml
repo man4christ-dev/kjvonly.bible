@@ -2,6 +2,7 @@ version: '0.2'
 ignorePaths: []
 dictionaryDefinitions: []
 dictionaries: []
-words: [bcvs, STRONGS, Storer, annots, flexsearch, FOOTNO, redtxt, svgs]
+words:
+  [bcvs, STRONGS, Storer, annots, flexsearch, FOOTNO, redtxt, svgs, thayers]
 ignoreWords: []
 import: []

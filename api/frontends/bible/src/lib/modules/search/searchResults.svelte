@@ -160,7 +160,7 @@
 	</p>
 {/if}
 
-<div class="{searchResults?.length > 0 ? '' : 'hidden'} pb-6">
+<div class="{searchResults?.length > 0 ? '' : 'hidden'} bg-neutral-50 pb-6">
 	{#each searchResults as sr}
 		<div
 			tabindex="0"
