@@ -5,8 +5,6 @@
 
 	// COMPONENTS
 	import ChevronDown from '$lib/components/chevronDown.svelte';
-	import PopupContainer from '../popupContainer.svelte';
-	import Search from '$lib/modules/search/search.svelte';
 	import type { Word } from '$lib/models/bible.model';
 
 	// MODELS
@@ -28,23 +26,14 @@
 	} = $props();
 
 	// ================================== VARS =================================
-	// =============================== LIFECYCLE ===============================
-	// ================================ FUNCS ==================================
-	// ============================== CLICK FUNCS ==============================
 
 	let toggleStrongs = $state(false);
-	let showByBook = $state(false);
-	let showByWord = $state(false);
 	let searchTerms = $state('');
 	let booknames: any = {};
 	let startsWithBookId = '';
-
 	let strongs: any[] | undefined = $state([]);
 
-	function sanatize(w: string) {
-		return w.replace(/[^a-zA-Z0-9 ]/g, '');
-	}
-
+	// =============================== LIFECYCLE ===============================
 	onMount(async () => {
 		if (strongsRefs) {
 			strongsRefs.forEach(async (ref: string) => {
@@ -57,6 +46,13 @@
 
 		booknames = await chapterApi.getBooknames();
 	});
+
+	// ================================ FUNCS ==================================
+	function sanatize(w: string) {
+		return w.replace(/[^a-zA-Z0-9 ]/g, '');
+	}
+
+	// ============================== CLICK FUNCS ==============================
 
 	function onFilterBibleLocationRefByBookID(refs: string[]): string[] {
 		return refs.filter((ref) => {
@@ -79,7 +75,6 @@
 
 		let lidx = searchText.lastIndexOf('OR');
 		searchTerms = sanatize(searchText.substring(0, lidx));
-		showByBook = true;
 
 		popups.searchPopup = {
 			paneID: paneID,

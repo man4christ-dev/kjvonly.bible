@@ -13,6 +13,10 @@
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import StrongsVersesRefsHeader from './strongsVersesRefsHeader.svelte';
+	import {
+		newStrongsPopups,
+		type StrongsPopups
+	} from '$lib/models/strongs.model';
 
 	// =============================== BINDINGS ================================
 
@@ -27,7 +31,7 @@
 	let verseRefs: string[] = $state([]);
 	let text = $state('');
 
-	let popups: any = $state({});
+	let popups: StrongsPopups = $state(newStrongsPopups());
 
 	// =============================== LIFECYCLE ===============================
 

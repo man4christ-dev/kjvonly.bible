@@ -1,23 +1,15 @@
 <script lang="ts">
-	import Search from '$lib/modules/search/search.svelte';
-
 	// ================================ IMPORTS ================================
-	// SVELTE
 	// COMPONENTS
+	import Search from '$lib/modules/search/search.svelte';
 	// MODELS
-	// SERVICES
+	import type { StrongsPopups } from '$lib/models/strongs.model';
+
 	// =============================== BINDINGS ================================
-	let { popups = $bindable<any>() }: { popups: any } = $props();
-	// ================================== VARS =================================
-	// =============================== LIFECYCLE ===============================
-	// ================================ FUNCS ==================================
-	// ============================== CLICK FUNCS ==============================
+	let { popups = $bindable<StrongsPopups>() }: { popups: StrongsPopups } =
+		$props();
 </script>
 
-<!-- ================================ HEADER =============================== -->
-<!-- ================================= BODY ================================ -->
-<!-- ================================ FOOTER =============================== -->
-<!-- ============================== CONTAINER ============================== -->
 <Search
 	paneID={popups?.searchPopup?.paneID}
 	showInput={true}
