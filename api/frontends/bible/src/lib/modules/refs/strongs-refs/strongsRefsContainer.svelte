@@ -90,7 +90,11 @@
 
 	function onByWord(b: any, idx: number) {
 		searchTerms = sanatize(b.text);
-		showByWord = true;
+
+		popups.searchPopup = {
+			paneID: paneID,
+			searchTerms: searchTerms
+		};
 	}
 </script>
 
@@ -255,38 +259,6 @@
 		{@render byWord(s, idx)}
 	</div>
 {/snippet}
-
-{#if showByBook}
-	<!-- <div class="sticky top-0 z-[1500] flex w-full justify-center">
-			<div class="absolute z-[10000] h-full w-full bg-neutral-50">
-				<Search
-					{paneID}
-					showInput={true}
-					{searchTerms}
-					onClose={() => {
-						showByBook = false;
-						searchTerms = '';
-					}}
-					onFilterBibleLocationRef={onFilterBibleLocationRefByBookID}
-				></Search>
-			</div>
-		</div> -->
-{/if}
-{#if showByWord}
-	<div class="sticky top-0 z-[1500] flex w-full justify-center">
-		<div class="absolute z-[10000] h-full w-full bg-neutral-50">
-			<Search
-				{paneID}
-				showInput={true}
-				{searchTerms}
-				onClose={() => {
-					showByWord = false;
-					searchTerms = '';
-				}}
-			></Search>
-		</div>
-	</div>
-{/if}
 
 {#if strongs.length > 1 || isVerseRef}
 	<div class="flex flex-row items-center">

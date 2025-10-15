@@ -154,10 +154,10 @@
 </script>
 
 {#if searchResultsResponse?.bibleLocationRefs && searchResultsResponse?.bibleLocationRefs.length > 0}
-	<p class="sticky top-10 bg-neutral-50 text-center">
+	<div class="sticky top-10 bg-neutral-50 text-center">
 		Showing {renderedSearchResultsCount} of {searchResultsResponse
 			?.bibleLocationRefs.length}
-	</p>
+	</div>
 {/if}
 
 <div class="{searchResults?.length > 0 ? '' : 'hidden'} bg-neutral-50 pb-6">
