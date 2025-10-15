@@ -96,18 +96,21 @@
 {/snippet}
 
 {#snippet header()}
-	<StrongsVersesRefsHeader bind:clientHeight bind:headerHeight {paneID}
-	></StrongsVersesRefsHeader>
+	<StrongsVersesRefsHeader bind:clientHeight {paneID}></StrongsVersesRefsHeader>
 {/snippet}
 
 <BufferContainer bind:clientHeight>
-	{@render header()}
+	<BufferHeader
+		bind:headerHeight
+		classes="flex w-full justify-between outline outline-neutral-400 text-neutral-700"
+	>
+		{@render header()}
+	</BufferHeader>
 	<BufferBody
 		bind:clientHeight
-		bind:headerHeight={zeroHeaderHeight}
+		bind:headerHeight
 		classes="clear-default-classes"
 	>
-		<span style="min-height: {headerHeight + 5}px"></span>
 		{@render body()}
 	</BufferBody>
 </BufferContainer>

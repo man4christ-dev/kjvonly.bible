@@ -13,15 +13,9 @@
 	// SERVICES
 	// =============================== BINDINGS ================================
 
-	let {
-		paneID,
-		clientHeight = $bindable<number>(),
-		headerHeight = $bindable<number>()
-	} = $props();
+	let { paneID, clientHeight = $bindable<number>() } = $props();
 
 	// ================================== VARS =================================
-
-	let hheight = $state(0);
 	// =============================== LIFECYCLE ===============================
 	// ================================ FUNCS ==================================
 	// ============================== CLICK FUNCS ==============================
@@ -44,9 +38,8 @@
 {/snippet}
 
 <div
-	bind:clientHeight={headerHeight}
 	id="test"
-	class="absolute flex w-full max-w-lg flex-row bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
+	class="flex w-full max-w-lg flex-row bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
 >
 	<span class="flex-1"></span>
 	<span class="text-center">Strongs / Refs</span>
