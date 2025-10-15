@@ -141,9 +141,10 @@
 
 		<div class="space-y-2 ps-4 pt-2">
 			{#each s['usageByBook'] as b, bookidx}
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
-				<!-- svelte-ignore a11y_click_events_have_key_events -->
 				{#if bookidx !== 0}&shy;,&nbsp;{/if}<span
+					role="button"
+					tabindex="-1"
+					onkeydown={() => {}}
 					onclick={() => {
 						onByBook(s, b, idx);
 					}}
@@ -162,6 +163,9 @@
 		<div class="space-y-2 ps-4 pb-4">
 			{#each s['usageByWord'] as w, idx}
 				{#if idx !== 0}&shy;,&nbsp;{/if}<span
+					role="button"
+					tabindex="-1"
+					onkeydown={() => {}}
 					onclick={() => {
 						onByWord(w, idx);
 					}}

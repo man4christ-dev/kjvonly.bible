@@ -10,6 +10,7 @@
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import Close from '$lib/components/svgs/close.svelte';
+	import StrongsVersesRefsHeader from './strongsVersesRefsHeader.svelte';
 
 	let {
 		paneID,
@@ -66,22 +67,7 @@
 			);
 		}
 	});
-
-	function onClose(e: Event): void {
-		e.stopPropagation();
-		paneService.onDeletePane(paneService.rootPane, paneID);
-	}
 </script>
-
-{#snippet header()}
-	<span class="flex-1"></span>
-	<span>Strongs / Refs</span>
-	<div class="flex flex-1 justify-end">
-		<KJVButton onClick={onClose} classes="">
-			<Close classes=""></Close>
-		</KJVButton>
-	</div>
-{/snippet}
 
 {#snippet body()}
 	{#if footnotes.length > 0}
@@ -107,11 +93,19 @@
 		<VerseRefsContainer paneID={pane?.id} {verseRefs}></VerseRefsContainer>
 	{/if}
 {/snippet}
+
 <BufferContainer bind:clientHeight>
-	<BufferHeader bind:headerHeight>
-		{@render header()}
+	<BufferHeader
+		bind:headerHeight
+		classes="flex w-full justify-between outline outline-neutral-400 text-neutral-700"
+	>
+		<StrongsVersesRefsHeader {paneID}></StrongsVersesRefsHeader>
 	</BufferHeader>
-	<BufferBody bind:clientHeight bind:headerHeight>
+	<BufferBody
+		bind:clientHeight
+		bind:headerHeight
+		classes="clear-default-classes"
+	>
 		{@render body()}
 	</BufferBody>
 </BufferContainer>
