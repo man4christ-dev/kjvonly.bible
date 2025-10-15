@@ -1,13 +1,36 @@
 <script lang="ts">
-	import { chapterApi } from '$lib/api/chapters.api';
-	import ChevronDown from '$lib/components/chevronDown.svelte';
-	import { bibleDB } from '$lib/storer/bible.db';
-	import Search from '$lib/modules/search/search.svelte';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount } from 'svelte';
+
+	// COMPONENTS
+	import ChevronDown from '$lib/components/chevronDown.svelte';
+	import PopupContainer from '../popupContainer.svelte';
+	import Search from '$lib/modules/search/search.svelte';
 	import type { Word } from '$lib/models/bible.model';
 
-	let { containerHeight, isVerseRef, strongsRefs, strongsWords, text, paneID } =
-		$props();
+	// MODELS
+	// SERVICES
+	import { bibleDB } from '$lib/storer/bible.db';
+
+	// API
+	import { chapterApi } from '$lib/api/chapters.api';
+
+	// =============================== BINDINGS ================================
+	let {
+		clientHeight = $bindable<number>(),
+		popups = $bindable<any>(),
+		isVerseRef,
+		strongsRefs,
+		strongsWords,
+		text,
+		paneID
+	} = $props();
+
+	// ================================== VARS =================================
+	// =============================== LIFECYCLE ===============================
+	// ================================ FUNCS ==================================
+	// ============================== CLICK FUNCS ==============================
 
 	let toggleStrongs = $state(false);
 	let showByBook = $state(false);
@@ -57,6 +80,12 @@
 		let lidx = searchText.lastIndexOf('OR');
 		searchTerms = sanatize(searchText.substring(0, lidx));
 		showByBook = true;
+
+		popups.searchPopup = {
+			paneID: paneID,
+			searchTerms: searchTerms,
+			onFilterBibleLocationRefByBookID: onFilterBibleLocationRefByBookID
+		};
 	}
 
 	function onByWord(b: any, idx: number) {
@@ -64,6 +93,11 @@
 		showByWord = true;
 	}
 </script>
+
+<!-- ================================ HEADER =============================== -->
+<!-- ================================= BODY ================================ -->
+<!-- ================================ FOOTER =============================== -->
+<!-- ============================== CONTAINER ============================== -->
 
 {#snippet header(s: any, idx: number)}
 	<div class="flex flex-row items-center ps-2 pt-2">
@@ -222,9 +256,8 @@
 	</div>
 {/snippet}
 
-<div class="">
-	{#if showByBook}
-		<div class="sticky top-0 z-[1500] flex w-full justify-center">
+{#if showByBook}
+	<!-- <div class="sticky top-0 z-[1500] flex w-full justify-center">
 			<div class="absolute z-[10000] h-full w-full bg-neutral-50">
 				<Search
 					{paneID}
@@ -237,49 +270,48 @@
 					onFilterBibleLocationRef={onFilterBibleLocationRefByBookID}
 				></Search>
 			</div>
-		</div>
-	{/if}
-	{#if showByWord}
-		<div class="sticky top-0 z-[1500] flex w-full justify-center">
-			<div class="absolute z-[10000] h-full w-full bg-neutral-50">
-				<Search
-					{paneID}
-					showInput={true}
-					{searchTerms}
-					onClose={() => {
-						showByWord = false;
-						searchTerms = '';
-					}}
-				></Search>
-			</div>
-		</div>
-	{/if}
-
-	{#if strongs.length > 1 || isVerseRef}
-		<div class="flex flex-row items-center">
-			<p class="pe-4 capitalize">definitions:</p>
-			<button
-				onclick={() => {
-					toggleStrongs = !toggleStrongs;
+		</div> -->
+{/if}
+{#if showByWord}
+	<div class="sticky top-0 z-[1500] flex w-full justify-center">
+		<div class="absolute z-[10000] h-full w-full bg-neutral-50">
+			<Search
+				{paneID}
+				showInput={true}
+				{searchTerms}
+				onClose={() => {
+					showByWord = false;
+					searchTerms = '';
 				}}
-				aria-label="toggle drop down"
-			>
-				<ChevronDown className="w-4 h-4" fill="fill-neutral-700"></ChevronDown>
-			</button>
+			></Search>
 		</div>
-		{#if toggleStrongs}
-			{#each strongs as s, idx}
-				{@render header(s, idx)}
-				{#if s.toggle}
-					{@render strongsHtml(s, idx)}
-				{/if}
-			{/each}
-		{/if}
-	{:else if strongs.length > 0}
-		{@render header(strongs[0], 0)}
-		{@render strongsHtml(strongs[0], 0)}
+	</div>
+{/if}
+
+{#if strongs.length > 1 || isVerseRef}
+	<div class="flex flex-row items-center">
+		<p class="pe-4 capitalize">definitions:</p>
+		<button
+			onclick={() => {
+				toggleStrongs = !toggleStrongs;
+			}}
+			aria-label="toggle drop down"
+		>
+			<ChevronDown className="w-4 h-4" fill="fill-neutral-700"></ChevronDown>
+		</button>
+	</div>
+	{#if toggleStrongs}
+		{#each strongs as s, idx}
+			{@render header(s, idx)}
+			{#if s.toggle}
+				{@render strongsHtml(s, idx)}
+			{/if}
+		{/each}
 	{/if}
-</div>
+{:else if strongs.length > 0}
+	{@render header(strongs[0], 0)}
+	{@render strongsHtml(strongs[0], 0)}
+{/if}
 
 <style>
 	ol {

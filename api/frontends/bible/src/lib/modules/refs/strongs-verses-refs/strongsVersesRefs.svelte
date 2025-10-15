@@ -1,4 +1,10 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// SVELTE
+	// COMPONENTS
+	// MODELS
+	// SERVICES
+
 	import { onMount } from 'svelte';
 	import StrongsRefsContainer from '../strongs-refs/strongsRefsContainer.svelte';
 	import VerseRefsContainer from '../verses-refs/verseRefsContainer.svelte';
@@ -8,20 +14,22 @@
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import StrongsVersesRefsHeader from './strongsVersesRefsHeader.svelte';
 
-	let {
-		paneID,
-		pane = $bindable(),
-		containerHeight = $bindable(),
-		containerWidth = $bindable()
-	} = $props();
+	// =============================== BINDINGS ================================
+
+	let { paneID, pane = $bindable() } = $props();
+
+	// ================================== VARS =================================
 
 	let clientHeight: number = $state(0);
 	let headerHeight: number = $state(0);
-	let zeroHeaderHeight: number = $state(0);
 	let strongsRefs: string[] = $state([]);
 	let footnotes: string[] = $state([]);
 	let verseRefs: string[] = $state([]);
 	let text = $state('');
+
+	let popups: any = $state({});
+
+	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
 		let refs: string[] = [];
@@ -64,12 +72,18 @@
 			);
 		}
 	});
-	$effect(() => {
-		headerHeight;
-		console.log(headerHeight);
-	});
+
+	// ================================ FUNCS ==================================
+	// ============================== CLICK FUNCS ==============================
 </script>
 
+<!-- ================================ HEADER =============================== -->
+{#snippet header()}
+	<StrongsVersesRefsHeader bind:popups bind:clientHeight {paneID}
+	></StrongsVersesRefsHeader>
+{/snippet}
+
+<!-- ================================= BODY ================================ -->
 {#snippet body()}
 	{#if footnotes.length > 0}
 		<FootnoteContainer
@@ -81,12 +95,13 @@
 
 	{#if strongsRefs.length > 0}
 		<StrongsRefsContainer
-			isVerseRef={verseRefs.length > 0}
-			strongsWords={pane?.buffer?.bag?.strongsWords}
+			bind:clientHeight
+			bind:popups
 			{text}
 			{strongsRefs}
 			{paneID}
-			{containerHeight}
+			isVerseRef={verseRefs.length > 0}
+			strongsWords={pane?.buffer?.bag?.strongsWords}
 		></StrongsRefsContainer>
 	{/if}
 
@@ -95,9 +110,7 @@
 	{/if}
 {/snippet}
 
-{#snippet header()}
-	<StrongsVersesRefsHeader bind:clientHeight {paneID}></StrongsVersesRefsHeader>
-{/snippet}
+<!-- ============================== CONTAINER ============================== -->
 
 <BufferContainer bind:clientHeight>
 	<BufferHeader

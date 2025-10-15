@@ -13,7 +13,11 @@
 	// SERVICES
 	// =============================== BINDINGS ================================
 
-	let { paneID, clientHeight = $bindable<number>() } = $props();
+	let {
+		paneID,
+		clientHeight = $bindable<number>(),
+		popups = $bindable()
+	} = $props();
 
 	// ================================== VARS =================================
 	// =============================== LIFECYCLE ===============================
@@ -31,10 +35,11 @@
 <!-- ================================ FOOTER =============================== -->
 <!-- ============================== CONTAINER ============================== -->
 {#snippet searchPopup()}
-	<PopupContainer bind:clientHeight>
-		<Search searchTerms=""></Search>
-		<SearchPopup></SearchPopup>
-	</PopupContainer>
+	{#if popups.searchPopup}
+		<PopupContainer bind:clientHeight>
+			<SearchPopup bind:popups></SearchPopup>
+		</PopupContainer>
+	{/if}
 {/snippet}
 
 <div
@@ -50,4 +55,4 @@
 	</div>
 </div>
 
-<!-- {@render searchPopup()} -->
+{@render searchPopup()}

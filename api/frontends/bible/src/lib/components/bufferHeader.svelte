@@ -14,7 +14,7 @@
 
 <header
 	bind:clientHeight={headerHeight}
-	class="sticky top-0 z-[1500] w-full bg-neutral-100 text-neutral-700"
+	class="w-full bg-neutral-100 text-neutral-700"
 >
 	<div class="{classes} relative">
 		{@render children?.()}
