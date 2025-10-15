@@ -315,3 +315,5 @@
 {@render actionsPopup()}
 {@render notePopup()}
 {@render copyVersePopup()}
+
+<span class="hidden grid-cols-7"></span>

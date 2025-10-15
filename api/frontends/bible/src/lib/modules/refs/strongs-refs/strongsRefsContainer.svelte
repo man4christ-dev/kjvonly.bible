@@ -225,10 +225,7 @@
 <div class="">
 	{#if showByBook}
 		<div class="sticky top-0 z-[1500] flex w-full justify-center">
-			<div
-				style={containerHeight}
-				class="absolute z-[10000] w-full bg-neutral-50"
-			>
+			<div class="absolute z-[10000] h-full w-full bg-neutral-50">
 				<Search
 					{paneID}
 					showInput={true}
@@ -244,10 +241,7 @@
 	{/if}
 	{#if showByWord}
 		<div class="sticky top-0 z-[1500] flex w-full justify-center">
-			<div
-				style={containerHeight}
-				class="absolute z-[10000] w-full bg-neutral-50"
-			>
+			<div class="absolute z-[10000] h-full w-full bg-neutral-50">
 				<Search
 					{paneID}
 					showInput={true}

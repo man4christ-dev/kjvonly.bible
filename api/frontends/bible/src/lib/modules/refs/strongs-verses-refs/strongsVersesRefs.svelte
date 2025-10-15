@@ -1,15 +1,11 @@
 <script lang="ts">
-	import { onDestroy, onMount } from 'svelte';
+	import { onMount } from 'svelte';
 	import StrongsRefsContainer from '../strongs-refs/strongsRefsContainer.svelte';
 	import VerseRefsContainer from '../verses-refs/verseRefsContainer.svelte';
-	import { paneService } from '$lib/services/pane.service.svelte';
 	import FootnoteContainer from '../footnote/footnoteContainer.svelte';
-	import uuid4 from 'uuid4';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
-	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import Close from '$lib/components/svgs/close.svelte';
 	import StrongsVersesRefsHeader from './strongsVersesRefsHeader.svelte';
 
 	let {
@@ -21,6 +17,7 @@
 
 	let clientHeight: number = $state(0);
 	let headerHeight: number = $state(0);
+	let zeroHeaderHeight: number = $state(0);
 	let strongsRefs: string[] = $state([]);
 	let footnotes: string[] = $state([]);
 	let verseRefs: string[] = $state([]);
@@ -67,6 +64,10 @@
 			);
 		}
 	});
+	$effect(() => {
+		headerHeight;
+		console.log(headerHeight);
+	});
 </script>
 
 {#snippet body()}
@@ -94,18 +95,19 @@
 	{/if}
 {/snippet}
 
+{#snippet header()}
+	<StrongsVersesRefsHeader bind:clientHeight bind:headerHeight {paneID}
+	></StrongsVersesRefsHeader>
+{/snippet}
+
 <BufferContainer bind:clientHeight>
-	<BufferHeader
-		bind:headerHeight
-		classes="flex w-full justify-between outline outline-neutral-400 text-neutral-700"
-	>
-		<StrongsVersesRefsHeader {paneID}></StrongsVersesRefsHeader>
-	</BufferHeader>
+	{@render header()}
 	<BufferBody
 		bind:clientHeight
-		bind:headerHeight
+		bind:headerHeight={zeroHeaderHeight}
 		classes="clear-default-classes"
 	>
+		<span style="min-height: {headerHeight + 5}px"></span>
 		{@render body()}
 	</BufferBody>
 </BufferContainer>
