@@ -162,7 +162,6 @@
 					bind:pane
 					bind:mode
 					bind:annotations
-					bind:headerHeight
 					{lastKnownScrollPosition}
 				></Chapter>
 			</div>
@@ -211,7 +210,7 @@
 	<BufferBody
 		ID={id}
 		bind:clientHeight
-		bind:headerHeight={zeroHeaderHeight}
+		bind:headerHeight
 		classes="clear-default-classes"
 	>
 		{#if bibleLocationRef}

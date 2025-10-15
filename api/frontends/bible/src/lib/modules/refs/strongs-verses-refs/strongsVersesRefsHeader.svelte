@@ -43,7 +43,6 @@
 {/snippet}
 
 <div
-	id="test"
 	class="flex w-full max-w-lg flex-row bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
 >
 	<span class="flex-1"></span>

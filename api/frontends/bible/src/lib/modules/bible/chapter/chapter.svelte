@@ -35,7 +35,6 @@
 	let {
 		bibleLocationRef = $bindable<string>(),
 		id = $bindable<string>(),
-		headerHeight = $bindable<number>(),
 		pane = $bindable<Pane>(),
 		mode = $bindable<BibleMode>(),
 		annotations = $bindable<Annotations>(),
@@ -43,7 +42,6 @@
 	}: {
 		bibleLocationRef: string;
 		id: string;
-		headerHeight: number;
 		pane: Pane;
 		mode: BibleMode;
 		annotations: Annotations;
@@ -216,7 +214,6 @@
 	{/each}
 {/snippet}
 
-<p style="min-height: {headerHeight + 5}px">&nbsp;</p>
 <div class="px-4 leading-loose">
 	{#if toggleVersesView}
 		{@render versesView()}

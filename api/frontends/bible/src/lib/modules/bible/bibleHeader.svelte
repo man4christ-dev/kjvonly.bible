@@ -208,8 +208,7 @@
 
 {#snippet header()}
 	<div
-		bind:clientHeight={headerHeight}
-		class="absolute w-full max-w-lg bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
+		class="w-full max-w-lg bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
 	>
 		<span
 			class="grid {'grid-cols-' +
