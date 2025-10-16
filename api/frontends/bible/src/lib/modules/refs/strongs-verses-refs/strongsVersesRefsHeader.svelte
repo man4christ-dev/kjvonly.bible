@@ -1,16 +1,14 @@
 <script lang="ts">
-	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	// ================================ IMPORTS ================================
+	// COMPONENTS
 	import Close from '$lib/components/svgs/close.svelte';
-	import Search from '$lib/modules/search/search.svelte';
-	import { paneService } from '$lib/services/pane.service.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import PopupContainer from '../popupContainer.svelte';
 	import SearchPopup from '../popups/searchPopup/searchPopup.svelte';
 
-	// ================================ IMPORTS ================================
-	// SVELTE
-	// COMPONENTS
-	// MODELS
 	// SERVICES
+	import { paneService } from '$lib/services/pane.service.svelte';
+
 	// =============================== BINDINGS ================================
 
 	let {
@@ -19,9 +17,6 @@
 		popups = $bindable()
 	} = $props();
 
-	// ================================== VARS =================================
-	// =============================== LIFECYCLE ===============================
-	// ================================ FUNCS ==================================
 	// ============================== CLICK FUNCS ==============================
 
 	function onClose(e: Event): void {
@@ -31,9 +26,22 @@
 </script>
 
 <!-- ================================ HEADER =============================== -->
-<!-- ================================= BODY ================================ -->
-<!-- ================================ FOOTER =============================== -->
-<!-- ============================== CONTAINER ============================== -->
+{#snippet header()}
+	<div
+		class="flex w-full max-w-lg flex-row bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
+	>
+		<span class="flex-1"></span>
+		<span class="text-center">Strongs / Refs</span>
+		<div class="flex flex-1 justify-end pe-4">
+			<KJVButton onClick={onClose} classes="">
+				<Close classes=""></Close>
+			</KJVButton>
+		</div>
+	</div>
+{/snippet}
+
+<!-- ================================ POPUPS =============================== -->
+
 {#snippet searchPopup()}
 	{#if popups.searchPopup}
 		<PopupContainer bind:clientHeight>
@@ -42,16 +50,6 @@
 	{/if}
 {/snippet}
 
-<div
-	class="flex w-full max-w-lg flex-row bg-neutral-100 py-2 leading-tight outline outline-neutral-400"
->
-	<span class="flex-1"></span>
-	<span class="text-center">Strongs / Refs</span>
-	<div class="flex flex-1 justify-end pe-4">
-		<KJVButton onClick={onClose} classes="">
-			<Close classes=""></Close>
-		</KJVButton>
-	</div>
-</div>
-
+<!-- ============================== CONTAINER ============================== -->
+{@render header()}
 {@render searchPopup()}
