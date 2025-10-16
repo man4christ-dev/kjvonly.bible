@@ -1,18 +1,18 @@
 <script lang="ts">
 	// ================================ IMPORTS ================================
 	// SVELTE
-	// COMPONENTS
-	// MODELS
-	// SERVICES
-
 	import { onMount } from 'svelte';
-	import StrongsRefsContainer from '../strongs-refs/strongsRefsContainer.svelte';
-	import VerseRefsContainer from '../verses-refs/verseRefsContainer.svelte';
-	import FootnoteContainer from '../footnote/footnoteContainer.svelte';
+
+	// COMPONENTS
+	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import BufferBody from '$lib/components/bufferBody.svelte';
+	import FootnoteContainer from '../footnote/footnoteContainer.svelte';
+	import StrongsRefsContainer from '../strongs-refs/strongsRefsContainer.svelte';
 	import StrongsVersesRefsHeader from './strongsVersesRefsHeader.svelte';
+	import VerseRefsContainer from '../verses-refs/verseRefsContainer.svelte';
+
+	// MODELS
 	import {
 		newStrongsPopups,
 		type StrongsPopups
@@ -26,17 +26,38 @@
 
 	let clientHeight: number = $state(0);
 	let headerHeight: number = $state(0);
-	let strongsRefs: string[] = $state([]);
-	let footnotes: string[] = $state([]);
-	let verseRefs: string[] = $state([]);
-	let text = $state('');
 
+	let footnotes: string[] = $state([]);
 	let popups: StrongsPopups = $state(newStrongsPopups());
+	let strongsRefs: string[] = $state([]);
+	let text = $state('');
+	let verseRefs: string[] = $state([]);
 
 	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
+		setRefs();
+		setCurrentVerseRef();
+		setWordText();
+	});
+
+	// ================================ FUNCS ==================================
+
+	function setRefs(): void {
+		let refs: string[] = getRefs();
+		refs.forEach((ref: string) => {
+			matchStrongsRef(ref);
+			matchFootnote(ref);
+			matchVerseRef(ref);
+		});
+	}
+
+	/**
+	 * Refs are passed to component via buffer bag
+	 */
+	function getRefs(): string[] {
 		let refs: string[] = [];
+		// TODO ADD TYPE
 		if (pane?.buffer?.bag?.refs) {
 			refs = pane?.buffer?.bag?.refs;
 		} else {
@@ -44,40 +65,55 @@
 				refs = pane?.buffer?.bag?.word?.href;
 			}
 		}
+		return refs;
+	}
 
-		refs.forEach((ref: string) => {
-			let match = new RegExp('^[GH]', 'm').test(ref);
+	function matchStrongsRef(ref: string): void {
+		let match = new RegExp('^[GH]', 'm').test(ref);
+		if (match) {
+			strongsRefs.push(ref);
+		}
+	}
 
-			if (match) {
-				strongsRefs.push(ref);
-			}
+	function matchFootnote(ref: string): void {
+		let match = new RegExp('\\d+_\\d+_\\d+', 'gm').test(ref);
+		if (match) {
+			footnotes.push(ref);
+		}
+	}
 
-			match = new RegExp('\\d+_\\d+_\\d+', 'gm').test(ref);
-			if (match) {
-				footnotes.push(ref);
-			}
+	function matchVerseRef(ref: string): void {
+		let match = new RegExp('\\d+\/\\d+\/\\d+', 'gm').test(ref);
+		if (match) {
+			verseRefs.push(ref);
+		}
+	}
 
-			match = new RegExp('\\d+\/\\d+\/\\d+', 'gm').test(ref);
-			if (match) {
-				verseRefs.push(ref);
-			}
-		});
-
-		if (verseRefs.length > 0) {
+	/**
+	 * If a word is selected and that word has verse references, add the
+	 * current verse to the {@link verseRefs} at index 0. This way the user
+	 * has visual queue for the verse that was clicked.
+	 */
+	function setCurrentVerseRef(): void {
+		if (hasVerseRefs()) {
 			if (pane?.buffer?.bag?.currentVerseRef) {
 				verseRefs = [pane?.buffer?.bag?.currentVerseRef, ...verseRefs];
 			}
 		}
+	}
 
+	function hasVerseRefs(): boolean {
+		return verseRefs.length > 0;
+	}
+
+	function setWordText(): void {
 		if (pane?.buffer?.bag?.word?.text) {
 			text = pane.buffer.bag.word.text.replace(
 				/[?.,\/#!$%\^&\*;:{}=\-_`~()]/g,
 				''
 			);
 		}
-	});
-
-	// ================================ FUNCS ==================================
+	}
 	// ============================== CLICK FUNCS ==============================
 </script>
 
