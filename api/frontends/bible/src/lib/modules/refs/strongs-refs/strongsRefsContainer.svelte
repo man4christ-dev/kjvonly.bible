@@ -5,18 +5,13 @@
 
 	// COMPONENTS
 	import ChevronDown from '$lib/components/chevronDown.svelte';
-	import type { Word } from '$lib/models/bible.model';
 
 	// MODELS
 	// SERVICES
 	import { strongsService } from '$lib/services/bible/strongs.service';
 
 	// API
-	import { chapterApi } from '$lib/api/chapters.api';
-	import {
-		bookIDByBookNameService,
-		BookIDByBookNameService
-	} from '$lib/services/bibleMetadata/bookIDByBookName.service';
+	import { bookIDByBookNameService } from '$lib/services/bibleMetadata/bookIDByBookName.service';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import type { Strongs, UsageBy } from '$lib/models/strongs.model';
 
@@ -36,22 +31,30 @@
 	let toggleStrongs = $state(false);
 	let searchTerms = $state('');
 	let startsWithBookId = '';
-	let strongs: any[] | undefined = $state([]);
+	let strongsWithToggle: StrongsWithToggle[] = $state([]);
+
+	interface StrongsWithToggle extends Strongs {
+		toggle: boolean;
+	}
 
 	// =============================== LIFECYCLE ===============================
 	onMount(async () => {
+		await setStrongsRef();
+	});
+
+	// ================================ FUNCS ==================================
+	async function setStrongsRef(): Promise<any> {
 		if (strongsRefs) {
 			strongsRefs.forEach(async (ref: string) => {
 				let data = await strongsService.get(ref.toLowerCase());
 				if (data) {
-					strongs.push(data);
+					strongsWithToggle.push({ ...data, toggle: false });
 				}
 			});
 		}
-	});
+	}
 
-	// ================================ FUNCS ==================================
-	function sanitize(w: string) {
+	function sanitize(w: string): string {
 		return w.replace(/[^a-zA-Z0-9 ]/g, '');
 	}
 
@@ -93,29 +96,33 @@
 			searchTerms: searchTerms
 		};
 	}
+
+	function onStrongsWordClicked(e: Event, s: StrongsWithToggle) {
+		s.toggle = !s.toggle;
+	}
 </script>
 
-<!-- ================================ HEADER =============================== -->
 <!-- ================================= BODY ================================ -->
 <!-- ================================ FOOTER =============================== -->
 <!-- ============================== CONTAINER ============================== -->
 
-{#snippet header(s: any, idx: number)}
+<!-- ================================ HEADER =============================== -->
+{#snippet header(s: StrongsWithToggle, idx: number)}
 	<div class="flex flex-row items-center ps-2 pt-2">
 		{#if strongsWords && strongsWords.length > 0}
-			<span class="pe-4">{s['number']}: {strongsWords[idx]}</span>
+			<span class="pe-4">{s.number}: {strongsWords[idx]}</span>
 
 			<button
-				onclick={() => {
-					s.toggle = !s.toggle;
+				onclick={(e: Event) => {
+					onStrongsWordClicked(e, s);
 				}}
 				aria-label="toggle drop down"
 			>
 				<ChevronDown className="w-4 h-4" fill="fill-neutral-700"></ChevronDown>
 			</button>
 		{:else}
-			<span class="pe-4">{s['number']}: {text}</span>
-			{#if isVerseRef || (strongs && strongs?.length > 1)}
+			<span class="pe-4">{s.number}: {text}</span>
+			{#if isVerseRef || (strongsWithToggle && strongsWithToggle?.length > 1)}
 				<button
 					onclick={() => {
 						s.toggle = !s.toggle;
@@ -257,7 +264,7 @@
 	</div>
 {/snippet}
 
-{#if strongs.length > 1 || isVerseRef}
+{#if strongsWithToggle.length > 1 || isVerseRef}
 	<div class="flex flex-row items-center">
 		<p class="pe-4 capitalize">definitions:</p>
 		<button
@@ -270,16 +277,16 @@
 		</button>
 	</div>
 	{#if toggleStrongs}
-		{#each strongs as s, idx}
+		{#each strongsWithToggle as s, idx}
 			{@render header(s, idx)}
 			{#if s.toggle}
 				{@render strongsHtml(s, idx)}
 			{/if}
 		{/each}
 	{/if}
-{:else if strongs.length > 0}
-	{@render header(strongs[0], 0)}
-	{@render strongsHtml(strongs[0], 0)}
+{:else if strongsWithToggle.length > 0}
+	{@render header(strongsWithToggle[0], 0)}
+	{@render strongsHtml(strongsWithToggle[0], 0)}
 {/if}
 
 <style>
