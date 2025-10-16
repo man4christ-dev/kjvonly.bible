@@ -9,10 +9,16 @@
 
 	// MODELS
 	// SERVICES
-	import { bibleDB } from '$lib/storer/bible.db';
+	import { strongsService } from '$lib/services/bible/strongs.service';
 
 	// API
 	import { chapterApi } from '$lib/api/chapters.api';
+	import {
+		bookIDByBookNameService,
+		BookIDByBookNameService
+	} from '$lib/services/bibleMetadata/bookIDByBookName.service';
+	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
+	import type { Strongs, UsageBy } from '$lib/models/strongs.model';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -29,7 +35,6 @@
 
 	let toggleStrongs = $state(false);
 	let searchTerms = $state('');
-	let booknames: any = {};
 	let startsWithBookId = '';
 	let strongs: any[] | undefined = $state([]);
 
@@ -37,18 +42,16 @@
 	onMount(async () => {
 		if (strongsRefs) {
 			strongsRefs.forEach(async (ref: string) => {
-				let data = await bibleDB.getValue('strongs', ref.toLowerCase());
+				let data = await strongsService.get(ref.toLowerCase());
 				if (data) {
 					strongs.push(data);
 				}
 			});
 		}
-
-		booknames = await chapterApi.getBooknames();
 	});
 
 	// ================================ FUNCS ==================================
-	function sanatize(w: string) {
+	function sanitize(w: string) {
 		return w.replace(/[^a-zA-Z0-9 ]/g, '');
 	}
 
@@ -62,19 +65,18 @@
 		});
 	}
 
-	function onByBook(s: any, b: any, idx: number) {
-		let bookid = booknames['booknamesByName'][b.text];
-		let shortName = booknames['shortNames'][bookid];
-
-		let byWord = s['usageByWord'];
+	function onByBook(s: Strongs, b: any, idx: number) {
+		let bookID = bookIDByBookNameService.get(b.text);
+		let shortName = shortBookNamesByIDService.get(bookID);
+		let byWord = s.usageByWord;
 
 		let searchText = '';
-		byWord?.forEach((w: Word) => {
-			searchText += `${shortName} ${w.text} OR `;
+		byWord?.forEach((ub: UsageBy) => {
+			searchText += `${shortName} ${ub.text} OR `;
 		});
 
-		let lidx = searchText.lastIndexOf('OR');
-		searchTerms = sanatize(searchText.substring(0, lidx));
+		let lastIndexOfOr = searchText.lastIndexOf('OR');
+		searchTerms = sanitize(searchText.substring(0, lastIndexOfOr));
 
 		popups.searchPopup = {
 			paneID: paneID,
@@ -84,7 +86,7 @@
 	}
 
 	function onByWord(b: any, idx: number) {
-		searchTerms = sanatize(b.text);
+		searchTerms = sanitize(b.text);
 
 		popups.searchPopup = {
 			paneID: paneID,
