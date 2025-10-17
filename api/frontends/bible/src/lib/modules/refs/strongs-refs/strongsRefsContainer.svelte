@@ -14,6 +14,11 @@
 	import { bookIDByBookNameService } from '$lib/services/bibleMetadata/bookIDByBookName.service';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import type { Strongs, UsageBy } from '$lib/models/strongs.model';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import KeyboardArrowRight from '$lib/components/svgs/keyboardArrowRight.svelte';
+	import KeyboardArrowDown from '$lib/components/svgs/keyboardArrowDown.svelte';
+	import Dictionary from '$lib/components/svgs/dictionary.svelte';
+	import ShortText from '$lib/components/svgs/shortText.svelte';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -68,7 +73,7 @@
 		});
 	}
 
-	function onByBook(s: Strongs, b: any, idx: number) {
+	function onByBook(s: Strongs, b: any, idx: number): void {
 		let bookID = bookIDByBookNameService.get(b.text);
 		let shortName = shortBookNamesByIDService.get(bookID);
 		let byWord = s.usageByWord;
@@ -88,7 +93,7 @@
 		};
 	}
 
-	function onByWord(b: any, idx: number) {
+	function onByWord(b: any, idx: number): void {
 		searchTerms = sanitize(b.text);
 
 		popups.searchPopup = {
@@ -97,8 +102,12 @@
 		};
 	}
 
-	function onStrongsWordClicked(e: Event, s: StrongsWithToggle) {
+	function onStrongsWordClicked(e: Event, s: StrongsWithToggle): void {
 		s.toggle = !s.toggle;
+	}
+
+	function onToggleStrongs(): void {
+		toggleStrongs = !toggleStrongs;
 	}
 </script>
 
@@ -110,29 +119,36 @@
 {#snippet header(s: StrongsWithToggle, idx: number)}
 	<div class="flex flex-row items-center ps-2 pt-2">
 		{#if strongsWords && strongsWords.length > 0}
-			<span class="pe-4">{s.number}: {strongsWords[idx]}</span>
-
-			<button
-				onclick={(e: Event) => {
+			<KJVButton
+				classes=""
+				onClick={(e: Event) => {
 					onStrongsWordClicked(e, s);
 				}}
-				aria-label="toggle drop down"
 			>
-				<ChevronDown className="w-4 h-4" fill="fill-neutral-700"></ChevronDown>
-			</button>
+				{#if !s.toggle}
+					<KeyboardArrowRight></KeyboardArrowRight>
+				{:else}
+					<KeyboardArrowDown></KeyboardArrowDown>
+				{/if}
+			</KJVButton>
+			<ShortText></ShortText>
+			<span class="ps-1 pe-4">{s.number}: {strongsWords[idx]}</span>
 		{:else}
-			<span class="pe-4">{s.number}: {text}</span>
 			{#if isVerseRef || (strongsWithToggle && strongsWithToggle?.length > 1)}
-				<button
-					onclick={() => {
-						s.toggle = !s.toggle;
+				<KJVButton
+					classes=""
+					onClick={(e: Event) => {
+						onStrongsWordClicked(e, s);
 					}}
-					aria-label="toggle drop down"
 				>
-					<ChevronDown className="w-4 h-4" fill="fill-neutral-700"
-					></ChevronDown>
-				</button>
+					{#if !s.toggle}
+						<KeyboardArrowRight></KeyboardArrowRight>
+					{:else}
+						<KeyboardArrowDown></KeyboardArrowDown>
+					{/if}
+				</KJVButton>
 			{/if}
+			<span class="pe-4">{s.number}: {text}</span>
 		{/if}
 	</div>
 {/snippet}
@@ -266,15 +282,15 @@
 
 {#if strongsWithToggle.length > 1 || isVerseRef}
 	<div class="flex flex-row items-center">
-		<p class="pe-4 capitalize">definitions:</p>
-		<button
-			onclick={() => {
-				toggleStrongs = !toggleStrongs;
-			}}
-			aria-label="toggle drop down"
-		>
-			<ChevronDown className="w-4 h-4" fill="fill-neutral-700"></ChevronDown>
-		</button>
+		<KJVButton classes="" onClick={onToggleStrongs}>
+			{#if !toggleStrongs}
+				<KeyboardArrowRight></KeyboardArrowRight>
+			{:else}
+				<KeyboardArrowDown></KeyboardArrowDown>
+			{/if}
+		</KJVButton>
+		<Dictionary></Dictionary>
+		<p class="ps-1 pe-4 capitalize">definitions:</p>
 	</div>
 	{#if toggleStrongs}
 		{#each strongsWithToggle as s, idx}

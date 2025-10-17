@@ -5,6 +5,10 @@
 	import { onMount } from 'svelte';
 	import { Module } from 'quill';
 	import { Modules } from '$lib/models/modules.model';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import KeyboardArrowRight from '$lib/components/svgs/keyboardArrowRight.svelte';
+	import KeyboardArrowDown from '$lib/components/svgs/keyboardArrowDown.svelte';
+	import MenuBook from '$lib/components/svgs/menuBook.svelte';
 
 	let { paneID, verseRefs } = $props();
 
@@ -76,6 +80,10 @@
 	function copyToClipboard(vref: any) {
 		let verse = `${vref.bookName} ${vref.chapterNumber}:${vref.verseNumber}\n${vref.text}`;
 		navigator.clipboard.writeText(verse);
+	}
+
+	function onToggle(): void {
+		toggle = !toggle;
 	}
 </script>
 
@@ -229,15 +237,15 @@
 <div>
 	<div class="">
 		<div class="flex flex-row items-center">
-			<p class="pe-4 capitalize">Verses:</p>
-			<button
-				onclick={() => {
-					toggle = !toggle;
-				}}
-				aria-label="toggle drop down"
-			>
-				<ChevronDown className="w-4 h-4" fill="fill-neutral-700"></ChevronDown>
-			</button>
+			<KJVButton classes="" onClick={onToggle}>
+				{#if !toggle}
+					<KeyboardArrowRight></KeyboardArrowRight>
+				{:else}
+					<KeyboardArrowDown></KeyboardArrowDown>
+				{/if}
+			</KJVButton>
+			<MenuBook></MenuBook>
+			<p class="ps-1 pe-4 capitalize">Verses:</p>
 		</div>
 		{#if toggle}
 			<div class="py-4 ps-2">
