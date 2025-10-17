@@ -10,7 +10,7 @@
 	import FootnoteContainer from '../footnote/footnoteContainer.svelte';
 	import StrongsRefsContainer from '../strongs-refs/strongsRefsContainer.svelte';
 	import StrongsVersesRefsHeader from './strongsVersesRefsHeader.svelte';
-	import VerseRefsContainer from '../verses-refs/verseRefsContainer.svelte';
+	import CrossRefsContainer from '../crossRefs/crossRefsContainer.svelte';
 
 	// MODELS
 	import {
@@ -31,7 +31,7 @@
 	let popups: StrongsPopups = $state(newStrongsPopups());
 	let strongsRefs: string[] = $state([]);
 	let text = $state('');
-	let verseRefs: string[] = $state([]);
+	let crossRefs: string[] = $state([]);
 
 	// =============================== LIFECYCLE ===============================
 
@@ -48,7 +48,7 @@
 		refs.forEach((ref: string) => {
 			matchStrongsRef(ref);
 			matchFootnote(ref);
-			matchVerseRef(ref);
+			matchCrossRef(ref);
 		});
 	}
 
@@ -82,28 +82,28 @@
 		}
 	}
 
-	function matchVerseRef(ref: string): void {
+	function matchCrossRef(ref: string): void {
 		let match = new RegExp('\\d+\/\\d+\/\\d+', 'gm').test(ref);
 		if (match) {
-			verseRefs.push(ref);
+			crossRefs.push(ref);
 		}
 	}
 
 	/**
 	 * If a word is selected and that word has verse references, add the
-	 * current verse to the {@link verseRefs} at index 0. This way the user
+	 * current verse to the {@link crossRefs} at index 0. This way the user
 	 * has visual queue for the verse that was clicked.
 	 */
 	function setCurrentVerseRef(): void {
 		if (hasVerseRefs()) {
 			if (pane?.buffer?.bag?.currentVerseRef) {
-				verseRefs = [pane?.buffer?.bag?.currentVerseRef, ...verseRefs];
+				crossRefs = [pane?.buffer?.bag?.currentVerseRef, ...crossRefs];
 			}
 		}
 	}
 
 	function hasVerseRefs(): boolean {
-		return verseRefs.length > 0;
+		return crossRefs.length > 0;
 	}
 
 	function setWordText(): void {
@@ -140,13 +140,14 @@
 			{text}
 			{strongsRefs}
 			{paneID}
-			isVerseRef={verseRefs.length > 0}
+			isVerseRef={crossRefs.length > 0}
 			strongsWords={pane?.buffer?.bag?.strongsWords}
 		></StrongsRefsContainer>
 	{/if}
 
-	{#if verseRefs.length > 0}
-		<VerseRefsContainer paneID={pane?.id} {verseRefs}></VerseRefsContainer>
+	{#if crossRefs.length > 0}
+		<CrossRefsContainer paneID={pane?.id} verseRefs={crossRefs}
+		></CrossRefsContainer>
 	{/if}
 {/snippet}
 
