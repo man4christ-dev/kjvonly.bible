@@ -21,23 +21,26 @@
 
 	// =============================== BINDINGS ================================
 
-	let { paneID, verseRefs } = $props();
+	let { paneID, boundCrossRefs } = $props();
 
 	// ================================== VARS =================================
-	let recursiveVerseRefs: any[] = $state([]);
+	let crossRefMatrix: any[] = $state([]);
 	let toggle = $state(false);
 
 	// =============================== LIFECYCLE ===============================
 
 	onMount(async () => {
-		addCrossRefs(verseRefs);
+		setCrossRefs();
 	});
 
 	// ================================ FUNCS ==================================
+	async function setCrossRefs(): Promise<void> {
+		addCrossRefs(boundCrossRefs);
+	}
 
-	async function addCrossRefs(refs: string[]) {
-		let verseRefs: any = $state([]);
-		refs.forEach(async (ref: string) => {
+	async function addCrossRefs(crossRefs: string[]): Promise<void> {
+		let crossRefsWithState: any = $state([]);
+		crossRefs.forEach(async (ref: string) => {
 			try {
 				let bibleLocationRef =
 					bibleLocationReferenceService.convertCrossRefToBibleLocationRef(ref);
@@ -59,13 +62,13 @@
 					text: verseWithoutNumber,
 					bookId: bookID
 				};
-				verseRefs.push(verseRef);
+				crossRefsWithState.push(verseRef);
 			} catch (ex) {
 				console.log(`error fetching ref ${ref} : ${ex}`);
 			}
 		});
 
-		recursiveVerseRefs.push(verseRefs);
+		crossRefMatrix.push(crossRefsWithState);
 	}
 
 	async function updateRefs(vref: any) {
@@ -95,8 +98,8 @@
 	// ============================== CLICK FUNCS ==============================
 
 	function onNavigateRefs(idx: number) {
-		if (idx <= recursiveVerseRefs.length - 1) {
-			recursiveVerseRefs.splice(idx, recursiveVerseRefs.length);
+		if (idx <= crossRefMatrix.length - 1) {
+			crossRefMatrix.splice(idx, crossRefMatrix.length);
 		}
 	}
 
@@ -274,9 +277,9 @@
 		{@render versesToggle()}
 		{#if toggle}
 			<div class="py-4 ps-2">
-				{#each recursiveVerseRefs as refs, idx}
-					{#if idx > recursiveVerseRefs.length - 4 && refs[0]}
-						{#if recursiveVerseRefs.length > 3 && idx === recursiveVerseRefs.length - 3}
+				{#each crossRefMatrix as refs, idx}
+					{#if idx > crossRefMatrix.length - 4 && refs[0]}
+						{#if crossRefMatrix.length > 3 && idx === crossRefMatrix.length - 3}
 							<span class="underline underline-offset-8">...</span>
 						{/if}
 						{#if idx !== 0}
@@ -296,13 +299,13 @@
 				{/each}
 
 				<div class="h-2"></div>
-				{#if recursiveVerseRefs.length > 0}
-					{@const vref = recursiveVerseRefs[recursiveVerseRefs.length - 1][0]}
+				{#if crossRefMatrix.length > 0}
+					{@const vref = crossRefMatrix[crossRefMatrix.length - 1][0]}
 
 					{@render refCurrentVerse(vref)}
 
-					{#if recursiveVerseRefs[recursiveVerseRefs.length - 1].length > 1}
-						{#each recursiveVerseRefs[recursiveVerseRefs.length - 1].slice(1, recursiveVerseRefs[recursiveVerseRefs.length - 1].length) as vref, idx}
+					{#if crossRefMatrix[crossRefMatrix.length - 1].length > 1}
+						{#each crossRefMatrix[crossRefMatrix.length - 1].slice(1, crossRefMatrix[crossRefMatrix.length - 1].length) as vref, idx}
 							{@render refVerse(vref)}
 						{/each}
 					{/if}

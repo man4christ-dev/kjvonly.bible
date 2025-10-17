@@ -8,8 +8,8 @@
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import FootnoteContainer from './footnote/footnoteContainer.svelte';
-	import StrongsRefsContainer from './strongs-refs/strongsRefsContainer.svelte';
-	import StrongsVersesRefsHeader from './refsHeader.svelte';
+	import StrongsDefsContainer from './strongsDefs/strongsDefsContainer.svelte';
+	import RefsHeader from './refsHeader.svelte';
 	import CrossRefsContainer from './crossRefs/crossRefsContainer.svelte';
 
 	// MODELS
@@ -95,14 +95,14 @@
 	 * has visual queue for the verse that was clicked.
 	 */
 	function setCurrentVerseRef(): void {
-		if (hasVerseRefs()) {
+		if (hasCrossRefs()) {
 			if (pane?.buffer?.bag?.currentVerseRef) {
 				crossRefs = [pane?.buffer?.bag?.currentVerseRef, ...crossRefs];
 			}
 		}
 	}
 
-	function hasVerseRefs(): boolean {
+	function hasCrossRefs(): boolean {
 		return crossRefs.length > 0;
 	}
 
@@ -119,8 +119,7 @@
 
 <!-- ================================ HEADER =============================== -->
 {#snippet header()}
-	<StrongsVersesRefsHeader bind:popups bind:clientHeight {paneID}
-	></StrongsVersesRefsHeader>
+	<RefsHeader bind:popups bind:clientHeight {paneID}></RefsHeader>
 {/snippet}
 
 <!-- ================================= BODY ================================ -->
@@ -134,7 +133,7 @@
 	{/if}
 
 	{#if strongsRefs.length > 0}
-		<StrongsRefsContainer
+		<StrongsDefsContainer
 			bind:clientHeight
 			bind:popups
 			{text}
@@ -142,11 +141,11 @@
 			{paneID}
 			isVerseRef={crossRefs.length > 0}
 			strongsWords={pane?.buffer?.bag?.strongsWords}
-		></StrongsRefsContainer>
+		></StrongsDefsContainer>
 	{/if}
 
 	{#if crossRefs.length > 0}
-		<CrossRefsContainer paneID={pane?.id} verseRefs={crossRefs}
+		<CrossRefsContainer paneID={pane?.id} boundCrossRefs={crossRefs}
 		></CrossRefsContainer>
 	{/if}
 {/snippet}
