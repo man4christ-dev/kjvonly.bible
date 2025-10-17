@@ -236,11 +236,11 @@
 {/snippet}
 
 {#snippet strongsHtml(s: any, idx: number)}
-	<div class="ps-4">
+	<div class="ps-8">
 		{#if s['strongsDef']}
 			<div class="">
 				<p class="text-neutral-600">Strongs Definition:</p>
-				<p class="ps-2">
+				<p class="ps-4">
 					{@html s['strongsDef']}
 				</p>
 			</div>
