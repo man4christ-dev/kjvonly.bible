@@ -45,6 +45,15 @@ class BibleLocationReferenceService {
 	}
 
 	/**
+	 *
+	 * @param ref a cross reference i.e. 47/5/3
+	 * @returns a bible location reference 47_5_3
+	 */
+	convertCrossRefToBibleLocationRef(ref: string): string {
+		return ref.replaceAll('/', '_');
+	}
+
+	/**
 	 * Reduces a reference chapter key to BookID_Chapter.
 	 *
 	 * @param ref any reference

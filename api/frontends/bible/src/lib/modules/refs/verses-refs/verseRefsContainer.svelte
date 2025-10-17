@@ -15,8 +15,9 @@
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import { bibleDB } from '$lib/storer/bible.db';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { chapterService } from '$lib/services/bible/chapter.service';
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+	import { verseService } from '$lib/services/bible/verse.service';
+	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
 
 	// =============================== BINDINGS ================================
 
@@ -29,25 +30,26 @@
 	// =============================== LIFECYCLE ===============================
 
 	onMount(async () => {
-		addVerseRefs(verseRefs);
+		addCrossRefs(verseRefs);
 	});
 
 	// ================================ FUNCS ==================================
 
-	async function addVerseRefs(refs: string[]) {
+	async function addCrossRefs(refs: string[]) {
 		let verseRefs: any = $state([]);
 		refs.forEach(async (ref: string) => {
 			try {
-				let lastIndex = ref.lastIndexOf('/');
-				let bibleLocationRef = ref.substring(0, lastIndex).replaceAll('/', '_');
+				let bibleLocationRef =
+					bibleLocationReferenceService.convertCrossRefToBibleLocationRef(ref);
 				let chapterNumber =
 					bibleLocationReferenceService.extractChapter(bibleLocationRef);
-				let verseNumber = ref.substring(lastIndex + 1, ref.length);
-				let data = await chapterService.get(bibleLocationRef);
-				let bookName = data.bookName;
-				let bookId = bibleLocationReferenceService.extractBookID(data.id);
-				let verse = data.verseMap.get(verseNumber);
-				let verseWithoutNumber = verse?.substring(0, verse?.length);
+				let verseNumber =
+					bibleLocationReferenceService.extractVerse(bibleLocationRef);
+				let bookID =
+					bibleLocationReferenceService.extractBookID(bibleLocationRef);
+				let bookName = bookNamesByIDService.get(bookID);
+				let verse = await verseService.get(bibleLocationRef);
+				let verseWithoutNumber = verse?.text.slice(1);
 
 				let verseRef = {
 					ref: ref,
@@ -55,7 +57,7 @@
 					chapterNumber: chapterNumber,
 					verseNumber: verseNumber,
 					text: verseWithoutNumber,
-					bookId: bookId
+					bookId: bookID
 				};
 				verseRefs.push(verseRef);
 			} catch (ex) {
@@ -82,7 +84,7 @@
 				}
 			});
 		});
-		addVerseRefs(refKeys);
+		addCrossRefs(refKeys);
 	}
 
 	function copyToClipboard(vref: any) {
