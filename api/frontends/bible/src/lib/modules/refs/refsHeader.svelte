@@ -3,8 +3,8 @@
 	// COMPONENTS
 	import Close from '$lib/components/svgs/close.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import PopupContainer from '../popupContainer.svelte';
-	import SearchPopup from '../popups/searchPopup/searchPopup.svelte';
+	import PopupContainer from './popupContainer.svelte';
+	import SearchPopup from './popups/searchPopup/searchPopup.svelte';
 
 	// SERVICES
 	import { paneService } from '$lib/services/pane.service.svelte';

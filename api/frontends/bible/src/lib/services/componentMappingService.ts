@@ -5,7 +5,7 @@ import Login from '$lib/modules/login/login.svelte';
 import Modules from '$lib/modules/modules/modules.svelte';
 import Notes from '$lib/modules/notes/notes.svelte';
 import PlansContainer from '$lib/modules/plans/plansContainer.svelte';
-import StrongsVersesRefs from '$lib/modules/refs/strongs-verses-refs/strongsVersesRefs.svelte';
+import RefsContainer from '$lib/modules/refs/refsContainer.svelte';
 import Settings from '$lib/modules/settings/settings.svelte';
 import SettingsContainer from '$lib/modules/settings/settingsContainer.svelte';
 import Search from '../modules/search/search.svelte';
@@ -26,7 +26,7 @@ export class ComponentMapping {
 			case modules.BIBLE:
 				return BibleContainer;
 			case modules.STRONGS:
-				return StrongsVersesRefs;
+				return RefsContainer;
 			case modules.SEARCH:
 				return Search;
 			case modules.MODULES:

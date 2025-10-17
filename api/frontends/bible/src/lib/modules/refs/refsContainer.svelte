@@ -7,10 +7,10 @@
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import FootnoteContainer from '../footnote/footnoteContainer.svelte';
-	import StrongsRefsContainer from '../strongs-refs/strongsRefsContainer.svelte';
-	import StrongsVersesRefsHeader from './strongsVersesRefsHeader.svelte';
-	import CrossRefsContainer from '../crossRefs/crossRefsContainer.svelte';
+	import FootnoteContainer from './footnote/footnoteContainer.svelte';
+	import StrongsRefsContainer from './strongs-refs/strongsRefsContainer.svelte';
+	import StrongsVersesRefsHeader from './refsHeader.svelte';
+	import CrossRefsContainer from './crossRefs/crossRefsContainer.svelte';
 
 	// MODELS
 	import {
