@@ -1,25 +1,38 @@
 <script lang="ts">
-	import ChevronDown from '$lib/components/chevronDown.svelte';
-	import { bibleDB } from '$lib/storer/bible.db';
-	import { paneService } from '$lib/services/pane.service.svelte';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount } from 'svelte';
-	import { Module } from 'quill';
-	import { Modules } from '$lib/models/modules.model';
+	// COMPONENTS
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	// // SVG
 	import KeyboardArrowRight from '$lib/components/svgs/keyboardArrowRight.svelte';
 	import KeyboardArrowDown from '$lib/components/svgs/keyboardArrowDown.svelte';
 	import MenuBook from '$lib/components/svgs/menuBook.svelte';
 
+	// MODELS
+	import { Modules } from '$lib/models/modules.model';
+	// SERVICES
+	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
+	import { bibleDB } from '$lib/storer/bible.db';
+	import { paneService } from '$lib/services/pane.service.svelte';
+	import { chapterService } from '$lib/services/bible/chapter.service';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
+
+	// =============================== BINDINGS ================================
+
 	let { paneID, verseRefs } = $props();
 
+	// ================================== VARS =================================
 	let recursiveVerseRefs: any[] = $state([]);
-	let booknames: any;
 	let toggle = $state(false);
 
+	// =============================== LIFECYCLE ===============================
+
 	onMount(async () => {
-		booknames = await bibleDB.getValue('booknames', 'booknames');
 		addVerseRefs(verseRefs);
 	});
+
+	// ================================ FUNCS ==================================
 
 	async function addVerseRefs(refs: string[]) {
 		let verseRefs: any = $state([]);
@@ -27,13 +40,14 @@
 			try {
 				let lastIndex = ref.lastIndexOf('/');
 				let bibleLocationRef = ref.substring(0, lastIndex).replaceAll('/', '_');
-				let chapterNumber = bibleLocationRef.split('_')[1];
+				let chapterNumber =
+					bibleLocationReferenceService.extractChapter(bibleLocationRef);
 				let verseNumber = ref.substring(lastIndex + 1, ref.length);
-				let data = await bibleDB.getValue('chapters', bibleLocationRef);
-				let bookName = data['bookName'];
-				let bookId = data['id'].split('_')[0];
-				let verse = data['verseMap'][verseNumber];
-				let verseWithoutNumber = verse.substring(0, verse.length);
+				let data = await chapterService.get(bibleLocationRef);
+				let bookName = data.bookName;
+				let bookId = bibleLocationReferenceService.extractBookID(data.id);
+				let verse = data.verseMap.get(verseNumber);
+				let verseWithoutNumber = verse?.substring(0, verse?.length);
 
 				let verseRef = {
 					ref: ref,
@@ -71,15 +85,17 @@
 		addVerseRefs(refKeys);
 	}
 
+	function copyToClipboard(vref: any) {
+		let verse = `${vref.bookName} ${vref.chapterNumber}:${vref.verseNumber}\n${vref.text}`;
+		navigator.clipboard.writeText(verse);
+	}
+
+	// ============================== CLICK FUNCS ==============================
+
 	function onNavigateRefs(idx: number) {
 		if (idx <= recursiveVerseRefs.length - 1) {
 			recursiveVerseRefs.splice(idx, recursiveVerseRefs.length);
 		}
-	}
-
-	function copyToClipboard(vref: any) {
-		let verse = `${vref.bookName} ${vref.chapterNumber}:${vref.verseNumber}\n${vref.text}`;
-		navigator.clipboard.writeText(verse);
 	}
 
 	function onToggle(): void {
@@ -87,6 +103,7 @@
 	}
 </script>
 
+<!-- ================================= BODY ================================ -->
 {#snippet actions(vref: any)}
 	<div class="flex flex-row justify-end space-x-4 py-2">
 		<!-- copy -->
@@ -234,19 +251,25 @@
 	{/if}
 {/snippet}
 
+<!-- ================================ HEADER =============================== -->
+{#snippet versesToggle()}
+	<div class="flex flex-row items-center">
+		<KJVButton classes="" onClick={onToggle}>
+			{#if !toggle}
+				<KeyboardArrowRight></KeyboardArrowRight>
+			{:else}
+				<KeyboardArrowDown></KeyboardArrowDown>
+			{/if}
+		</KJVButton>
+		<MenuBook></MenuBook>
+		<p class="ps-1 pe-4 capitalize">Verses:</p>
+	</div>
+{/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
 <div>
 	<div class="">
-		<div class="flex flex-row items-center">
-			<KJVButton classes="" onClick={onToggle}>
-				{#if !toggle}
-					<KeyboardArrowRight></KeyboardArrowRight>
-				{:else}
-					<KeyboardArrowDown></KeyboardArrowDown>
-				{/if}
-			</KJVButton>
-			<MenuBook></MenuBook>
-			<p class="ps-1 pe-4 capitalize">Verses:</p>
-		</div>
+		{@render versesToggle()}
 		{#if toggle}
 			<div class="py-4 ps-2">
 				{#each recursiveVerseRefs as refs, idx}
@@ -263,7 +286,7 @@
 							}}
 						>
 							<span class="underline underline-offset-8"
-								>{booknames['shortNames'][refs[0].bookId]}
+								>{shortBookNamesByIDService.get(refs[0].bookId)}
 								{refs[0].chapterNumber}:{refs[0].verseNumber}</span
 							></button
 						>

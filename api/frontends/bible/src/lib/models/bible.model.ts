@@ -24,6 +24,7 @@ export interface BCV {
 
 export function jsonToChapter(data: any): Chapter {
 	let result: Chapter = {
+		id: data.id,
 		number: data.number,
 		bookName: data.bookName,
 		verses: new Map(
@@ -41,6 +42,7 @@ export function jsonToChapter(data: any): Chapter {
 }
 
 export interface Chapter {
+	id: string;
 	number: number;
 	bookName: string;
 	verses: Map<string, Verse>;
@@ -50,6 +52,7 @@ export interface Chapter {
 
 export function newChapter(): Chapter {
 	return {
+		id: '',
 		number: 0,
 		bookName: '',
 		verses: new Map(),
