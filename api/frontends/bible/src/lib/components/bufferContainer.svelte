@@ -4,7 +4,7 @@
 
 <div
 	bind:clientHeight
-	class="relative flex h-full w-full justify-center bg-neutral-50"
+	class="relative flex h-full w-full justify-center bg-neutral-50 outline outline-neutral-400"
 >
 	<div class="w-full max-w-lg outline outline-neutral-400">
 		{@render children?.()}
