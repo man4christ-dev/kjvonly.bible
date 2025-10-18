@@ -28,6 +28,8 @@
 
 	// OTHER
 	import uuid4 from 'uuid4';
+	import { findElement, scrollTo } from '$lib/utils/eventHandlers';
+	import { sleep } from '$lib/utils/sleep';
 
 	// =============================== BINDINGS ================================
 
@@ -106,17 +108,37 @@
 		};
 	}
 
-	function updateCurrentCrossRefs(): void {
+	async function updateCurrentCrossRefs(): Promise<void> {
 		if (crossRefMatrix.length > 0) {
 			currentCrossRef = crossRefMatrix[crossRefMatrix.length - 1][0];
 			currentCrossRefs = crossRefMatrix[crossRefMatrix.length - 1].slice(1);
 
 			let breadcrumbs: CrossRef[] = [];
-			crossRefMatrix.forEach((crossRefs: CrossRef[], idx: number) => {
+			crossRefMatrix.forEach((crossRefs: CrossRef[]) => {
 				breadcrumbs.push(crossRefs[0]);
 			});
 			breadcrumbCrossRefs = breadcrumbs;
+			scrollToBreadcrumbs();
 		}
+	}
+
+	async function scrollToBreadcrumbs(): Promise<void> {
+		let breadcrumbsID = `${ID}-breadcrumbs`;
+		let el = document.getElementById(breadcrumbsID);
+
+		if (!el) {
+			await sleep(100);
+			el = await findElement(breadcrumbsID);
+		}
+
+		if (!el) {
+			return;
+		}
+		el?.scrollIntoView({
+			behavior: 'smooth',
+			block: 'start',
+			inline: 'start'
+		});
 	}
 
 	function copyToClipboard(e: Event, crossRef: CrossRef) {
@@ -155,6 +177,7 @@
 
 	function onToggle(): void {
 		toggleCrossRefs = !toggleCrossRefs;
+		scrollToBreadcrumbs();
 	}
 
 	function onSplitScreenHorizontal(e: Event, crossRef: CrossRef): void {
@@ -234,7 +257,7 @@
 {/snippet}
 
 <!-- ================================ HEADER =============================== -->
-{#snippet versesToggle()}
+{#snippet crossRefsToggle()}
 	<div class="flex flex-row items-center">
 		<KJVButton classes="" onClick={onToggle}>
 			{#if !toggleCrossRefs}
@@ -248,8 +271,8 @@
 	</div>
 {/snippet}
 
-{#snippet breadcrumb()}
-	<div id="{ID}-breadcrumb">
+{#snippet breadcrumbs()}
+	<div id="{ID}-breadcrumbs">
 		{#each breadcrumbCrossRefs as ref, idx}
 			{#if idx > breadcrumbCrossRefs.length - 4 && ref}
 				{#if breadcrumbCrossRefs.length > 3 && idx === breadcrumbCrossRefs.length - 3}
@@ -286,11 +309,11 @@
 <!-- ============================== CONTAINER ============================== -->
 
 <div>
-	<div class="">
-		{@render versesToggle()}
+	<div id={ID}>
+		{@render crossRefsToggle()}
 		{#if toggleCrossRefs}
 			<div class="py-4 ps-2">
-				{@render breadcrumb()}
+				{@render breadcrumbs()}
 				<div class="h-2"></div>
 				{@render verseCrossRefs()}
 			</div>

@@ -1,6 +1,6 @@
 import { sleep } from './sleep';
 
-async function findElement(id: string): Promise<HTMLElement | null> {
+export async function findElement(id: string): Promise<HTMLElement | null> {
 	let el = document.getElementById(id);
 	let retriesMax = 10;
 	let count = 0;
