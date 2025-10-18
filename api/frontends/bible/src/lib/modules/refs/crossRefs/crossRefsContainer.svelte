@@ -237,6 +237,7 @@
 	{#if crossRef}
 		<div class="hover:bg-primary-100 flex w-full">
 			<button
+				class="w-full"
 				onclick={() => {
 					onCrossRefClicked(crossRef);
 				}}
@@ -246,8 +247,10 @@
 						>{crossRef.bookName}
 						{crossRef.chapterNumber}:{crossRef.verseNumber}</span
 					><br />
-					{#each crossRef.text.trim().split(' ') as w}
-						<span class="inline-block">{w}</span>&nbsp;
+
+					{#each crossRef.text.trim().split(' ') as w}<span
+							><span class="inline-block">{w}&nbsp;</span><span></span></span
+						>
 					{/each}
 					{@render actions(crossRef)}
 				</p>
@@ -317,7 +320,7 @@
 	<div id={ID}>
 		{@render crossRefsToggle()}
 		{#if toggleCrossRefs}
-			<div class="py-4 ps-2">
+			<div class="ps-2">
 				{@render breadcrumbs()}
 				<div id="{ID}-cross-refs-spacer" class="py-4"></div>
 				{@render crossRefList()}
