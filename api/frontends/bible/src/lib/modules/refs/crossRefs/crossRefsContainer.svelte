@@ -16,7 +16,7 @@
 
 	// MODELS
 	import { Modules } from '$lib/models/modules.model';
-	import type { CrossRef } from '$lib/models/bible.model';
+	import { newCrossRef, type CrossRef } from '$lib/models/bible.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
@@ -48,8 +48,11 @@
 	 * in the cross reference matrix. The verse that was clicked is the first
 	 * cross reference in the array.
 	 */
-	let crossRefMatrix: CrossRef[][] = $state([]);
+	let crossRefMatrix: CrossRef[][] = [];
 	let toggleCrossRefs = $state(false);
+	let currentCrossRefs: CrossRef[] = $state([]);
+	let currentCrossRef: CrossRef = $state(newCrossRef());
+	let breadcrumbCrossRefs: CrossRef[] = $state([]);
 
 	// =============================== LIFECYCLE ===============================
 
@@ -67,16 +70,17 @@
 	}
 
 	async function addCrossRefs(crossRefs: string[]): Promise<void> {
-		let crossRefsWithState: any = $state([]);
-		crossRefs.forEach(async (crossRefStr: string) => {
+		let verseCrossRefs: CrossRef[] = [];
+		for (let crossRefStr of crossRefs) {
 			try {
 				let crossRef = await getCrossRef(crossRefStr);
-				crossRefsWithState.push(crossRef);
+				verseCrossRefs.push(crossRef);
 			} catch (ex) {
 				console.log(`error fetching ref ${crossRefStr} : ${ex}`);
 			}
-		});
-		crossRefMatrix.push(crossRefsWithState);
+		}
+		crossRefMatrix.push(verseCrossRefs);
+		updateCurrentCrossRefs();
 	}
 
 	async function getCrossRef(crossRef: string): Promise<CrossRef> {
@@ -102,6 +106,28 @@
 		};
 	}
 
+	function updateCurrentCrossRefs(): void {
+		if (crossRefMatrix.length > 0) {
+			currentCrossRef = crossRefMatrix[crossRefMatrix.length - 1][0];
+			currentCrossRefs = crossRefMatrix[crossRefMatrix.length - 1].slice(1);
+
+			let breadcrumbs: CrossRef[] = [];
+			crossRefMatrix.forEach((crossRefs: CrossRef[], idx: number) => {
+				breadcrumbs.push(crossRefs[0]);
+			});
+			breadcrumbCrossRefs = breadcrumbs;
+		}
+	}
+
+	function copyToClipboard(e: Event, crossRef: CrossRef) {
+		e.stopPropagation();
+		let verse = `${crossRef.bookName} ${crossRef.chapterNumber}:${crossRef.verseNumber}\n${crossRef.text}`;
+		navigator.clipboard.writeText(verse);
+		toastService.showToast('Copied Verse');
+	}
+
+	// ============================== CLICK FUNCS ==============================
+
 	async function onCrossRefClicked(crossRef: CrossRef) {
 		let bibleLocationRef =
 			bibleLocationReferenceService.convertCrossRefToBibleLocationRef(
@@ -120,31 +146,26 @@
 		addCrossRefs(crossRefs);
 	}
 
-	function copyToClipboard(crossRef: CrossRef) {
-		let verse = `${crossRef.bookName} ${crossRef.chapterNumber}:${crossRef.verseNumber}\n${crossRef.text}`;
-		navigator.clipboard.writeText(verse);
-		toastService.showToast('Copied Verse');
-	}
-
-	// ============================== CLICK FUNCS ==============================
-
 	function onBreadcrumbCrossRefClicked(idx: number): void {
 		if (idx <= crossRefMatrix.length - 1) {
 			crossRefMatrix.splice(idx, crossRefMatrix.length);
 		}
+		updateCurrentCrossRefs();
 	}
 
 	function onToggle(): void {
 		toggleCrossRefs = !toggleCrossRefs;
 	}
 
-	function onSplitScreenHorizontal(crossRef: CrossRef): void {
+	function onSplitScreenHorizontal(e: Event, crossRef: CrossRef): void {
+		e.stopPropagation();
 		paneService.onSplitPane(paneID, 'h', Modules.BIBLE, {
 			bibleLocationRef: `${crossRef.bookId}_${crossRef.chapterNumber}_${crossRef.verseNumber}`
 		});
 	}
 
-	function onSplitScreenVertical(crossRef: CrossRef): void {
+	function onSplitScreenVertical(e: Event, crossRef: CrossRef): void {
+		e.stopPropagation();
 		paneService.onSplitPane(paneID, 'v', Modules.BIBLE, {
 			bibleLocationRef: `${crossRef.bookId}_${crossRef.chapterNumber}_${crossRef.verseNumber}`
 		});
@@ -154,53 +175,61 @@
 <!-- ================================= BODY ================================ -->
 {#snippet actions(crossRef: CrossRef)}
 	<div class="flex flex-row justify-end space-x-4 py-2">
-		<KJVButton classes="" onClick={() => copyToClipboard(crossRef)}>
+		<KJVButton classes="" onClick={(e: Event) => copyToClipboard(e, crossRef)}>
 			<Copy></Copy>
 		</KJVButton>
 
-		<KJVButton classes="" onClick={() => onSplitScreenHorizontal(crossRef)}>
+		<KJVButton
+			classes=""
+			onClick={(e: Event) => onSplitScreenHorizontal(e, crossRef)}
+		>
 			<SplitScreenBottom></SplitScreenBottom>
 		</KJVButton>
 
-		<KJVButton classes="" onClick={() => onSplitScreenVertical(crossRef)}>
+		<KJVButton
+			classes=""
+			onClick={(e: Event) => onSplitScreenVertical(e, crossRef)}
+		>
 			<SplitScreenRight></SplitScreenRight>
 		</KJVButton>
 	</div>
 {/snippet}
 
-{#snippet crossRefCurrentVerse(crossRef: CrossRef)}
-	{#if crossRef}
+{#snippet crossRefCurrentVerse()}
+	{#if currentCrossRef}
 		<p class="px-4 py-2 text-left">
 			<span class="font-bold text-neutral-500"
-				>{crossRef.bookName}
-				{crossRef.chapterNumber}:{crossRef.verseNumber}</span
+				>{currentCrossRef.bookName}
+				{currentCrossRef.chapterNumber}:{currentCrossRef.verseNumber}</span
 			><br />
-			{#each crossRef.text.trim().split(' ') as w}
+			{#each currentCrossRef.text.trim().split(' ') as w}
 				<span class="inline-block">{w}</span>&nbsp;
 			{/each}
 		</p>
-		{@render actions(crossRef)}
+		{@render actions(currentCrossRef)}
 	{/if}
 {/snippet}
 
 {#snippet refVerse(crossRef: CrossRef)}
 	{#if crossRef}
-		<button
-			onclick={() => {
-				onCrossRefClicked(crossRef);
-			}}
-		>
-			<p class="hover:bg-primary-100 cursor-pointer px-4 py-2 text-left">
-				<span class="font-bold text-neutral-500"
-					>{crossRef.bookName}
-					{crossRef.chapterNumber}:{crossRef.verseNumber}</span
-				><br />
-				{#each crossRef.text.trim().split(' ') as w}
-					<span class="inline-block">{w}</span>&nbsp;
-				{/each}
-			</p>
-		</button>
-		{@render actions(crossRef)}
+		<div class="hover:bg-primary-100">
+			<button
+				onclick={() => {
+					onCrossRefClicked(crossRef);
+				}}
+			>
+				<p class=" px-4 py-2 text-left">
+					<span class="font-bold text-neutral-500"
+						>{crossRef.bookName}
+						{crossRef.chapterNumber}:{crossRef.verseNumber}</span
+					><br />
+					{#each crossRef.text.trim().split(' ') as w}
+						<span class="inline-block">{w}</span>&nbsp;
+					{/each}
+					{@render actions(crossRef)}
+				</p>
+			</button>
+		</div>
 	{/if}
 {/snippet}
 
@@ -219,11 +248,11 @@
 	</div>
 {/snippet}
 
-{#snippet breadcrumbCrossRefs()}
+{#snippet breadcrumb()}
 	<div id="{ID}-breadcrumb">
-		{#each crossRefMatrix as refs, idx}
-			{#if idx > crossRefMatrix.length - 4 && refs[0]}
-				{#if crossRefMatrix.length > 3 && idx === crossRefMatrix.length - 3}
+		{#each breadcrumbCrossRefs as ref, idx}
+			{#if idx > breadcrumbCrossRefs.length - 4 && ref}
+				{#if breadcrumbCrossRefs.length > 3 && idx === breadcrumbCrossRefs.length - 3}
 					<span class="underline underline-offset-8">...</span>
 				{/if}
 				{#if idx !== 0}
@@ -235,8 +264,8 @@
 					}}
 				>
 					<span class="underline underline-offset-8"
-						>{shortBookNamesByIDService.get(refs[0].bookId)}
-						{refs[0].chapterNumber}:{refs[0].verseNumber}</span
+						>{shortBookNamesByIDService.get(ref.bookId)}
+						{ref.chapterNumber}:{ref.verseNumber}</span
 					></button
 				>
 			{/if}
@@ -245,27 +274,23 @@
 {/snippet}
 
 {#snippet verseCrossRefs()}
-	{#if crossRefMatrix.length > 0}
-		{@const crossRef = crossRefMatrix[crossRefMatrix.length - 1][0]}
+	<div class="py-2">
+		{@render crossRefCurrentVerse()}
 
-		<div class="py-2">
-			{@render crossRefCurrentVerse(crossRef)}
-
-			{#if crossRefMatrix[crossRefMatrix.length - 1].length > 1}
-				{#each crossRefMatrix[crossRefMatrix.length - 1].slice(1, crossRefMatrix[crossRefMatrix.length - 1].length) as crossRef}
-					{@render refVerse(crossRef)}
-				{/each}
-			{/if}
-		</div>
-	{/if}
+		{#each currentCrossRefs as crossRef}
+			{@render refVerse(crossRef)}
+		{/each}
+	</div>
 {/snippet}
+
 <!-- ============================== CONTAINER ============================== -->
+
 <div>
 	<div class="">
 		{@render versesToggle()}
 		{#if toggleCrossRefs}
 			<div class="py-4 ps-2">
-				{@render breadcrumbCrossRefs()}
+				{@render breadcrumb()}
 				<div class="h-2"></div>
 				{@render verseCrossRefs()}
 			</div>

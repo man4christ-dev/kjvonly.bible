@@ -167,3 +167,15 @@ export interface CrossRef {
 	text: string;
 	verseNumber: number;
 }
+
+export function newCrossRef(): CrossRef {
+	return {
+		bookId: '',
+		bookName: '',
+		chapterNumber: 0,
+		crossRef: '',
+		bibleLocationRef: '',
+		text: '',
+		verseNumber: 0
+	};
+}
