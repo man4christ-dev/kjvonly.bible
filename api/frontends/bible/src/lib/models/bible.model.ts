@@ -162,7 +162,8 @@ export interface CrossRef {
 	bookId: string;
 	bookName: string;
 	chapterNumber: number;
-	ref: string;
+	crossRef: string;
+	bibleLocationRef: string;
 	text: string;
 	verseNumber: number;
 }

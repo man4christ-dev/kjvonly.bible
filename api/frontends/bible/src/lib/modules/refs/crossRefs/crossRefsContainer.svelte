@@ -2,27 +2,32 @@
 	// ================================ IMPORTS ================================
 	// SVELTE
 	import { onMount } from 'svelte';
+
 	// COMPONENTS
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+
 	// // SVG
+	import Copy from '$lib/components/svgs/copy.svelte';
 	import KeyboardArrowRight from '$lib/components/svgs/keyboardArrowRight.svelte';
 	import KeyboardArrowDown from '$lib/components/svgs/keyboardArrowDown.svelte';
 	import MenuBook from '$lib/components/svgs/menuBook.svelte';
+	import SplitScreenBottom from '$lib/components/svgs/splitScreenBottom.svelte';
+	import SplitScreenRight from '$lib/components/svgs/splitScreenRight.svelte';
 
 	// MODELS
 	import { Modules } from '$lib/models/modules.model';
+	import type { CrossRef } from '$lib/models/bible.model';
 
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
-	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { verseService } from '$lib/services/bible/verse.service';
-	import type { CrossRef } from '$lib/models/bible.model';
-	import SplitScreenBottom from '$lib/components/svgs/splitScreenBottom.svelte';
-	import SplitScreenRight from '$lib/components/svgs/splitScreenRight.svelte';
-	import Copy from '$lib/components/svgs/copy.svelte';
+	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import { toastService } from '$lib/services/toast.service';
+	import { verseService } from '$lib/services/bible/verse.service';
+
+	// OTHER
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
 
@@ -35,8 +40,16 @@
 	} = $props();
 
 	// ================================== VARS =================================
-	let crossRefMatrix: any[] = $state([]);
-	let toggle = $state(false);
+
+	let ID = uuid4();
+	/**
+	 * A user can click on a cross reference to view the clicked cross reference
+	 * cross references. We store the cross references for each verse clicked
+	 * in the cross reference matrix. The verse that was clicked is the first
+	 * cross reference in the array.
+	 */
+	let crossRefMatrix: CrossRef[][] = $state([]);
+	let toggleCrossRefs = $state(false);
 
 	// =============================== LIFECYCLE ===============================
 
@@ -45,6 +58,10 @@
 	});
 
 	// ================================ FUNCS ==================================
+	/**
+	 * Add the cross references that were passed in via the props. This will be
+	 * the first entry in the crossRefMatrix.
+	 */
 	async function setCrossRefs(): Promise<void> {
 		addCrossRefs(boundCrossRefs);
 	}
@@ -75,7 +92,8 @@
 		let verseWithoutNumber = verse.text.slice(verse.text.indexOf(' ') + 1);
 
 		return {
-			ref: crossRef,
+			crossRef: crossRef,
+			bibleLocationRef: bibleLocationRef,
 			bookName: bookName,
 			chapterNumber: chapterNumber,
 			verseNumber: verseNumber,
@@ -87,10 +105,10 @@
 	async function onCrossRefClicked(crossRef: CrossRef) {
 		let bibleLocationRef =
 			bibleLocationReferenceService.convertCrossRefToBibleLocationRef(
-				crossRef.ref
+				crossRef.crossRef
 			);
 		let verse = await verseService.get(bibleLocationRef);
-		let crossRefs = [crossRef.ref];
+		let crossRefs = [crossRef.crossRef];
 		verse?.words.forEach((w: any) => {
 			w.href?.forEach((ref: string) => {
 				let match = new RegExp('\\d+\/\\d+\/\\d+', 'gm').test(ref);
@@ -110,14 +128,14 @@
 
 	// ============================== CLICK FUNCS ==============================
 
-	function onNavigateRefs(idx: number): void {
+	function onBreadcrumbCrossRefClicked(idx: number): void {
 		if (idx <= crossRefMatrix.length - 1) {
 			crossRefMatrix.splice(idx, crossRefMatrix.length);
 		}
 	}
 
 	function onToggle(): void {
-		toggle = !toggle;
+		toggleCrossRefs = !toggleCrossRefs;
 	}
 
 	function onSplitScreenHorizontal(crossRef: CrossRef): void {
@@ -150,7 +168,7 @@
 	</div>
 {/snippet}
 
-{#snippet refCurrentVerse(crossRef: CrossRef)}
+{#snippet crossRefCurrentVerse(crossRef: CrossRef)}
 	{#if crossRef}
 		<p class="px-4 py-2 text-left">
 			<span class="font-bold text-neutral-500"
@@ -190,58 +208,67 @@
 {#snippet versesToggle()}
 	<div class="flex flex-row items-center">
 		<KJVButton classes="" onClick={onToggle}>
-			{#if !toggle}
+			{#if !toggleCrossRefs}
 				<KeyboardArrowRight></KeyboardArrowRight>
 			{:else}
 				<KeyboardArrowDown></KeyboardArrowDown>
 			{/if}
 		</KJVButton>
 		<MenuBook></MenuBook>
-		<p class="ps-1 pe-4 capitalize">Verses:</p>
+		<p class="ps-1 pe-4 capitalize">Cross References:</p>
 	</div>
 {/snippet}
 
+{#snippet breadcrumbCrossRefs()}
+	<div id="{ID}-breadcrumb">
+		{#each crossRefMatrix as refs, idx}
+			{#if idx > crossRefMatrix.length - 4 && refs[0]}
+				{#if crossRefMatrix.length > 3 && idx === crossRefMatrix.length - 3}
+					<span class="underline underline-offset-8">...</span>
+				{/if}
+				{#if idx !== 0}
+					<span>&nbsp;/ </span>
+				{/if}
+				<button
+					onclick={() => {
+						onBreadcrumbCrossRefClicked(idx + 1);
+					}}
+				>
+					<span class="underline underline-offset-8"
+						>{shortBookNamesByIDService.get(refs[0].bookId)}
+						{refs[0].chapterNumber}:{refs[0].verseNumber}</span
+					></button
+				>
+			{/if}
+		{/each}
+	</div>
+{/snippet}
+
+{#snippet verseCrossRefs()}
+	{#if crossRefMatrix.length > 0}
+		{@const crossRef = crossRefMatrix[crossRefMatrix.length - 1][0]}
+
+		<div class="py-2">
+			{@render crossRefCurrentVerse(crossRef)}
+
+			{#if crossRefMatrix[crossRefMatrix.length - 1].length > 1}
+				{#each crossRefMatrix[crossRefMatrix.length - 1].slice(1, crossRefMatrix[crossRefMatrix.length - 1].length) as crossRef}
+					{@render refVerse(crossRef)}
+				{/each}
+			{/if}
+		</div>
+	{/if}
+{/snippet}
 <!-- ============================== CONTAINER ============================== -->
 <div>
 	<div class="">
 		{@render versesToggle()}
-		{#if toggle}
+		{#if toggleCrossRefs}
 			<div class="py-4 ps-2">
-				{#each crossRefMatrix as refs, idx}
-					{#if idx > crossRefMatrix.length - 4 && refs[0]}
-						{#if crossRefMatrix.length > 3 && idx === crossRefMatrix.length - 3}
-							<span class="underline underline-offset-8">...</span>
-						{/if}
-						{#if idx !== 0}
-							<span>&nbsp;/ </span>
-						{/if}
-						<button
-							onclick={() => {
-								onNavigateRefs(idx + 1);
-							}}
-						>
-							<span class="underline underline-offset-8"
-								>{shortBookNamesByIDService.get(refs[0].bookId)}
-								{refs[0].chapterNumber}:{refs[0].verseNumber}</span
-							></button
-						>
-					{/if}
-				{/each}
-
+				{@render breadcrumbCrossRefs()}
 				<div class="h-2"></div>
-				{#if crossRefMatrix.length > 0}
-					{@const crossRef = crossRefMatrix[crossRefMatrix.length - 1][0]}
-
-					{@render refCurrentVerse(crossRef)}
-
-					{#if crossRefMatrix[crossRefMatrix.length - 1].length > 1}
-						{#each crossRefMatrix[crossRefMatrix.length - 1].slice(1, crossRefMatrix[crossRefMatrix.length - 1].length) as crossRef}
-							{@render refVerse(crossRef)}
-						{/each}
-					{/if}
-				{/if}
+				{@render verseCrossRefs()}
 			</div>
 		{/if}
 	</div>
 </div>
-<span>&nbsp;</span>
