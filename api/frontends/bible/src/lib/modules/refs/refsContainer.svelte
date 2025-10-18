@@ -125,6 +125,7 @@
 <!-- ================================= BODY ================================ -->
 {#snippet body()}
 	{#if footnotes.length > 0}
+		<div class=" pt-4"></div>
 		<FootnoteContainer
 			isVerseRef={pane?.buffer?.bag?.refs !== undefined}
 			{footnotes}
@@ -133,6 +134,7 @@
 	{/if}
 
 	{#if strongsRefs.length > 0}
+		<div class=" pt-4"></div>
 		<StrongsDefsContainer
 			bind:clientHeight
 			bind:popups
@@ -145,6 +147,7 @@
 	{/if}
 
 	{#if crossRefs.length > 0}
+		<div class=" pt-4"></div>
 		<CrossRefsContainer paneID={pane?.id} boundCrossRefs={crossRefs}
 		></CrossRefsContainer>
 	{/if}

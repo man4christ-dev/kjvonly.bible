@@ -270,7 +270,7 @@
 			{/if}
 		</KJVButton>
 		<MenuBook></MenuBook>
-		<p class="ps-1 pe-4 capitalize">Cross References:</p>
+		<p class="ps-1 pe-4 capitalize">Cross References</p>
 	</div>
 {/snippet}
 

@@ -33,9 +33,7 @@ export function jsonToChapter(data: any): Chapter {
 		verseMap: new Map(
 			Object.entries(data.verseMap).map(([k, v]) => [k, v as string])
 		),
-		footnotes: new Map(
-			Object.entries(data.footnotes).map(([k, v]) => [k, v as string])
-		)
+		footnotes: data.footnotes
 	};
 
 	return result;
@@ -47,7 +45,7 @@ export interface Chapter {
 	bookName: string;
 	verses: Map<string, Verse>;
 	verseMap: Map<string, string>;
-	footnotes: Map<string, string>;
+	footnotes: { [key: string]: string };
 }
 
 export function newChapter(): Chapter {

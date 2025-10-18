@@ -17,3 +17,4 @@ note needed with h-full on the bufferContainer
 ◊ keep dynamic grid-cols
 ◊ a little movement in search in showing n of search result size
 ◊ add triangle/chevron to left side of strongs words.
+◊ remove Map type back to dict for all bound objects

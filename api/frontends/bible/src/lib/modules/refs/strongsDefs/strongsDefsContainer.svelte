@@ -132,7 +132,10 @@
 				{/if}
 			</KJVButton>
 			<ShortText></ShortText>
-			<span class="ps-1 pe-4">{s.number}: {strongsWords[idx]}</span>
+			<span class="ps-1 pe-4"
+				><pre class="inline-block">{`${s.number}:`.padStart(6, ' ')}</pre>
+				{sanitize(strongsWords[idx])}</span
+			>
 		{:else}
 			{#if isVerseRef || (strongsWithToggle && strongsWithToggle?.length > 1)}
 				<KJVButton
@@ -148,7 +151,7 @@
 					{/if}
 				</KJVButton>
 			{/if}
-			<span class="pe-4">{s.number}: {text}</span>
+			<span class="pe-4">{s.number}: {sanitize(text)}</span>
 		{/if}
 	</div>
 {/snippet}
@@ -290,7 +293,7 @@
 			{/if}
 		</KJVButton>
 		<Dictionary></Dictionary>
-		<p class="ps-1 pe-4 capitalize">definitions:</p>
+		<p class="ps-1 pe-4 capitalize">definitions</p>
 	</div>
 	{#if toggleStrongs}
 		{#each strongsWithToggle as s, idx}
