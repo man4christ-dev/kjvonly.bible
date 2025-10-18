@@ -1,12 +1,14 @@
-import type { Verse } from '$lib/models/bible.model';
+import { newVerse, type Verse } from '$lib/models/bible.model';
 import { bibleLocationReferenceService } from './bibleLocationReference.service';
 import { chapterService } from './chapter.service';
 
 class VerseService {
-	async get(reference: string): Promise<Verse | undefined> {
-		let chapter = await chapterService.get(reference);
-		let verseNumber = bibleLocationReferenceService.extractVerse(reference);
-		return chapter.verses.get(`${verseNumber}`);
+	async get(bibleLocationRef: string): Promise<Verse> {
+		let chapter = await chapterService.get(bibleLocationRef);
+		let verseNumber =
+			bibleLocationReferenceService.extractVerse(bibleLocationRef);
+		let verse = chapter.verses.get(`${verseNumber}`);
+		return verse || newVerse();
 	}
 }
 

@@ -11,17 +11,24 @@
 
 	// MODELS
 	import { Modules } from '$lib/models/modules.model';
+
 	// SERVICES
-	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
-	import { bibleDB } from '$lib/storer/bible.db';
-	import { paneService } from '$lib/services/pane.service.svelte';
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
-	import { verseService } from '$lib/services/bible/verse.service';
 	import { bookNamesByIDService } from '$lib/services/bibleMetadata/bookNamesByID.service';
+	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
+	import { paneService } from '$lib/services/pane.service.svelte';
+	import { verseService } from '$lib/services/bible/verse.service';
+	import type { CrossRef } from '$lib/models/bible.model';
 
 	// =============================== BINDINGS ================================
 
-	let { paneID, boundCrossRefs } = $props();
+	let {
+		paneID,
+		boundCrossRefs
+	}: {
+		paneID: string;
+		boundCrossRefs: string[];
+	} = $props();
 
 	// ================================== VARS =================================
 	let crossRefMatrix: any[] = $state([]);
@@ -40,58 +47,59 @@
 
 	async function addCrossRefs(crossRefs: string[]): Promise<void> {
 		let crossRefsWithState: any = $state([]);
-		crossRefs.forEach(async (ref: string) => {
+		crossRefs.forEach(async (crossRefStr: string) => {
 			try {
-				let bibleLocationRef =
-					bibleLocationReferenceService.convertCrossRefToBibleLocationRef(ref);
-				let chapterNumber =
-					bibleLocationReferenceService.extractChapter(bibleLocationRef);
-				let verseNumber =
-					bibleLocationReferenceService.extractVerse(bibleLocationRef);
-				let bookID =
-					bibleLocationReferenceService.extractBookID(bibleLocationRef);
-				let bookName = bookNamesByIDService.get(bookID);
-				let verse = await verseService.get(bibleLocationRef);
-				let verseWithoutNumber = verse?.text.slice(1);
-
-				let verseRef = {
-					ref: ref,
-					bookName: bookName,
-					chapterNumber: chapterNumber,
-					verseNumber: verseNumber,
-					text: verseWithoutNumber,
-					bookId: bookID
-				};
-				crossRefsWithState.push(verseRef);
+				let crossRef = await getCrossRef(crossRefStr);
+				crossRefsWithState.push(crossRef);
 			} catch (ex) {
-				console.log(`error fetching ref ${ref} : ${ex}`);
+				console.log(`error fetching ref ${crossRefStr} : ${ex}`);
 			}
 		});
-
 		crossRefMatrix.push(crossRefsWithState);
 	}
 
-	async function updateRefs(vref: any) {
-		let index = vref.ref.lastIndexOf('/');
-		let bibleLocationRef = vref.ref.substring(0, index).replaceAll('/', '_');
-		let verseNumber = vref.ref.substring(index + 1, vref.ref.length);
+	async function getCrossRef(crossRef: string): Promise<CrossRef> {
+		let bibleLocationRef =
+			bibleLocationReferenceService.convertCrossRefToBibleLocationRef(crossRef);
+		let chapterNumber =
+			bibleLocationReferenceService.extractChapter(bibleLocationRef);
+		let verseNumber =
+			bibleLocationReferenceService.extractVerse(bibleLocationRef);
+		let bookID = bibleLocationReferenceService.extractBookID(bibleLocationRef);
+		let bookName = bookNamesByIDService.get(bookID);
+		let verse = await verseService.get(bibleLocationRef);
+		let verseWithoutNumber = verse.text.slice(verse.text.indexOf(' '));
 
-		let data = await bibleDB.getValue('chapters', bibleLocationRef);
-		let verse = data['verses'][verseNumber];
-		let refKeys = [vref.ref];
-		verse.words.forEach((w: any) => {
+		return {
+			ref: crossRef,
+			bookName: bookName,
+			chapterNumber: chapterNumber,
+			verseNumber: verseNumber,
+			text: verseWithoutNumber,
+			bookId: bookID
+		};
+	}
+
+	async function onCrossRefClicked(crossRef: CrossRef) {
+		let bibleLocationRef =
+			bibleLocationReferenceService.convertCrossRefToBibleLocationRef(
+				crossRef.ref
+			);
+		let verse = await verseService.get(bibleLocationRef);
+		let crossRefs = [crossRef.ref];
+		verse?.words.forEach((w: any) => {
 			w.href?.forEach((ref: string) => {
 				let match = new RegExp('\\d+\/\\d+\/\\d+', 'gm').test(ref);
 				if (match) {
-					refKeys.push(ref);
+					crossRefs.push(ref);
 				}
 			});
 		});
-		addCrossRefs(refKeys);
+		addCrossRefs(crossRefs);
 	}
 
-	function copyToClipboard(vref: any) {
-		let verse = `${vref.bookName} ${vref.chapterNumber}:${vref.verseNumber}\n${vref.text}`;
+	function copyToClipboard(crossRef: CrossRef) {
+		let verse = `${crossRef.bookName} ${crossRef.chapterNumber}:${crossRef.verseNumber}\n${crossRef.text}`;
 		navigator.clipboard.writeText(verse);
 	}
 
@@ -109,13 +117,13 @@
 </script>
 
 <!-- ================================= BODY ================================ -->
-{#snippet actions(vref: any)}
+{#snippet actions(crossRef: CrossRef)}
 	<div class="flex flex-row justify-end space-x-4 py-2">
 		<!-- copy -->
 		<button
 			aria-label="copy button"
 			onclick={() => {
-				copyToClipboard(vref);
+				copyToClipboard(crossRef);
 			}}
 		>
 			<svg
@@ -142,7 +150,7 @@
 			aria-label="horizontal split"
 			onclick={() => {
 				paneService.onSplitPane(paneID, 'h', Modules.BIBLE, {
-					bibleLocationRef: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
+					bibleLocationRef: `${crossRef.bookId}_${crossRef.chapterNumber}_${crossRef.verseNumber}`
 				});
 			}}
 		>
@@ -182,7 +190,7 @@
 			aria-label="horizontal split"
 			onclick={() => {
 				paneService.onSplitPane(paneID, 'v', Modules.BIBLE, {
-					bibleLocationRef: `${vref.bookId}_${vref.chapterNumber}_${vref.verseNumber}`
+					bibleLocationRef: `${crossRef.bookId}_${crossRef.chapterNumber}_${crossRef.verseNumber}`
 				});
 			}}
 		>
@@ -222,37 +230,39 @@
 	</div>
 {/snippet}
 
-{#snippet refCurrentVerse(vref: any)}
-	{#if vref}
+{#snippet refCurrentVerse(crossRef: CrossRef)}
+	{#if crossRef}
 		<p class="px-4 py-2 text-left">
 			<span class="font-bold text-neutral-500"
-				>{vref.bookName} {vref.chapterNumber}:{vref.verseNumber}</span
+				>{crossRef.bookName}
+				{crossRef.chapterNumber}:{crossRef.verseNumber}</span
 			><br />
-			{#each vref.text.trim().split(' ') as w}
+			{#each crossRef.text.trim().split(' ') as w}
 				<span class="inline-block">{w}</span>&nbsp;
 			{/each}
 		</p>
-		{@render actions(vref)}
+		{@render actions(crossRef)}
 	{/if}
 {/snippet}
 
-{#snippet refVerse(vref: any)}
-	{#if vref}
+{#snippet refVerse(crossRef: CrossRef)}
+	{#if crossRef}
 		<button
 			onclick={() => {
-				updateRefs(vref);
+				onCrossRefClicked(crossRef);
 			}}
 		>
 			<p class="hover:bg-primary-100 cursor-pointer px-4 py-2 text-left">
 				<span class="font-bold text-neutral-500"
-					>{vref.bookName} {vref.chapterNumber}:{vref.verseNumber}</span
+					>{crossRef.bookName}
+					{crossRef.chapterNumber}:{crossRef.verseNumber}</span
 				><br />
-				{#each vref.text.trim().split(' ') as w}
+				{#each crossRef.text.trim().split(' ') as w}
 					<span class="inline-block">{w}</span>&nbsp;
 				{/each}
 			</p>
 		</button>
-		{@render actions(vref)}
+		{@render actions(crossRef)}
 	{/if}
 {/snippet}
 
@@ -300,13 +310,13 @@
 
 				<div class="h-2"></div>
 				{#if crossRefMatrix.length > 0}
-					{@const vref = crossRefMatrix[crossRefMatrix.length - 1][0]}
+					{@const crossRef = crossRefMatrix[crossRefMatrix.length - 1][0]}
 
-					{@render refCurrentVerse(vref)}
+					{@render refCurrentVerse(crossRef)}
 
 					{#if crossRefMatrix[crossRefMatrix.length - 1].length > 1}
-						{#each crossRefMatrix[crossRefMatrix.length - 1].slice(1, crossRefMatrix[crossRefMatrix.length - 1].length) as vref, idx}
-							{@render refVerse(vref)}
+						{#each crossRefMatrix[crossRefMatrix.length - 1].slice(1, crossRefMatrix[crossRefMatrix.length - 1].length) as crossRef}
+							{@render refVerse(crossRef)}
 						{/each}
 					{/if}
 				{/if}

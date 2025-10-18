@@ -67,6 +67,14 @@ export interface Verse {
 	text: string;
 }
 
+export function newVerse(): Verse {
+	return {
+		number: 0,
+		words: [],
+		text: ''
+	};
+}
+
 export interface Word {
 	text: string;
 	class: string[] | null;
@@ -148,4 +156,13 @@ export interface BookGrouping {
 export interface Book {
 	id: string;
 	name: string;
+}
+
+export interface CrossRef {
+	bookId: string;
+	bookName: string;
+	chapterNumber: number;
+	ref: string;
+	text: string;
+	verseNumber: number;
 }
