@@ -2,7 +2,7 @@
 	let {
 		classes = ''
 	}: {
-		classes: string;
+		classes?: string;
 	} = $props();
 </script>
 
