@@ -123,11 +123,11 @@
 	}
 
 	async function scrollToBreadcrumbs(): Promise<void> {
-		let breadcrumbsID = `${ID}-breadcrumbs`;
+		let breadcrumbsID = `${ID}-cross-refs-spacer`;
 		let el = document.getElementById(breadcrumbsID);
 
 		if (!el) {
-			await sleep(100);
+			await sleep(10);
 			el = await findElement(breadcrumbsID);
 		}
 
@@ -218,7 +218,7 @@
 	</div>
 {/snippet}
 
-{#snippet crossRefCurrentVerse()}
+{#snippet firstCrossRefListItem()}
 	{#if currentCrossRef}
 		<p class="px-4 py-2 text-left">
 			<span class="font-bold text-neutral-500"
@@ -233,9 +233,9 @@
 	{/if}
 {/snippet}
 
-{#snippet refVerse(crossRef: CrossRef)}
+{#snippet crossRefListItem(crossRef: CrossRef)}
 	{#if crossRef}
-		<div class="hover:bg-primary-100">
+		<div class="hover:bg-primary-100 flex w-full">
 			<button
 				onclick={() => {
 					onCrossRefClicked(crossRef);
@@ -272,36 +272,41 @@
 {/snippet}
 
 {#snippet breadcrumbs()}
-	<div id="{ID}-breadcrumbs">
+	<div
+		class="outline-t sticky top-0 flex flex-wrap border-t border-b border-neutral-400 bg-neutral-50 px-4 py-2"
+	>
 		{#each breadcrumbCrossRefs as ref, idx}
-			{#if idx > breadcrumbCrossRefs.length - 4 && ref}
+			<!-- {#if idx > breadcrumbCrossRefs.length - 4 && ref}
 				{#if breadcrumbCrossRefs.length > 3 && idx === breadcrumbCrossRefs.length - 3}
-					<span class="underline underline-offset-8">...</span>
-				{/if}
-				{#if idx !== 0}
-					<span>&nbsp;/ </span>
-				{/if}
-				<button
-					onclick={() => {
-						onBreadcrumbCrossRefClicked(idx + 1);
-					}}
-				>
-					<span class="underline underline-offset-8"
-						>{shortBookNamesByIDService.get(ref.bookId)}
-						{ref.chapterNumber}:{ref.verseNumber}</span
-					></button
-				>
+					<span>...</span>
+				{/if} -->
+			{#if idx !== 0}
+				<span class="flex items-center">
+					<KeyboardArrowRight classes=""></KeyboardArrowRight>
+				</span>
+				<!-- <span>&nbsp;/ </span> -->
 			{/if}
+			<button
+				onclick={() => {
+					onBreadcrumbCrossRefClicked(idx + 1);
+				}}
+			>
+				<span
+					>{shortBookNamesByIDService.get(ref.bookId)}
+					{ref.chapterNumber}:{ref.verseNumber}</span
+				></button
+			>
+			<!-- {/if} -->
 		{/each}
 	</div>
 {/snippet}
 
-{#snippet verseCrossRefs()}
+{#snippet crossRefList()}
 	<div class="py-2">
-		{@render crossRefCurrentVerse()}
+		{@render firstCrossRefListItem()}
 
 		{#each currentCrossRefs as crossRef}
-			{@render refVerse(crossRef)}
+			{@render crossRefListItem(crossRef)}
 		{/each}
 	</div>
 {/snippet}
@@ -314,8 +319,8 @@
 		{#if toggleCrossRefs}
 			<div class="py-4 ps-2">
 				{@render breadcrumbs()}
-				<div class="h-2"></div>
-				{@render verseCrossRefs()}
+				<div id="{ID}-cross-refs-spacer" class="py-4"></div>
+				{@render crossRefList()}
 			</div>
 		{/if}
 	</div>
