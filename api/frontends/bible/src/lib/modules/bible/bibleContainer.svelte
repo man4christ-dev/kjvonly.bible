@@ -154,7 +154,7 @@
 
 {#snippet body()}
 	<div class="kjvonly-noselect flex justify-center">
-		<div class="max-w-lg">
+		<div>
 			<div id="chapter-container-{id}" class="w-full">
 				<Chapter
 					bind:bibleLocationRef
@@ -173,7 +173,7 @@
 
 {#snippet footer()}
 	<div class="flex w-full justify-center">
-		<div class="w-full max-w-6xl">
+		<div class="w-full">
 			{#if mode.value === BIBLE_MODES.READING}
 				<ChapterNavButtons
 					bind:mode
