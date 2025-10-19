@@ -26,6 +26,8 @@
 	import Close from '$lib/components/svgs/close.svelte';
 	import Tag from '$lib/components/svgs/tag.svelte';
 	import NoTag from '$lib/components/svgs/noTag.svelte';
+	import NewTag from '$lib/components/svgs/newTag.svelte';
+	import Delete from '$lib/components/svgs/delete.svelte';
 
 	let { mode = $bindable(), note = $bindable() } = $props();
 
@@ -175,18 +177,20 @@
 			return;
 		}
 
-		let tagId = uuid4();
-		if (!note.tags) {
-			note.tags = [];
-		}
-		let now = Date.now();
-		note.tags.push({
-			id: tagId,
-			created: now,
-			modified: now,
-			tag: tagInput
-		});
+		tagInput.split(',').forEach((t: string) => {
+			let tagId = uuid4();
+			if (!note.tags) {
+				note.tags = [];
+			}
 
+			let now = Date.now();
+			note.tags.push({
+				id: tagId,
+				created: now,
+				modified: now,
+				tag: t
+			});
+		});
 		tagInput = '';
 	}
 
@@ -327,38 +331,18 @@
 
 {#snippet noteTagsSnippet()}
 	{#if showTags}
-		<div style="width: {clientWidth}px" class="max-w-lg overflow-hidden">
-			<div
-				class="flex flex-row items-end space-y-2 space-x-2 overflow-x-scroll p-2"
-			>
+		<div class="overflow-hidden">
+			<div class="flex flex-wrap items-end space-x-2 p-2">
 				{#each [...note.tags].reverse() as t}
-					<span
-						class="border-support-a-500 text-support-a-700 inline-flex h-8 items-center justify-center rounded-full border px-2.5 py-0.5"
-					>
-						<p class="text-sm whitespace-nowrap">{t.tag}</p>
-
-						<button
-							aria-label="delete tag"
-							onclick={() => {
-								onDeleteTag(t.id);
-							}}
-							class="bg-support-a-200 text-support-a-700 hover:bg-support-a-300 ms-1.5 -me-1 inline-block rounded-full p-0.5 transition"
+					<span class="py-2">
+						<span
+							class="border-support-a-500 text-support-a-700 inline-flex items-center justify-center rounded-full border p-1 px-2.5"
 						>
-							<svg
-								xmlns="http://www.w3.org/2000/svg"
-								fill="none"
-								viewBox="0 0 24 24"
-								stroke-width="1.5"
-								stroke="currentColor"
-								class="size-3"
-							>
-								<path
-									stroke-linecap="round"
-									stroke-linejoin="round"
-									d="M6 18L18 6M6 6l12 12"
-								/>
-							</svg>
-						</button>
+							<span class="whitespace-nowrap">{t.tag}</span>
+							<KJVButton classes="" onClick={() => onDeleteTag(t.id)}>
+								<Delete classes=""></Delete>
+							</KJVButton>
+						</span>
 					</span>
 				{/each}
 			</div>
