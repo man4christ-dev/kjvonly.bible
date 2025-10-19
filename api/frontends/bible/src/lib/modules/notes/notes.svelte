@@ -145,11 +145,13 @@ note icon in the Bible only the notes associated to that word will be displayed 
 {:else}
 	<NotesList
 		bind:mode
+		bind:filterInput
 		bind:noteKeys
 		bind:notes
 		bind:note
 		{allNotes}
 		{noteIDToOpen}
+		{filterParams}
 		{onFilterInputChanged}
 		{onAddNewNote}
 	></NotesList>

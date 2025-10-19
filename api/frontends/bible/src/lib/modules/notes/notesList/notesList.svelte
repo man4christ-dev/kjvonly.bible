@@ -21,25 +21,31 @@
 	import AddNote from '$lib/components/svgs/addNote.svelte';
 	import Menu from '$lib/components/svgs/menu.svelte';
 	import Close from '$lib/components/svgs/close.svelte';
+	import Filter from '$lib/components/svgs/filter.svelte';
+	import ClearFilter from '$lib/components/svgs/clearFilter.svelte';
 
 	// =============================== BINDINGS ================================
 
 	let {
 		mode = $bindable(),
-		allNotes,
-		noteIDToOpen = '',
+		filterInput = $bindable(),
 		noteKeys = $bindable(),
 		notes = $bindable(),
 		note = $bindable(),
+		allNotes,
+		filterParams,
+		noteIDToOpen = '',
 		onFilterInputChanged,
 		onAddNewNote
 	}: {
 		mode: any;
-		allNotes: boolean;
-		noteIDToOpen: string;
+		filterInput: string;
 		noteKeys: string[];
 		notes: any;
 		note: any;
+		allNotes: boolean;
+		filterParams: any;
+		noteIDToOpen: string;
 		onFilterInputChanged: any;
 		onAddNewNote: any;
 	} = $props();
@@ -51,26 +57,6 @@
 
 	let showNoteListActions = $state(false);
 	let showNoteListFilter = $state(false);
-
-	let filterInput: string = $state('');
-
-	let filterParams = $state([
-		{
-			option: 'title',
-			index: 'title',
-			checked: true
-		},
-		{
-			option: 'text',
-			index: 'text',
-			checked: true
-		},
-		{
-			option: 'tags',
-			index: 'tags[]:tag',
-			checked: true
-		}
-	]);
 
 	let noteListActions: any = {
 		filter: () => {
@@ -219,6 +205,13 @@
 			mode.notePopup.show = false;
 		}
 	}
+
+	function onToggleFilter(): void {
+		if (showNoteListFilter) {
+			filterInput = '';
+		}
+		showNoteListFilter = !showNoteListFilter;
+	}
 </script>
 
 <!-- ================================ HEADER =============================== -->
@@ -226,8 +219,14 @@
 	<KJVButton onClick={onAdd} classes="">
 		<AddNote></AddNote>
 	</KJVButton>
+	<KJVButton onClick={onToggleFilter} classes="">
+		{#if showNoteListFilter}
+			<ClearFilter></ClearFilter>
+		{:else}
+			<Filter></Filter>
+		{/if}
+	</KJVButton>
 
-	<span></span>
 	<span class="">Notes</span>
 	<KJVButton
 		classes=""
