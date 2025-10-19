@@ -228,20 +228,15 @@
 			{#each currentCrossRef.text.trim().split(' ') as w}
 				<span class="inline-block">{w}</span>&nbsp;
 			{/each}
+			{@render actions(currentCrossRef)}
 		</p>
-		{@render actions(currentCrossRef)}
 	{/if}
 {/snippet}
 
 {#snippet crossRefListItem(crossRef: CrossRef)}
 	{#if crossRef}
 		<div class="hover:bg-primary-100 flex w-full">
-			<button
-				class="w-full"
-				onclick={() => {
-					onCrossRefClicked(crossRef);
-				}}
-			>
+			<button class="w-full" onclick={() => onCrossRefClicked(crossRef)}>
 				<p class=" px-4 py-2 text-left">
 					<span class="font-bold text-neutral-500"
 						>{crossRef.bookName}
@@ -279,15 +274,10 @@
 		class="outline-t sticky top-0 flex flex-wrap border-t border-b border-neutral-400 bg-neutral-50 px-4 py-2"
 	>
 		{#each breadcrumbCrossRefs as ref, idx}
-			<!-- {#if idx > breadcrumbCrossRefs.length - 4 && ref}
-				{#if breadcrumbCrossRefs.length > 3 && idx === breadcrumbCrossRefs.length - 3}
-					<span>...</span>
-				{/if} -->
 			{#if idx !== 0}
 				<span class="flex items-center">
 					<KeyboardArrowRight classes=""></KeyboardArrowRight>
 				</span>
-				<!-- <span>&nbsp;/ </span> -->
 			{/if}
 			<button
 				onclick={() => {
@@ -299,7 +289,6 @@
 					{ref.chapterNumber}:{ref.verseNumber}</span
 				></button
 			>
-			<!-- {/if} -->
 		{/each}
 	</div>
 {/snippet}

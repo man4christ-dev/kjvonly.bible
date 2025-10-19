@@ -63,19 +63,9 @@
 	}
 </script>
 
-<!-- ================================= BODY ================================ -->
-{#snippet multipleFootnotes()}
-	{#if fs.length > 1 || isVerseRef}
-		{@render footnoteRoot()}
-		<div class="flex flex-col">
-			{#if toggle}
-				{@render footnoteList()}
-			{/if}
-		</div>
-	{/if}
-{/snippet}
+<!-- ================================ HEADER =============================== -->
 
-{#snippet footnoteRoot()}
+{#snippet footnotesToggle()}
 	<div class="flex flex-row items-center">
 		<KJVButton classes="" onClick={onToggleFootnotes}>
 			{#if !toggle}
@@ -87,6 +77,18 @@
 		<Asterisk></Asterisk>
 		<p class="ps-1 pe-4 capitalize">footnotes</p>
 	</div>
+{/snippet}
+
+<!-- ================================= BODY ================================ -->
+{#snippet multipleFootnotes()}
+	{#if fs.length > 1 || isVerseRef}
+		{@render footnotesToggle()}
+		<div class="flex flex-col">
+			{#if toggle}
+				{@render footnoteList()}
+			{/if}
+		</div>
+	{/if}
 {/snippet}
 
 {#snippet footnoteList()}
