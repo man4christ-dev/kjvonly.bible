@@ -3,10 +3,9 @@ import BibleContainer from '$lib/modules/bible/bibleContainer.svelte';
 import UserGuide from '$lib/modules/guide/userGuide.svelte';
 import Login from '$lib/modules/login/login.svelte';
 import Modules from '$lib/modules/modules/modules.svelte';
-import Notes from '$lib/modules/notes/notes.svelte';
+import NotesContainer from '$lib/modules/notes/notesContainer.svelte';
 import PlansContainer from '$lib/modules/plans/plansContainer.svelte';
 import RefsContainer from '$lib/modules/refs/refsContainer.svelte';
-import Settings from '$lib/modules/settings/settings.svelte';
 import SettingsContainer from '$lib/modules/settings/settingsContainer.svelte';
 import Search from '../modules/search/search.svelte';
 
@@ -32,7 +31,7 @@ export class ComponentMapping {
 			case modules.MODULES:
 				return Modules;
 			case modules.NOTES:
-				return Notes;
+				return NotesContainer;
 			case modules.USER_GUIDE:
 				return UserGuide;
 			case modules.LOGIN:

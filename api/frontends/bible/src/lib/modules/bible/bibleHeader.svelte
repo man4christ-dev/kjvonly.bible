@@ -7,7 +7,7 @@
 	import BookChapterPopup from './popups/bookChapterVersePopup/bookChapterPopup.svelte';
 	import CopyVersePopup from './popups/copyVersePopup.svelte';
 	import NavReadingsList from './plans/navReadingsList.svelte';
-	import NotesContainer from '../notes/notesContainer.svelte';
+	import Notes from '../notes/notes.svelte';
 	import Settings from '../settings/settings.svelte';
 
 	// // TOOLBAR
@@ -288,7 +288,7 @@
 {#snippet notePopup()}
 	{#if mode.notePopup.show}
 		<PopupContainer bind:clientHeight>
-			<NotesContainer bind:mode allNotes={false}></NotesContainer>
+			<Notes bind:mode allNotes={false}></Notes>
 		</PopupContainer>
 	{/if}
 {/snippet}
