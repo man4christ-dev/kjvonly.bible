@@ -28,11 +28,12 @@
 	import NoTag from '$lib/components/svgs/noTag.svelte';
 	import NewTag from '$lib/components/svgs/newTag.svelte';
 	import Delete from '$lib/components/svgs/delete.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
 
 	let { mode = $bindable(), note = $bindable() } = $props();
 
 	let clientHeight = $state(0);
-	let clientWidth = $state(0);
+	let tagContainerHeight = $state(0);
 	let headerHeight = $state(0);
 
 	let showTags: boolean = $state(false);
@@ -360,7 +361,10 @@
 			{@render noteConfirmDeleteSnippet()}
 		{/if}
 	{:else}
-		<div class="flex w-full max-w-lg flex-col items-start justify-start">
+		<div
+			bind:clientHeight={tagContainerHeight}
+			class="flex w-full max-w-lg flex-col items-start justify-start"
+		>
 			{@render noteTagInputSnippet()}
 			{#if note?.tags}
 				{@render noteTagsSnippet()}
@@ -369,10 +373,16 @@
 	{/if}
 	<!-- keep the editor in the dom the while notes container is open. toggle the hidden params. Otherwise we'd need to keep creating this. -->
 	<div
-		style="height: {clientHeight - headerHeight}px"
 		class=" {showNoteActions || !note
 			? 'hidden'
-			: ''} flex w-full max-w-lg flex-col overflow-y-scroll border"
+			: ''} flex h-full w-full flex-col"
+		style="min-height: {clientHeight -
+			headerHeight -
+			tagContainerHeight -
+			50}px; max-height: {clientHeight -
+			headerHeight -
+			tagContainerHeight -
+			50}px"
 	>
 		<div id={editor}></div>
 	</div>
@@ -380,7 +390,13 @@
 
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
+		{headerHeight}
 		{@render noteHeaderSnippet()}
 	</BufferHeader>
-	{@render noteBody()}
+	<div style="height: {clientHeight - headerHeight}px">
+		{@render noteBody()}
+	</div>
 </BufferContainer>
+
+<style>
+</style>
