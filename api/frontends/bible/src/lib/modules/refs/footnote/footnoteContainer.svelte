@@ -17,7 +17,7 @@
 	// =============================== BINDINGS ================================
 	let {
 		hasCrossRef,
-		footnotes,
+		footnotes: footnotesByID,
 		chapterFootnotes
 	}: {
 		hasCrossRef: boolean;
@@ -32,7 +32,7 @@
 	});
 
 	// ================================== VARS =================================
-	let fs: Footnote[] = $state([]);
+	let footnotes: Footnote[] = $state([]);
 	let toggle = $state(false);
 
 	interface Footnote {
@@ -43,9 +43,9 @@
 
 	// ================================ FUNCS ==================================
 	function setFootnotes(): void {
-		footnotes.forEach((f: any) => {
+		footnotesByID.forEach((f: any) => {
 			let key = f?.split('_')[2];
-			fs.push({
+			footnotes.push({
 				key: numberToLetters(key),
 				html: chapterFootnotes[key],
 				toggle: false
@@ -81,7 +81,7 @@
 
 <!-- ================================= BODY ================================ -->
 {#snippet multipleFootnotes()}
-	{#if fs.length > 1 || hasCrossRef}
+	{#if footnotes.length > 1 || hasCrossRef}
 		{@render footnotesToggle()}
 		<div class="flex flex-col">
 			{#if toggle}
@@ -92,7 +92,7 @@
 {/snippet}
 
 {#snippet footnoteList()}
-	{#each fs as f}
+	{#each footnotes as f}
 		<div class="ps-2">
 			<p class="flex flex-row items-center pt-2">
 				<KJVButton classes="" onClick={() => onToggleFootnote(f)}>
@@ -118,12 +118,12 @@
 	</p>{/snippet}
 
 {#snippet singleFootnote()}
-	{#if fs.length === 1 && !hasCrossRef}
+	{#if footnotes.length === 1 && !hasCrossRef}
 		<div class="flex flex-row items-center py-2">
-			<span class="px-2">{fs[0]['key']} </span>
+			<span class="px-2">{footnotes[0]['key']} </span>
 
 			<p class="ps-4">
-				{@html fs[0]['html']}
+				{@html footnotes[0]['html']}
 			</p>
 		</div>
 	{/if}
