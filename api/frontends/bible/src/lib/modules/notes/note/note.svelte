@@ -20,12 +20,20 @@
 	// OTHER
 	import Quill from 'quill';
 	import uuid4 from 'uuid4';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import Save from '$lib/components/svgs/save.svelte';
+	import Menu from '$lib/components/svgs/menu.svelte';
+	import Close from '$lib/components/svgs/close.svelte';
+	import Tag from '$lib/components/svgs/tag.svelte';
+	import NoTag from '$lib/components/svgs/noTag.svelte';
 
 	let { mode = $bindable(), note = $bindable() } = $props();
 
 	let clientHeight = $state(0);
 	let clientWidth = $state(0);
 	let headerHeight = $state(0);
+
+	let showTags: boolean = $state(false);
 
 	let booknames: any = {};
 
@@ -197,85 +205,29 @@
 
 <!-- START NOTE SNIPPETS -->
 {#snippet noteHeaderSnippet()}
-	<header
-		bind:clientHeight={headerHeight}
-		class=" flex w-full max-w-lg flex-row items-center justify-between bg-neutral-100 text-neutral-700"
-	>
-		<button
-			aria-label="close"
-			onclick={() => {
-				onSave(`Saved Note: ${note.title}`);
-			}}
-			class="h-12 w-12 px-2 pt-2 text-neutral-700"
+	<div class="grid w-full grid-cols-5 place-items-center">
+		<KJVButton classes="" onClick={() => onSave(`Saved Note: ${note.title}`)}>
+			<Save></Save>
+		</KJVButton>
+
+		<KJVButton classes="" onClick={() => (showTags = !showTags)}>
+			{#if showTags}
+				<NoTag></NoTag>
+			{:else}
+				<Tag></Tag>
+			{/if}
+		</KJVButton>
+		<span class="text-center"
+			>{note.title}{note.title?.length === 20 ? '...' : ''}</span
 		>
-			<svg
-				version="1.1"
-				id="svg2"
-				width="100%"
-				height="100%"
-				viewBox="0 0 96.130432 96"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<g id="g8" transform="translate(-16,-16)">
-					<path
-						class="fill-neutral-700"
-						style="stroke-width:1.33333"
-						d="M 19.272727,108.72727 16,105.45455 V 64 22.545455 L 19.272727,19.272727 22.545455,16 h 33.641558 33.641559 l 11.150928,11.150928 11.15093,11.150928 -0.39855,34.302125 c -0.3976,34.220589 -0.40603,34.308179 -3.54626,36.849069 C 105.2389,111.83737 102.4042,112 63.791681,112 H 22.545455 Z m 55.9361,-12.654045 c 3.502058,-3.50206 4.124506,-5.122865 4.124506,-10.739892 0,-5.693716 -0.607301,-7.222686 -4.358974,-10.974358 C 71.222687,70.607301 69.693716,70 64,70 c -5.693716,0 -7.222687,0.607301 -10.974359,4.358975 -3.737012,3.73701 -4.358974,5.291226 -4.358974,10.892581 0,6.853933 3.398442,12.271284 9.333333,14.877974 4.985283,2.1896 12.806448,0.34607 17.208827,-4.056305 z M 78.4,46.4 c 2.077387,-2.077387 2.077387,-16.055947 0,-18.133333 -2.250848,-2.250848 -47.882485,-2.250848 -50.133333,0 -2.077387,2.077386 -2.077387,16.055946 0,18.133333 2.250848,2.250848 47.882485,2.250848 50.133333,0 z"
-						id="path293"
-					/>
-				</g>
-			</svg>
-		</button>
-		<!-- svelte-ignore a11y_click_events_have_key_events -->
-		<!-- svelte-ignore a11y_no_noninteractive_element_interactions -->
-		<p
-			onclick={() => {
-				showNoteActions = !showNoteActions;
-			}}
-			class="hover:cursor-pointer"
-		>
-			<span class="inline-block font-bold"
-				>{note.title}{note.title?.length === 20 ? '...' : ''}</span
-			>
-			<button aria-label="chevron down" class="h-4 w-4 hover:cursor-pointer">
-				<svg
-					width="100%"
-					height="100%"
-					viewBox="0 0 25.4 14.098638"
-					version="1.1"
-					xml:space="preserve"
-					xmlns="http://www.w3.org/2000/svg"
-					><g transform="translate(-53.644677,-127.79211)"
-						><path
-							class="fill-neutral-700"
-							style="stroke-width:0.352778"
-							d="m 59.906487,137.65245 -6.26181,-4.21622 v -2.82206 -2.82206 l 6.35,4.24282 6.35,4.24283 6.35,-4.24283 6.35,-4.24282 v 2.82222 2.82222 l -6.3429,4.23808 c -3.48859,2.33094 -6.38578,4.22817 -6.43819,4.21606 -0.0524,-0.0121 -2.91311,-1.91931 -6.3571,-4.23824 z"
-							id="path179"
-						/></g
-					></svg
-				>
-			</button>
-		</p>
-		<button
-			aria-label="close"
-			onclick={() => {
-				onCloseNote();
-			}}
-			class="h-12 w-12 px-2 pt-2 text-neutral-700"
-		>
-			<svg
-				xmlns="http://www.w3.org/2000/svg"
-				viewBox="0 0 24 24"
-				width="100%"
-				height="100%"
-			>
-				<path
-					class="fill-neutral-700"
-					d="M12,2C6.47,2,2,6.47,2,12s4.47,10,10,10s10-4.47,10-10S17.53,2,12,2z M17,15.59L15.59,17L12,13.41L8.41,17L7,15.59 L10.59,12L7,8.41L8.41,7L12,10.59L15.59,7L17,8.41L13.41,12L17,15.59z"
-				/>
-			</svg>
-		</button>
-	</header>
+		<KJVButton classes="" onClick={() => (showNoteActions = !showNoteActions)}>
+			<Menu></Menu>
+		</KJVButton>
+
+		<KJVButton classes="" onClick={onCloseNote}>
+			<Close></Close>
+		</KJVButton>
+	</div>
 {/snippet}
 <!-- ================================= BODY ================================ -->
 
@@ -326,88 +278,92 @@
 {/snippet}
 
 {#snippet noteTagInputSnippet()}
-	<div class="flex justify-center px-2">
-		<label
-			for="tags"
-			class="focus-within:border-support-a-600 relative block overflow-hidden border-b border-neutral-200 bg-transparent pt-3"
-		>
-			<div class="flex items-center">
-				<input
-					type="tags"
-					id="tags"
-					placeholder="add tags..."
-					bind:value={tagInput}
-					class="focus:ring-none peer h-8 w-full border-none bg-transparent p-0 outline-none focus:border-transparent focus:outline-hidden"
-				/>
+	{#if showTags}
+		<div class="flex justify-center px-2">
+			<label
+				for="tags"
+				class="focus-within:border-support-a-600 relative block overflow-hidden border-b border-neutral-200 bg-transparent pt-3"
+			>
+				<div class="flex items-center">
+					<input
+						type="tags"
+						id="tags"
+						placeholder="add tags..."
+						bind:value={tagInput}
+						class="focus:ring-none peer h-8 w-full border-none bg-transparent p-0 outline-none focus:border-transparent focus:outline-hidden"
+					/>
 
-				<button
-					onclick={() => {
-						onAddTag();
-					}}
-					class="float-end h-8 w-8 p-0.5"
-					aria-label="add tag button"
-				>
-					<svg
-						version="1.1"
-						id="svg2"
-						width="100%"
-						height="100%"
-						viewBox="0 0 105.50072 106.78786"
-						xmlns="http://www.w3.org/2000/svg"
+					<button
+						onclick={() => {
+							onAddTag();
+						}}
+						class="float-end h-8 w-8 p-0.5"
+						aria-label="add tag button"
 					>
-						<defs id="defs6" />
-						<g id="g8" transform="translate(-11.214067,-10.602166)">
-							<path
-								id="path478"
-								class="fill-neutral-400"
-								style="stroke-width:4.20363;stroke-linejoin:round"
-								d="M 63.952348,10.627557 A 52.737736,53.368481 0 0 0 11.214067,63.996697 52.737736,53.368481 0 0 0 63.952348,117.36388 52.737736,53.368481 0 0 0 116.68868,63.996697 52.737736,53.368481 0 0 0 63.952348,10.627557 Z m -4.40625,34.925781 h 8.884766 v 14.335937 h 12.917969 v 8.138672 H 68.430864 V 82.438103 H 59.546098 V 68.027947 H 46.553911 v -8.138672 h 12.992187 z"
-							/>
-						</g>
-					</svg>
-				</button>
-			</div>
-		</label>
-	</div>
+						<svg
+							version="1.1"
+							id="svg2"
+							width="100%"
+							height="100%"
+							viewBox="0 0 105.50072 106.78786"
+							xmlns="http://www.w3.org/2000/svg"
+						>
+							<defs id="defs6" />
+							<g id="g8" transform="translate(-11.214067,-10.602166)">
+								<path
+									id="path478"
+									class="fill-neutral-400"
+									style="stroke-width:4.20363;stroke-linejoin:round"
+									d="M 63.952348,10.627557 A 52.737736,53.368481 0 0 0 11.214067,63.996697 52.737736,53.368481 0 0 0 63.952348,117.36388 52.737736,53.368481 0 0 0 116.68868,63.996697 52.737736,53.368481 0 0 0 63.952348,10.627557 Z m -4.40625,34.925781 h 8.884766 v 14.335937 h 12.917969 v 8.138672 H 68.430864 V 82.438103 H 59.546098 V 68.027947 H 46.553911 v -8.138672 h 12.992187 z"
+								/>
+							</g>
+						</svg>
+					</button>
+				</div>
+			</label>
+		</div>
+	{/if}
 {/snippet}
 
 {#snippet noteTagsSnippet()}
-	<div style="width: {clientWidth}px" class="max-w-lg overflow-hidden">
-		<div
-			class="flex flex-row items-end space-y-2 space-x-2 overflow-x-scroll p-2"
-		>
-			{#each [...note.tags].reverse() as t}
-				<span
-					class="border-support-a-500 text-support-a-700 inline-flex h-8 items-center justify-center rounded-full border px-2.5 py-0.5"
-				>
-					<p class="text-sm whitespace-nowrap">{t.tag}</p>
-
-					<button
-						aria-label="delete tag"
-						onclick={() => {
-							onDeleteTag(t.id);
-						}}
-						class="bg-support-a-200 text-support-a-700 hover:bg-support-a-300 ms-1.5 -me-1 inline-block rounded-full p-0.5 transition"
+	{#if showTags}
+		<div style="width: {clientWidth}px" class="max-w-lg overflow-hidden">
+			<div
+				class="flex flex-row items-end space-y-2 space-x-2 overflow-x-scroll p-2"
+			>
+				{#each [...note.tags].reverse() as t}
+					<span
+						class="border-support-a-500 text-support-a-700 inline-flex h-8 items-center justify-center rounded-full border px-2.5 py-0.5"
 					>
-						<svg
-							xmlns="http://www.w3.org/2000/svg"
-							fill="none"
-							viewBox="0 0 24 24"
-							stroke-width="1.5"
-							stroke="currentColor"
-							class="size-3"
+						<p class="text-sm whitespace-nowrap">{t.tag}</p>
+
+						<button
+							aria-label="delete tag"
+							onclick={() => {
+								onDeleteTag(t.id);
+							}}
+							class="bg-support-a-200 text-support-a-700 hover:bg-support-a-300 ms-1.5 -me-1 inline-block rounded-full p-0.5 transition"
 						>
-							<path
-								stroke-linecap="round"
-								stroke-linejoin="round"
-								d="M6 18L18 6M6 6l12 12"
-							/>
-						</svg>
-					</button>
-				</span>
-			{/each}
+							<svg
+								xmlns="http://www.w3.org/2000/svg"
+								fill="none"
+								viewBox="0 0 24 24"
+								stroke-width="1.5"
+								stroke="currentColor"
+								class="size-3"
+							>
+								<path
+									stroke-linecap="round"
+									stroke-linejoin="round"
+									d="M6 18L18 6M6 6l12 12"
+								/>
+							</svg>
+						</button>
+					</span>
+				{/each}
+			</div>
 		</div>
-	</div>
+	{/if}
 {/snippet}
 <!-- ================================ FOOTER =============================== -->
 <!-- ============================== CONTAINER ============================== -->
