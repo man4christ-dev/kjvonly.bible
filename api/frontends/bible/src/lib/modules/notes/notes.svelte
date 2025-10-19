@@ -35,6 +35,8 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	// OTHER
 	import Quill from 'quill';
 	import uuid4 from 'uuid4';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
 
 	let { mode = $bindable(), allNotes, noteIDToOpen = '' } = $props();
 
@@ -940,45 +942,22 @@ note icon in the Bible only the notes associated to that word will be displayed 
 {/snippet}
 <!-- END NOTE LIST SNIPPETS -->
 
-<div
-	bind:clientHeight
-	bind:clientWidth
-	class="flex h-full w-full flex-col items-center bg-neutral-50"
->
-	{#if note}
-		{@render noteHeaderSnippet()}
-		{#if showNoteActions}
-			{#if !showConfirmDelete}
-				{@render noteActionsSnippet()}
-			{/if}
-			{#if showConfirmDelete}
-				{@render noteConfirmDeleteSnippet()}
-			{/if}
-		{:else}
-			<div class="flex w-full max-w-lg flex-col items-start justify-start">
-				{@render noteTagInputSnippet()}
-				{#if note?.tags}
-					{@render noteTagsSnippet()}
-				{/if}
-			</div>
+{#snippet noteBody()}
+	{#if showNoteActions}
+		{#if !showConfirmDelete}
+			{@render noteActionsSnippet()}
+		{/if}
+		{#if showConfirmDelete}
+			{@render noteConfirmDeleteSnippet()}
 		{/if}
 	{:else}
-		{@render noteListHeader()}
-		{#if !showNoteListActions}
-			<div
-				class="flex h-full w-full max-w-lg flex-col overflow-hidden overflow-y-scroll border border-neutral-100"
-			>
-				{#if showNoteListFilter}
-					{@render noteListFilter()}
-				{/if}
-				{@render noteListSnippet()}
-			</div>
-		{/if}
-		{#if showNoteListActions}
-			{@render noteListActionsSnippet()}
-		{/if}
+		<div class="flex w-full max-w-lg flex-col items-start justify-start">
+			{@render noteTagInputSnippet()}
+			{#if note?.tags}
+				{@render noteTagsSnippet()}
+			{/if}
+		</div>
 	{/if}
-
 	<!-- keep the editor in the dom the while notes container is open. toggle the hidden params. Otherwise we'd need to keep creating this. -->
 	<div
 		style="height: {clientHeight - headerHeight}px"
@@ -988,4 +967,36 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	>
 		<div id={editor}></div>
 	</div>
-</div>
+{/snippet}
+
+{#snippet noteListBody()}
+	{#if !showNoteListActions}
+		<div
+			class="flex h-full w-full max-w-lg flex-col overflow-hidden overflow-y-scroll border border-neutral-100"
+		>
+			{#if showNoteListFilter}
+				{@render noteListFilter()}
+			{/if}
+			{@render noteListSnippet()}
+		</div>
+	{/if}
+	{#if showNoteListActions}
+		{@render noteListActionsSnippet()}
+	{/if}
+{/snippet}
+
+{#if note}
+	<BufferContainer bind:clientHeight>
+		<BufferHeader bind:headerHeight>
+			{@render noteHeaderSnippet()}
+		</BufferHeader>
+		{@render noteBody()}
+	</BufferContainer>
+{:else}
+	<BufferContainer bind:clientHeight>
+		<BufferHeader bind:headerHeight>
+			{@render noteListHeader()}
+		</BufferHeader>
+		{@render noteListBody()}
+	</BufferContainer>
+{/if}
