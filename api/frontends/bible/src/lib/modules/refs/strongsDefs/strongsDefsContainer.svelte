@@ -24,7 +24,7 @@
 	let {
 		clientHeight = $bindable<number>(),
 		popups = $bindable<any>(),
-		isVerseRef,
+		hasCrossRef,
 		strongsRefs,
 		strongsWords,
 		text,
@@ -289,7 +289,7 @@
 			 	 associated cross reference so we'd want to toggle the 
 				 strongs def. Also a word could have more than one associated 
 				 strongs def. If thats the case we want to toggle them -->
-			{#if isVerseRef || strongsWithToggle?.length > 1}
+			{#if hasCrossRef || strongsWithToggle?.length > 1}
 				<KJVButton
 					classes=""
 					onClick={(e: Event) => {
@@ -310,7 +310,7 @@
 
 <!-- ============================== CONTAINER ============================== -->
 
-{#if strongsWithToggle.length > 1 || isVerseRef}
+{#if strongsWithToggle.length > 1 || hasCrossRef}
 	{@render strongsToggle()}
 	{@render strongsList()}
 {:else if strongsWithToggle.length === 1}

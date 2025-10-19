@@ -134,7 +134,7 @@
 	{#if footnotes.length > 0}
 		<div class=" pt-4"></div>
 		<FootnoteContainer
-			isVerseRef={pane?.buffer?.bag?.refs !== undefined}
+			hasCrossRef={pane?.buffer?.bag?.refs !== undefined}
 			{footnotes}
 			chapterFootnotes={pane?.buffer?.bag?.footnotes}
 		></FootnoteContainer>
@@ -148,7 +148,7 @@
 			{text}
 			{strongsRefs}
 			{paneID}
-			isVerseRef={crossRefs.length > 0}
+			hasCrossRef={crossRefs.length > 0}
 			strongsWords={pane?.buffer?.bag?.strongsWords}
 		></StrongsDefsContainer>
 	{/if}

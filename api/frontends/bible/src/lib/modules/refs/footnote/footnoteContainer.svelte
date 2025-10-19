@@ -16,11 +16,11 @@
 	import { numberToLetters } from '$lib/services/dynamicGrid.service';
 	// =============================== BINDINGS ================================
 	let {
-		isVerseRef,
+		hasCrossRef,
 		footnotes,
 		chapterFootnotes
 	}: {
-		isVerseRef: boolean;
+		hasCrossRef: boolean;
 		footnotes: string[];
 		chapterFootnotes: { [key: string]: string };
 	} = $props();
@@ -81,7 +81,7 @@
 
 <!-- ================================= BODY ================================ -->
 {#snippet multipleFootnotes()}
-	{#if fs.length > 1 || isVerseRef}
+	{#if fs.length > 1 || hasCrossRef}
 		{@render footnotesToggle()}
 		<div class="flex flex-col">
 			{#if toggle}
@@ -118,7 +118,7 @@
 	</p>{/snippet}
 
 {#snippet singleFootnote()}
-	{#if fs.length === 1 && !isVerseRef}
+	{#if fs.length === 1 && !hasCrossRef}
 		<div class="flex flex-row items-center py-2">
 			<span class="px-2">{fs[0]['key']} </span>
 
