@@ -14,6 +14,10 @@
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
 	import uuid4 from 'uuid4';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import Bible from '$lib/components/svgs/bible.svelte';
+	import SplitScreenBottom from '$lib/components/svgs/splitScreenBottom.svelte';
+	import SplitScreenRight from '$lib/components/svgs/splitScreenRight.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -183,6 +187,27 @@
 	async function onSelectedNote(noteId: string) {
 		note = notes[noteId];
 	}
+
+	function onBibleClicked(e: Event): void {
+		e.stopPropagation();
+		paneService.onSplitPane(mode.paneID, 'h', Modules.BIBLE, {
+			bibleLocationRef: note.bibleLocationRef
+		});
+	}
+
+	function onHorizontalClicked(e: Event, noteID: string): void {
+		e.stopPropagation();
+		paneService.onSplitPane(mode.paneID, 'h', Modules.NOTES, {
+			noteID: noteID
+		});
+	}
+
+	function onVerticalClicked(e: Event, noteID: string): void {
+		e.stopPropagation();
+		paneService.onSplitPane(mode.paneID, 'v', Modules.NOTES, {
+			noteID: noteID
+		});
+	}
 </script>
 
 <!-- ================================ HEADER =============================== -->
@@ -320,120 +345,18 @@
 	<div class="flex w-full flex-row justify-end space-x-4">
 		<!-- bible -->
 		{#if !note?.bibleLocationRef?.startsWith('0')}
-			<button
-				aria-label="bible"
-				onclick={(e) => {
-					e.stopPropagation();
-					paneService.onSplitPane(mode.paneID, 'h', Modules.BIBLE, {
-						bibleLocationRef: note.bibleLocationRef
-					});
-				}}
-			>
-				<svg
-					class="h-8 w-8"
-					version="1.1"
-					id="svg2"
-					width="100%"
-					height="100%"
-					viewBox="0 0 96.115854 120.69053"
-					xmlns="http://www.w3.org/2000/svg"
-				>
-					<g id="g8" transform="translate(-18.550806,-7.6146084)">
-						<path
-							class="fill-none stroke-neutral-400"
-							style="stroke-width:6"
-							d="m 114.66666,128 v -5.33334 H 45.333332 C 37.756666,122.66613 24.609066,122.9868 24.609066,112 c 0,-10.9868 13.1476,-10.66614 20.724266,-10.66667 H 114.66666 V 7.9999998 H 53.333332 c -8.2976,0 -19.27,-1.8839866 -26.641999,2.6790132 -9.203733,5.696853 -8.024667,15.89592 -8.024667,25.320986 v 62.666665 c 0,9.123866 -1.5564,19.638396 6.739733,25.796266 C 32.656666,129.84466 43.508266,128 51.999999,128 H 114.66666 M 74.666665,26.666666 v 16 H 87.999998 V 53.333332 H 74.666665 V 82.666665 H 63.999998 V 53.333332 H 50.666665 V 42.666666 h 13.333333 v -16 z"
-							id="path293"
-						/>
-					</g>
-				</svg>
-			</button>
+			<KJVButton classes="" onClick={onBibleClicked}>
+				<Bible></Bible>
+			</KJVButton>
 		{/if}
 
-		<!-- horizontal split -->
-		<button
-			aria-label="horizontal split"
-			onclick={(e) => {
-				e.stopPropagation();
-				paneService.onSplitPane(mode.paneID, 'h', Modules.NOTES, {
-					noteID: nk
-				});
-			}}
-		>
-			<svg
-				class=" h-8 w-8"
-				version="1.1"
-				width="100%"
-				height="100%"
-				viewBox="0 0 94.018994 99.168052"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<g id="g8" transform="translate(-16.573607,-13.492392)">
-					<rect
-						style="stroke-width:5;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-						class="fill-none stroke-neutral-400"
-						width="90"
-						height="42.665619"
-						x="-108.58311"
-						y="-58.167511"
-						transform="scale(-1)"
-					/>
-					<rect
-						style="stroke-width:5;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-						class="fill-none stroke-neutral-400"
-						width="90"
-						height="42.665619"
-						x="-108.58311"
-						y="-110.65095"
-						transform="scale(-1)"
-					/>
-				</g>
-			</svg>
-		</button>
+		<KJVButton onClick={(e: Event) => onHorizontalClicked(e, nk)} classes="">
+			<SplitScreenBottom></SplitScreenBottom>
+		</KJVButton>
 
-		<!-- vertical split -->
-		<button
-			aria-label="vertical split"
-			onclick={(e) => {
-				e.stopPropagation();
-				paneService.onSplitPane(mode.paneID, 'v', Modules.NOTES, {
-					noteID: nk
-				});
-			}}
-		>
-			<svg
-				class="h-8 w-8"
-				version="1.1"
-				id="svg2"
-				width="100%"
-				height="100%"
-				viewBox="0 0 94.018994 99.168052"
-				xmlns="http://www.w3.org/2000/svg"
-			>
-				<g class="" id="g8" transform="translate(-16.898488,-13.804183)">
-					<rect
-						style="stroke-width:5;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-						class="fill-none stroke-neutral-400"
-						id="rect2158"
-						width="90"
-						height="42.665619"
-						x="-105.81368"
-						y="18.907988"
-						transform="rotate(-90)"
-					/>
-					<rect
-						style="stroke-width:5;stroke-linejoin:round;stroke-dasharray:none;stroke-opacity:1"
-						class="fill-none stroke-neutral-400"
-						id="rect2330"
-						width="90"
-						height="42.665619"
-						x="-105.81368"
-						y="70.164314"
-						transform="rotate(-90)"
-					/>
-				</g>
-			</svg>
-		</button>
+		<KJVButton onClick={(e: Event) => onVerticalClicked(e, nk)} classes="">
+			<SplitScreenRight></SplitScreenRight>
+		</KJVButton>
 	</div>
 {/snippet}
 
