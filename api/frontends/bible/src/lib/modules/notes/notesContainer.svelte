@@ -24,7 +24,6 @@
 
 <div class="kjvonly-noselect h-full overflow-hidden">
 	<div {id} class="h-full">
-		<Notes annotations={{}} allNotes={true} bind:mode noteIDToOpen={noteID}
-		></Notes>
+		<Notes allNotes={true} bind:mode noteIDToOpen={noteID}></Notes>
 	</div>
 </div>

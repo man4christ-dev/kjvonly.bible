@@ -5,6 +5,17 @@
 	// SVELTE
 	import { onMount } from 'svelte';
 
+	// COMPONENTS
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+
+	// // SVGS
+	import Close from '$lib/components/svgs/close.svelte';
+	import Delete from '$lib/components/svgs/delete.svelte';
+	import Menu from '$lib/components/svgs/menu.svelte';
+	import NoTag from '$lib/components/svgs/noTag.svelte';
+	import Save from '$lib/components/svgs/save.svelte';
+	import Tag from '$lib/components/svgs/tag.svelte';
+
 	// MODELS
 	import { Modules } from '$lib/models/modules.model';
 
@@ -14,57 +25,32 @@
 	import { toastService } from '$lib/services/toast.service';
 
 	// APIS
-	import { chapterApi } from '$lib/api/chapters.api';
 	import { notesApi } from '$lib/api/notes.api';
 
 	// OTHER
 	import Quill from 'quill';
 	import uuid4 from 'uuid4';
-	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import Save from '$lib/components/svgs/save.svelte';
-	import Menu from '$lib/components/svgs/menu.svelte';
-	import Close from '$lib/components/svgs/close.svelte';
-	import Tag from '$lib/components/svgs/tag.svelte';
-	import NoTag from '$lib/components/svgs/noTag.svelte';
-	import NewTag from '$lib/components/svgs/newTag.svelte';
-	import Delete from '$lib/components/svgs/delete.svelte';
-	import BufferBody from '$lib/components/bufferBody.svelte';
+
+	// =============================== BINDINGS ================================
 
 	let { mode = $bindable(), note = $bindable() } = $props();
 
+	// ================================== VARS =================================
+
 	let clientHeight = $state(0);
-	let tagContainerHeight = $state(0);
 	let headerHeight = $state(0);
-
-	let showTags: boolean = $state(false);
-
-	let booknames: any = {};
-
-	/**
-	 * These variables are set once a user
-	 * adds a new note or selects an existing
-	 * note.
-	 */
 	let noteID: string = '';
-
-	/**
-	 * view toggles
-	 */
+	let showConfirmDelete = $state(false);
 	let showNoteActions = $state(false);
 	let showNoteListActions = $state(false);
-	let showConfirmDelete = $state(false);
+	let showTags: boolean = $state(false);
+	let tagContainerHeight = $state(0);
+	let tagInput: string = $state('');
 
+	/** editor*/
 	let editor = uuid4().replaceAll('-', '');
 	let quill: Quill;
 
-	/**
-	 * inputs
-	 */
-	let tagInput: string = $state('');
-
-	/**
-	 * Note Actions
-	 */
 	let noteActions: any = {
 		delete: () => {
 			showConfirmDelete = true;
@@ -80,66 +66,10 @@
 		}
 	};
 
-	function onCloseNote() {
-		if (!isShowingOptions()) {
-			showNoteActions = false;
-			showConfirmDelete = false;
-			note = undefined;
-			noteID = '';
-		}
-	}
-
-	/** if an options menu is open close it instead
-	 * of closing the view
-	 */
-	function isShowingOptions() {
-		if (showConfirmDelete) {
-			showConfirmDelete = false;
-			return true;
-		}
-
-		if (showNoteActions) {
-			showNoteActions = false;
-			return true;
-		}
-
-		if (showNoteListActions) {
-			showNoteListActions = false;
-			return true;
-		}
-
-		return false;
-	}
-
-	function showNoteList() {
-		showConfirmDelete = false;
-		showNoteActions = false;
-		showNoteListActions = false;
-	}
-
-	async function onConfirmDelete() {
-		notesApi.delete(noteID);
-		showNoteList();
-	}
-
-	async function onSave(toastMessage: string) {
-		let savedNote = await notesApi.put(JSON.parse(JSON.stringify(note)));
-
-		if (savedNote) {
-			noteID = savedNote.id;
-			note.id = savedNote.id;
-			note.bibleLocationRef = savedNote.bibleLocationRef;
-			note.version = savedNote.version;
-			note.dateCreated = savedNote.dateCreated;
-			note.dateUpdated = savedNote.dateUpdated;
-			toastService.showToast(toastMessage);
-			notesService.addNote('*', noteID, JSON.parse(JSON.stringify(note)));
-		}
-	}
+	// =============================== LIFECYCLE ===============================
 
 	onMount(async () => {
 		let element = document.getElementById(editor);
-		booknames = await chapterApi.getBooknames();
 
 		/* editor */
 		if (element) {
@@ -162,16 +92,49 @@
 		}
 	});
 
-	// ================================ IMPORTS ================================
-	// SVELTE
-	// COMPONENTS
-	// MODELS
-	// SERVICES
-	// =============================== BINDINGS ================================
-	// ================================== VARS =================================
-	// =============================== LIFECYCLE ===============================
 	// ================================ FUNCS ==================================
+
+	// TODO add popup
+	function isShowingOptions() {
+		if (showConfirmDelete) {
+			showConfirmDelete = false;
+			return true;
+		}
+
+		if (showNoteActions) {
+			showNoteActions = false;
+			return true;
+		}
+
+		if (showNoteListActions) {
+			showNoteListActions = false;
+			return true;
+		}
+
+		return false;
+	}
+
 	// ============================== CLICK FUNCS ==============================
+
+	async function onConfirmDelete() {
+		notesApi.delete(noteID);
+		note = undefined;
+	}
+
+	async function onSave(toastMessage: string) {
+		let savedNote = await notesApi.put(JSON.parse(JSON.stringify(note)));
+
+		if (savedNote) {
+			noteID = savedNote.id;
+			note.id = savedNote.id;
+			note.bibleLocationRef = savedNote.bibleLocationRef;
+			note.version = savedNote.version;
+			note.dateCreated = savedNote.dateCreated;
+			note.dateUpdated = savedNote.dateUpdated;
+			toastService.showToast(toastMessage);
+			notesService.addNote('*', noteID, JSON.parse(JSON.stringify(note)));
+		}
+	}
 
 	function onAddTag() {
 		if (tagInput && tagInput.length < 1) {
@@ -202,6 +165,15 @@
 					return t;
 				}
 			});
+		}
+	}
+
+	function onCloseNote() {
+		if (!isShowingOptions()) {
+			showNoteActions = false;
+			showConfirmDelete = false;
+			note = undefined;
+			noteID = '';
 		}
 	}
 </script>
@@ -390,7 +362,6 @@
 
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
-		{headerHeight}
 		{@render noteHeaderSnippet()}
 	</BufferHeader>
 	<div style="height: {clientHeight - headerHeight}px">
