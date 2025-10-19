@@ -17,10 +17,9 @@ note icon in the Bible only the notes associated to that word will be displayed 
 
 -->
 <script lang="ts">
+	// ================================ IMPORTS ================================
 	// SVELTE
 	import { onMount } from 'svelte';
-
-	// MODELS
 
 	// SERVICES
 	import { notesService } from '$lib/services/notes.service';
@@ -30,9 +29,14 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	import Note from './note/note.svelte';
 	import NotesList from './notesList/notesList.svelte';
 
+	// =============================== BINDINGS ================================
+
 	let { mode = $bindable(), allNotes, noteIDToOpen = '' } = $props();
 
+	// ================================== VARS =================================
+
 	let noteID: string = '';
+	let NOTE_SUBSCRIPTION_ID = uuid4();
 	let note: any = $state();
 	let notes: any = $state({});
 	let noteKeys: string[] = $state([]);
@@ -41,6 +45,37 @@ note icon in the Bible only the notes associated to that word will be displayed 
 
 	let filterInput: string = $state('');
 
+	let filterParams = $state([
+		{
+			option: 'title',
+			index: 'title',
+			checked: true
+		},
+		{
+			option: 'text',
+			index: 'text',
+			checked: true
+		},
+		{
+			option: 'tags',
+			index: 'tags[]:tag',
+			checked: true
+		}
+	]);
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(async () => {
+		notesService.subscribe(
+			NOTE_SUBSCRIPTION_ID,
+			NOTE_SEARCH_ID,
+			onFilterInputResults
+		);
+		notesService.subscribe(NOTE_SUBSCRIPTION_ID, '*', onSearchResults);
+		notesService.getAllNotes('*');
+	});
+
+	// ================================ FUNCS ==================================
 	function updateNotesKeys() {
 		noteKeys = Object.keys(notes).sort((a, b) => {
 			return (notes[a].dateUpdated - notes[b].dateUpdated) * -1;
@@ -70,24 +105,6 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		}
 	}
 
-	let filterParams = $state([
-		{
-			option: 'title',
-			index: 'title',
-			checked: true
-		},
-		{
-			option: 'text',
-			index: 'text',
-			checked: true
-		},
-		{
-			option: 'tags',
-			index: 'tags[]:tag',
-			checked: true
-		}
-	]);
-
 	function onFilterInputChanged() {
 		if (filterInput.length > 0) {
 			let indexes: any = [];
@@ -115,13 +132,14 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		note = notes[noteId];
 	}
 
-	onMount(async () => {
-		notesService.subscribe(noteID, NOTE_SEARCH_ID, onFilterInputResults);
-		notesService.subscribe(noteID, '*', onSearchResults);
-		notesService.getAllNotes('*');
-	});
+	function onAddNewNote(newNote: any) {
+		notes[newNote.id] = newNote;
+		noteKeys = [newNote.id, ...noteKeys];
+		note = newNote;
+	}
 </script>
 
+<!-- ============================== CONTAINER ============================== -->
 {#if note}
 	<Note bind:mode bind:note></Note>
 {:else}
@@ -133,5 +151,6 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		{allNotes}
 		{noteIDToOpen}
 		{onFilterInputChanged}
+		{onAddNewNote}
 	></NotesList>
 {/if}

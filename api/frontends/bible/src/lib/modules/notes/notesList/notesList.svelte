@@ -1,42 +1,21 @@
-<!-- 
-The challenge to solve stemmed from two types of notes.
- 
-
-1. There are notes associated to verse words
-2. There are notes independent of verse words i.e sermon notes, bible study etc...
-
-bibleLocationRef variable maps to a location in the bible. <book>_<chapter>_<verse>_<word>. 0_0_0_0 
-key is a standalone/independent note.
-
-kjvsearch worker uses flexsearch to index all the notes. We store all notes in indexdb and 
-load the notes into a flexsearch index to quickly query notes locally.
-
-We added in the boolean of allNotes to signal we are displaying all notes to the user. 
-Users can edit verse word notes as well as independent notes. If a user clicks on the 
-note icon in the Bible only the notes associated to that word will be displayed to the user.
-
--->
 <script lang="ts">
-	// SVELTE
-	import { onMount } from 'svelte';
-
+	// ================================ IMPORTS ================================
 	// MODELS
 	import { Modules } from '$lib/models/modules.model';
 
 	// SERVICES
-	import { notesService } from '$lib/services/notes.service';
+	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { toastService } from '$lib/services/toast.service';
-
-	// APIS
-	import { chapterApi } from '$lib/api/chapters.api';
-	import { notesApi } from '$lib/api/notes.api';
+	import { verseService } from '$lib/services/bible/verse.service';
 
 	// OTHER
-	import Quill from 'quill';
-	import uuid4 from 'uuid4';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
+	import uuid4 from 'uuid4';
+
+	// =============================== BINDINGS ================================
 
 	let {
 		mode = $bindable(),
@@ -45,7 +24,8 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		noteKeys = $bindable(),
 		notes = $bindable(),
 		note = $bindable(),
-		onFilterInputChanged
+		onFilterInputChanged,
+		onAddNewNote
 	}: {
 		mode: any;
 		allNotes: boolean;
@@ -54,32 +34,19 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		notes: any;
 		note: any;
 		onFilterInputChanged: any;
+		onAddNewNote: any;
 	} = $props();
+
+	// ================================== VARS =================================
 
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 
-	/**
-	 * These variables are set once a user
-	 * adds a new note or selects an existing
-	 * note.
-	 */
-
-	/**
-	 * view toggles
-	 */
-
 	let showNoteListActions = $state(false);
 	let showNoteListFilter = $state(false);
 
-	/**
-	 * inputs
-	 */
 	let filterInput: string = $state('');
 
-	/**
-	 * Filters
-	 */
 	let filterParams = $state([
 		{
 			option: 'title',
@@ -97,6 +64,27 @@ note icon in the Bible only the notes associated to that word will be displayed 
 			checked: true
 		}
 	]);
+
+	let noteListActions: any = {
+		filter: () => {
+			showNoteListFilter = !showNoteListFilter;
+			showNoteListActions = false;
+		},
+		'export filtered notes': () => {
+			onExport();
+		},
+		'split vertical': () => {
+			paneService.onSplitPane(mode.paneID, 'v', Modules.MODULES, {});
+			showNoteListActions = false;
+		},
+
+		'split horizontal': () => {
+			paneService.onSplitPane(mode.paneID, 'h', Modules.MODULES, {});
+			showNoteListActions = false;
+		}
+	};
+
+	// ============================== CLICK FUNCS ==============================
 
 	async function onExport() {
 		toastService.showToast('starting export data');
@@ -153,67 +141,51 @@ note icon in the Bible only the notes associated to that word will be displayed 
 	}
 
 	async function onAdd() {
-		// let keys = mode.bibleLocationRef?.split('_');
-		// let now = Date.now();
-		// if (keys[0] === '0') {
-		// 	note = {
-		// 		id: noteID,
-		// 		bibleLocationRef: mode.bibleLocationRef,
-		// 		text: ``,
-		// 		html: ``,
-		// 		title: `Note`,
-		// 		dateCreated: now,
-		// 		dateUpdated: now,
-		// 		tags: [],
-		// 		version: 0
-		// 	};
-		// } else {
-		// 	// This adds the verse to the note body
-		// 	let chapter = await chapterApi.getChapter(mode.bibleLocationRef);
-		// 	let verse = chapter['verseMap'][keys[2]];
-		// 	let title = `${booknames['shortNames'][keys[0]]} ${keys[1]}:${keys[2]}${keys[3] > 0 ? ':' + keys[3] : ''}`;
-		// 	note = {
-		// 		id: noteID,
-		// 		bibleLocationRef: mode.bibleLocationRef,
-		// 		bcv: `${booknames['shortNames'][keys[0]]} ${keys[1]}:${keys[2]}`,
-		// 		text: `${title}\n${verse}`,
-		// 		html: `<h1>${title}</h1><p><italic>${verse}</italic></p>`,
-		// 		title: `${title}`,
-		// 		dateCreated: now,
-		// 		dateUpdated: now,
-		// 		tags: [],
-		// 		version: 0
-		// 	};
-		// }
-	}
-
-	/**
-	 * Note List
-	 */
-	let noteListActions: any = {
-		filter: () => {
-			showNoteListFilter = !showNoteListFilter;
-			showNoteListActions = false;
-		},
-		'export filtered notes': () => {
-			onExport();
-		},
-		'split vertical': () => {
-			paneService.onSplitPane(mode.paneID, 'v', Modules.MODULES, {});
-			showNoteListActions = false;
-		},
-
-		'split horizontal': () => {
-			paneService.onSplitPane(mode.paneID, 'h', Modules.MODULES, {});
-			showNoteListActions = false;
+		let keys = mode.bibleLocationRef?.split('_');
+		let now = Date.now();
+		let newNote = undefined;
+		let noteID = uuid4();
+		if (keys[0] === '0') {
+			newNote = {
+				id: noteID,
+				bibleLocationRef: mode.bibleLocationRef,
+				text: ``,
+				html: ``,
+				title: `Note`,
+				dateCreated: now,
+				dateUpdated: now,
+				tags: [],
+				version: 0
+			};
+		} else {
+			let verse = await verseService.get(mode.bibleLocationRef);
+			let bookName = bibleLocationReferenceService.extractShortBookName(
+				mode.bibleLocationRef
+			);
+			let title = `${bookName} ${keys[1]}:${keys[2]}${keys[3] > 0 ? ':' + keys[3] : ''}`;
+			newNote = {
+				id: noteID,
+				bibleLocationRef: mode.bibleLocationRef,
+				bcv: `${shortBookNamesByIDService.get(keys[0])} ${keys[1]}:${keys[2]}`,
+				text: `${title}\n${verse}`,
+				html: `<h1>${title}</h1><p><italic>${verse}</italic></p>`,
+				title: `${title}`,
+				dateCreated: now,
+				dateUpdated: now,
+				tags: [],
+				version: 0
+			};
 		}
-	};
+
+		onAddNewNote(newNote);
+	}
 
 	async function onSelectedNote(noteId: string) {
 		note = notes[noteId];
 	}
 </script>
 
+<!-- ================================ HEADER =============================== -->
 {#snippet noteListHeader()}
 	<header
 		bind:clientHeight={headerHeight}
@@ -296,6 +268,8 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		</button>
 	</header>
 {/snippet}
+
+<!-- ================================= BODY ================================ -->
 
 {#snippet noteListFilter()}
 	<div class="flex flex-col justify-start px-2">
@@ -516,7 +490,6 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		{/each}
 	</div>
 {/snippet}
-<!-- END NOTE LIST SNIPPETS -->
 
 {#snippet noteListBody()}
 	{#if !showNoteListActions}
@@ -533,6 +506,8 @@ note icon in the Bible only the notes associated to that word will be displayed 
 		{@render noteListActionsSnippet()}
 	{/if}
 {/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
 
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
