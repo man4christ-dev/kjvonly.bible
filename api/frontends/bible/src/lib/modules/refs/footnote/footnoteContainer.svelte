@@ -1,16 +1,37 @@
 <script lang="ts">
-	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import ChevronDown from '$lib/components/chevronDown.svelte';
-	import Asterisk from '$lib/components/svgs/asterisk.svelte';
-
-	import KeyboardArrowDown from '$lib/components/svgs/keyboardArrowDown.svelte';
-	import KeyboardArrowRight from '$lib/components/svgs/keyboardArrowRight.svelte';
-	import ShortText from '$lib/components/svgs/shortText.svelte';
-	import { numberToLetters } from '$lib/services/dynamicGrid.service';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount } from 'svelte';
 
-	let { isVerseRef, footnotes, chapterFootnotes } = $props();
+	// COMPONENTS
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 
+	// // SVGS
+	import Asterisk from '$lib/components/svgs/asterisk.svelte';
+	import ShortText from '$lib/components/svgs/shortText.svelte';
+	import KeyboardArrowDown from '$lib/components/svgs/keyboardArrowDown.svelte';
+	import KeyboardArrowRight from '$lib/components/svgs/keyboardArrowRight.svelte';
+
+	// OTHERS
+	import { numberToLetters } from '$lib/services/dynamicGrid.service';
+	// =============================== BINDINGS ================================
+	let {
+		isVerseRef,
+		footnotes,
+		chapterFootnotes
+	}: {
+		isVerseRef: boolean;
+		footnotes: string[];
+		chapterFootnotes: { [key: string]: string };
+	} = $props();
+
+	// =============================== LIFECYCLE ===============================
+
+	onMount(() => {
+		setFootnotes();
+	});
+
+	// ================================== VARS =================================
 	let fs: Footnote[] = $state([]);
 	let toggle = $state(false);
 
@@ -20,10 +41,7 @@
 		toggle: boolean;
 	}
 
-	onMount(() => {
-		setFootnotes();
-	});
-
+	// ================================ FUNCS ==================================
 	function setFootnotes(): void {
 		footnotes.forEach((f: any) => {
 			let key = f?.split('_')[2];
@@ -35,6 +53,7 @@
 		});
 	}
 
+	// ============================== CLICK FUNCS ==============================
 	function onToggleFootnotes(): void {
 		toggle = !toggle;
 	}
@@ -44,44 +63,60 @@
 	}
 </script>
 
-{#if fs.length > 0}
+<!-- ================================= BODY ================================ -->
+{#snippet multipleFootnotes()}
 	{#if fs.length > 1 || isVerseRef}
+		{@render footnoteRoot()}
 		<div class="flex flex-col">
-			<div class="flex flex-row items-center">
-				<KJVButton classes="" onClick={onToggleFootnotes}>
-					{#if !toggle}
+			{#if toggle}
+				{@render footnoteList()}
+			{/if}
+		</div>
+	{/if}
+{/snippet}
+
+{#snippet footnoteRoot()}
+	<div class="flex flex-row items-center">
+		<KJVButton classes="" onClick={onToggleFootnotes}>
+			{#if !toggle}
+				<KeyboardArrowRight></KeyboardArrowRight>
+			{:else}
+				<KeyboardArrowDown></KeyboardArrowDown>
+			{/if}
+		</KJVButton>
+		<Asterisk></Asterisk>
+		<p class="ps-1 pe-4 capitalize">footnotes</p>
+	</div>
+{/snippet}
+
+{#snippet footnoteList()}
+	{#each fs as f}
+		<div class="ps-2">
+			<p class="flex flex-row items-center pt-2">
+				<KJVButton classes="" onClick={() => onToggleFootnote(f)}>
+					{#if !f.toggle}
 						<KeyboardArrowRight></KeyboardArrowRight>
 					{:else}
 						<KeyboardArrowDown></KeyboardArrowDown>
 					{/if}
 				</KJVButton>
-				<Asterisk></Asterisk>
-				<p class="ps-1 pe-4 capitalize">footnotes</p>
-			</div>
-			{#if toggle}
-				{#each fs as f}
-					<div class="ps-2">
-						<p class="flex flex-row items-center pt-2">
-							<KJVButton classes="" onClick={() => onToggleFootnote(f)}>
-								{#if !f.toggle}
-									<KeyboardArrowRight></KeyboardArrowRight>
-								{:else}
-									<KeyboardArrowDown></KeyboardArrowDown>
-								{/if}
-							</KJVButton>
-							<ShortText></ShortText>
-							<span class="px-2 ps-1">{f['key']} </span>
-						</p>
-						{#if f.toggle}
-							<p class="ps-10">
-								{@html f['html']}
-							</p>
-						{/if}
-					</div>
-				{/each}
+				<ShortText></ShortText>
+				<span class="px-2 ps-1">{f['key']} </span>
+			</p>
+			{#if f.toggle}
+				{@render footnoteItem(f)}
 			{/if}
 		</div>
-	{:else}
+	{/each}
+{/snippet}
+
+{#snippet footnoteItem(f: Footnote)}
+	<p class="ps-10">
+		{@html f['html']}
+	</p>{/snippet}
+
+{#snippet singleFootnote()}
+	{#if fs.length === 1 && !isVerseRef}
 		<div class="flex flex-row items-center py-2">
 			<span class="px-2">{fs[0]['key']} </span>
 
@@ -90,4 +125,8 @@
 			</p>
 		</div>
 	{/if}
-{/if}
+{/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
+{@render multipleFootnotes()}
+{@render singleFootnote()}

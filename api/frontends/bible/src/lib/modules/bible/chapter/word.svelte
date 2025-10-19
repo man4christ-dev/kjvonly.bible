@@ -38,7 +38,7 @@
 		mode: BibleMode;
 		notes: any;
 		bibleLocationRef: string;
-		footnotes: Map<string, string>;
+		footnotes: { [key: string]: string };
 		lastKnownScrollPosition: number;
 		verse: Verse;
 		word: Word;

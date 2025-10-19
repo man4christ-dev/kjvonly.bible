@@ -52,7 +52,7 @@
 
 	let notesID = uuid4();
 
-	let footnotes: Map<string, string> = $state(new Map());
+	let footnotes: { [key: string]: string } = $state({});
 	let hasVerseRange: boolean = $state(false);
 
 	let notes: any = $state();
