@@ -112,47 +112,48 @@
 </script>
 
 <!-- ================================= BODY ================================ -->
-<!-- ================================ FOOTER =============================== -->
-<!-- ============================== CONTAINER ============================== -->
-
-<!-- ================================ HEADER =============================== -->
-{#snippet header(s: StrongsWithToggle, idx: number)}
-	<div class="flex flex-row items-center ps-2 pt-2">
-		{#if strongsWords && strongsWords.length > 0}
-			<KJVButton
-				classes=""
-				onClick={(e: Event) => {
-					onStrongsWordClicked(e, s);
-				}}
-			>
-				{#if !s.toggle}
-					<KeyboardArrowRight></KeyboardArrowRight>
-				{:else}
-					<KeyboardArrowDown></KeyboardArrowDown>
-				{/if}
-			</KJVButton>
-			<ShortText></ShortText>
-			<span class="ps-1 pe-4"
-				><pre class="inline-block">{`${s.number}:`.padStart(6, ' ')}</pre>
-				{sanitize(strongsWords[idx])}</span
-			>
-		{:else}
-			{#if isVerseRef || (strongsWithToggle && strongsWithToggle?.length > 1)}
-				<KJVButton
-					classes=""
-					onClick={(e: Event) => {
-						onStrongsWordClicked(e, s);
-					}}
-				>
-					{#if !s.toggle}
-						<KeyboardArrowRight></KeyboardArrowRight>
-					{:else}
-						<KeyboardArrowDown></KeyboardArrowDown>
-					{/if}
-				</KJVButton>
-			{/if}
-			<span class="pe-4">{s.number}: {sanitize(text)}</span>
+{#snippet strongsHtml(s: any, idx: number)}
+	<div class="ps-8">
+		{#if s['strongsDef']}
+			<div class="">
+				<p class="text-neutral-600">Strongs Definition:</p>
+				<p class="ps-4">
+					{@html s['strongsDef']}
+				</p>
+			</div>
 		{/if}
+
+		<div class="">
+			<h1 class="pt-4 text-neutral-600">Linguistic Elements:</h1>
+			<div class="flex flex-shrink">
+				<div class="flex flex-col p-2">
+					{#if s['originalWord']}
+						<p class="text-neutral-500">Original Word</p>
+						<p class="ps-4">{@html s['originalWord']}</p>
+					{/if}
+
+					{#if s['partsOfSpeech']}
+						<p class="text-neutral-500">Parts of Speech</p>
+						<p class="ps-4">{@html s['partsOfSpeech']}</p>
+					{/if}
+
+					{#if s['phoneticSpelling']}
+						<p class="text-neutral-500">Phonetic Spelling</p>
+						<p class="ps-4">{@html s['phoneticSpelling']}</p>
+					{/if}
+
+					{#if s['transliteratedWord']}
+						<p class="text-neutral-500">Transliterated Word</p>
+						<p class="ps-4">{@html s['transliteratedWord']}</p>
+					{/if}
+				</div>
+			</div>
+		</div>
+
+		{@render thayersContainer(s)}
+		{@render brownContainer(s)}
+		{@render byBook(s, idx)}
+		{@render byWord(s, idx)}
 	</div>
 {/snippet}
 
@@ -201,8 +202,8 @@
 		</div>
 
 		<div class="space-y-2 ps-4 pt-2">
-			{#each s['usageByBook'] as b, bookidx}
-				{#if bookidx !== 0}&shy;,&nbsp;{/if}<span
+			{#each s['usageByBook'] as b, bookIndex}
+				{#if bookIndex !== 0}&shy;,&nbsp;{/if}<span
 					role="button"
 					tabindex="-1"
 					onkeydown={() => {}}
@@ -238,52 +239,7 @@
 	{/if}
 {/snippet}
 
-{#snippet strongsHtml(s: any, idx: number)}
-	<div class="ps-8">
-		{#if s['strongsDef']}
-			<div class="">
-				<p class="text-neutral-600">Strongs Definition:</p>
-				<p class="ps-4">
-					{@html s['strongsDef']}
-				</p>
-			</div>
-		{/if}
-
-		<div class="">
-			<h1 class="pt-4 text-neutral-600">Linguistic Elements:</h1>
-			<div class="flex flex-shrink">
-				<div class="flex flex-col p-2">
-					{#if s['originalWord']}
-						<p class="text-neutral-500">Original Word</p>
-						<p class="ps-4">{@html s['originalWord']}</p>
-					{/if}
-
-					{#if s['partsOfSpeech']}
-						<p class="text-neutral-500">Parts of Speech</p>
-						<p class="ps-4">{@html s['partsOfSpeech']}</p>
-					{/if}
-
-					{#if s['phoneticSpelling']}
-						<p class="text-neutral-500">Phonetic Spelling</p>
-						<p class="ps-4">{@html s['phoneticSpelling']}</p>
-					{/if}
-
-					{#if s['transliteratedWord']}
-						<p class="text-neutral-500">Transliterated Word</p>
-						<p class="ps-4">{@html s['transliteratedWord']}</p>
-					{/if}
-				</div>
-			</div>
-		</div>
-
-		{@render thayersContainer(s)}
-		{@render brownContainer(s)}
-		{@render byBook(s, idx)}
-		{@render byWord(s, idx)}
-	</div>
-{/snippet}
-
-{#if strongsWithToggle.length > 1 || isVerseRef}
+{#snippet strongsToggle()}
 	<div class="flex flex-row items-center">
 		<KJVButton classes="" onClick={onToggleStrongs}>
 			{#if !toggleStrongs}
@@ -295,16 +251,70 @@
 		<Dictionary></Dictionary>
 		<p class="ps-1 pe-4 capitalize">definitions</p>
 	</div>
+{/snippet}
+
+{#snippet strongsList()}
 	{#if toggleStrongs}
 		{#each strongsWithToggle as s, idx}
-			{@render header(s, idx)}
+			{@render strongsWordToggle(s, idx)}
 			{#if s.toggle}
 				{@render strongsHtml(s, idx)}
 			{/if}
 		{/each}
 	{/if}
-{:else if strongsWithToggle.length > 0}
-	{@render header(strongsWithToggle[0], 0)}
+{/snippet}
+
+{#snippet strongsWordToggle(s: StrongsWithToggle, idx: number)}
+	<div class="flex flex-row items-center ps-2 pt-2">
+		{#if strongsWords && strongsWords.length > 0}
+			<KJVButton
+				classes=""
+				onClick={(e: Event) => {
+					onStrongsWordClicked(e, s);
+				}}
+			>
+				{#if !s.toggle}
+					<KeyboardArrowRight></KeyboardArrowRight>
+				{:else}
+					<KeyboardArrowDown></KeyboardArrowDown>
+				{/if}
+			</KJVButton>
+			<ShortText></ShortText>
+			<span class="ps-1 pe-4"
+				><pre class="inline-block">{`${s.number}:`.padStart(6, ' ')}</pre>
+				{sanitize(strongsWords[idx])}</span
+			>
+		{:else}
+			<!-- This is for single word clicks. That word could have an
+			 	 associated cross reference so we'd want to toggle the 
+				 strongs def. Also a word could have more than one associated 
+				 strongs def. If thats the case we want to toggle them -->
+			{#if isVerseRef || strongsWithToggle?.length > 1}
+				<KJVButton
+					classes=""
+					onClick={(e: Event) => {
+						onStrongsWordClicked(e, s);
+					}}
+				>
+					{#if !s.toggle}
+						<KeyboardArrowRight></KeyboardArrowRight>
+					{:else}
+						<KeyboardArrowDown></KeyboardArrowDown>
+					{/if}
+				</KJVButton>
+			{/if}
+			<span class="pe-4">{s.number}: {sanitize(text)}</span>
+		{/if}
+	</div>
+{/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
+
+{#if strongsWithToggle.length > 1 || isVerseRef}
+	{@render strongsToggle()}
+	{@render strongsList()}
+{:else if strongsWithToggle.length === 1}
+	{@render strongsWordToggle(strongsWithToggle[0], 0)}
 	{@render strongsHtml(strongsWithToggle[0], 0)}
 {/if}
 

@@ -17,10 +17,17 @@
 		newStrongsPopups,
 		type StrongsPopups
 	} from '$lib/models/strongs.model';
+	import type { Pane } from '$lib/models/pane.model';
 
 	// =============================== BINDINGS ================================
 
-	let { paneID, pane = $bindable() } = $props();
+	let {
+		paneID,
+		pane = $bindable<Pane>()
+	}: {
+		paneID: string;
+		pane: Pane;
+	} = $props();
 
 	// ================================== VARS =================================
 
@@ -59,11 +66,11 @@
 		let refs: string[] = [];
 		// TODO ADD TYPE
 		if (pane?.buffer?.bag?.refs) {
+			// if verse number is clicked TODO make this implicit
 			refs = pane?.buffer?.bag?.refs;
-		} else {
-			if (pane?.buffer?.bag?.word?.href) {
-				refs = pane?.buffer?.bag?.word?.href;
-			}
+		} else if (pane?.buffer?.bag?.word?.href) {
+			// if a non verse number is clicked TODO make this implicit
+			refs = pane?.buffer?.bag?.word?.href;
 		}
 		return refs;
 	}
