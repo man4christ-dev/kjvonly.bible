@@ -14,7 +14,9 @@
 
 	// OTHERS
 	import { numberToLetters } from '$lib/services/dynamicGrid.service';
+
 	// =============================== BINDINGS ================================
+
 	let {
 		hasCrossRef,
 		footnotes: footnotesByID,
@@ -54,6 +56,7 @@
 	}
 
 	// ============================== CLICK FUNCS ==============================
+
 	function onToggleFootnotes(): void {
 		toggle = !toggle;
 	}
