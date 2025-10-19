@@ -18,3 +18,5 @@ note needed with h-full on the bufferContainer
 ◊ a little movement in search in showing n of search result size
 ◊ add triangle/chevron to left side of strongs words.
 ◊ remove Map type back to dict for all bound objects
+◊ Create a strongs module allowing users to search for strongs words. this will
+launch the existing strongs module when strongs word is selected.

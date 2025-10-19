@@ -7,7 +7,7 @@ class VerseService {
 		let chapter = await chapterService.get(bibleLocationRef);
 		let verseNumber =
 			bibleLocationReferenceService.extractVerse(bibleLocationRef);
-		let verse = chapter.verses.get(`${verseNumber}`);
+		let verse = chapter.verses[`${verseNumber}`];
 		return verse || newVerse();
 	}
 }

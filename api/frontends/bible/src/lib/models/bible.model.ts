@@ -27,12 +27,8 @@ export function jsonToChapter(data: any): Chapter {
 		id: data.id,
 		number: data.number,
 		bookName: data.bookName,
-		verses: new Map(
-			Object.entries(data.verses).map(([k, v]) => [k, v as Verse])
-		),
-		verseMap: new Map(
-			Object.entries(data.verseMap).map(([k, v]) => [k, v as string])
-		),
+		verses: data.verses,
+		verseMap: data.verseMap,
 		footnotes: data.footnotes
 	};
 
@@ -43,8 +39,8 @@ export interface Chapter {
 	id: string;
 	number: number;
 	bookName: string;
-	verses: Map<string, Verse>;
-	verseMap: Map<string, string>;
+	verses: { [verseNumber: string]: Verse };
+	verseMap: { [verseNumber: string]: string };
 	footnotes: { [key: string]: string };
 }
 
@@ -53,9 +49,9 @@ export function newChapter(): Chapter {
 		id: '',
 		number: 0,
 		bookName: '',
-		verses: new Map(),
-		verseMap: new Map(),
-		footnotes: new Map()
+		verses: {},
+		verseMap: {},
+		footnotes: {}
 	};
 }
 

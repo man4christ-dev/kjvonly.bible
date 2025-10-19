@@ -66,7 +66,7 @@
 	 * to update annotations
 	 */
 	let toggleVersesView: boolean = $state(true);
-	let verses: Map<string, VerseModel> = $state(new Map());
+	let verses: { [verseNumber: string]: VerseModel } = $state({});
 	let versesNumbersToShow: string[] = $state([]);
 
 	// =============================== LIFECYCLE ===============================
@@ -173,16 +173,13 @@
 
 	function setChapterVersesToShow() {
 		if (hasVerseRange) {
-			versesNumbersToShow = verses
-				.keys()
-				.toArray()
+			versesNumbersToShow = Object.keys(verses)
 				.sort((a, b) => (Number(a) < Number(b) ? -1 : 1))
 				.slice(verseRangeStartIndex, verseRangeEndIndex);
 		} else {
-			versesNumbersToShow = verses
-				.keys()
-				.toArray()
-				.sort((a, b) => (Number(a) < Number(b) ? -1 : 1));
+			versesNumbersToShow = Object.keys(verses).sort((a, b) =>
+				Number(a) < Number(b) ? -1 : 1
+			);
 		}
 	}
 
@@ -206,7 +203,7 @@
 				bind:notes
 				bind:mode
 				{footnotes}
-				verse={chapter?.verses.get(k) as VerseModel}
+				verse={chapter?.verses[k] as VerseModel}
 				{bibleLocationRef}
 				{lastKnownScrollPosition}
 			></Verse>
