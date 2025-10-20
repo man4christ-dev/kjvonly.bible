@@ -23,6 +23,7 @@
 	import Close from '$lib/components/svgs/close.svelte';
 	import Filter from '$lib/components/svgs/filter.svelte';
 	import ClearFilter from '$lib/components/svgs/clearFilter.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -152,6 +153,9 @@
 			};
 		} else {
 			let verse = await verseService.get(mode.bibleLocationRef);
+			let verseTextWithoutVerseNumber = verse.text.slice(
+				verse.text.indexOf(' ') + 1
+			);
 			let bookName = bibleLocationReferenceService.extractShortBookName(
 				mode.bibleLocationRef
 			);
@@ -160,8 +164,8 @@
 				id: noteID,
 				bibleLocationRef: mode.bibleLocationRef,
 				bcv: `${shortBookNamesByIDService.get(keys[0])} ${keys[1]}:${keys[2]}`,
-				text: `${title}\n${verse}`,
-				html: `<h1>${title}</h1><p><italic>${verse}</italic></p>`,
+				text: `${title}\n${verseTextWithoutVerseNumber}`,
+				html: `<h1>${title}</h1><p><italic>${verseTextWithoutVerseNumber}</italic></p>`,
 				title: `${title}`,
 				dateCreated: now,
 				dateUpdated: now,
@@ -209,6 +213,7 @@
 	function onToggleFilter(): void {
 		if (showNoteListFilter) {
 			filterInput = '';
+			onFilterInputChanged();
 		}
 		showNoteListFilter = !showNoteListFilter;
 	}
@@ -344,33 +349,24 @@
 {/snippet}
 
 {#snippet noteListActionsSnippet()}
-	<div
-		class="flex h-full w-full max-w-lg flex-col items-start justify-start border border-neutral-100"
-	>
-		{#each Object.keys(noteListActions) as na}
-			<button
-				class="hover:bg-primary-50 w-full py-4 ps-2 text-left capitalize"
-				aria-label="note action button"
-				onclick={() => noteListActions[na]()}
-			>
-				{na}
-			</button>
-		{/each}
-	</div>
+	{#each Object.keys(noteListActions) as na}
+		<button
+			class="hover:bg-primary-50 w-full py-4 ps-2 text-left capitalize"
+			aria-label="note action button"
+			onclick={() => noteListActions[na]()}
+		>
+			{na}
+		</button>
+	{/each}
 {/snippet}
 
 {#snippet noteListBody()}
 	{#if !showNoteListActions}
-		<div
-			class="flex h-full w-full max-w-lg flex-col overflow-hidden overflow-y-scroll border border-neutral-100"
-		>
-			{#if showNoteListFilter}
-				{@render noteListFilter()}
-			{/if}
-			{@render noteListSnippet()}
-		</div>
-	{/if}
-	{#if showNoteListActions}
+		{#if showNoteListFilter}
+			{@render noteListFilter()}
+		{/if}
+		{@render noteListSnippet()}
+	{:else}
 		{@render noteListActionsSnippet()}
 	{/if}
 {/snippet}
@@ -381,5 +377,7 @@
 	<BufferHeader bind:headerHeight>
 		{@render noteListHeader()}
 	</BufferHeader>
-	{@render noteListBody()}
+	<BufferBody bind:clientHeight bind:headerHeight>
+		{@render noteListBody()}
+	</BufferBody>
 </BufferContainer>
