@@ -15,5 +15,11 @@ export default defineConfig({
 	test: {
 		include: ['src/**/*.{test,spec}.{js,ts}'],
 		pool: 'forks' // or 'vmForks'
+	},
+	build: {
+		target: 'es2022'
+	},
+	worker: {
+		format: 'es'
 	}
 });

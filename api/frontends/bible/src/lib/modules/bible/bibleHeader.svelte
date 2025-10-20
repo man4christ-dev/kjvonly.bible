@@ -137,11 +137,10 @@
 		let bookIDChapter =
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 		let verseNumber =
-			bibleLocationReferenceService.extractVersesOrOne(bibleLocationRef);
+			bibleLocationReferenceService.extractVerse(bibleLocationRef);
 		let wordIdx =
 			bibleLocationReferenceService.extractWordIndexOrDefault(bibleLocationRef);
 		mode.bibleLocationRef = `${bookIDChapter}_${verseNumber}_${wordIdx}`;
-
 		mode.value = BIBLE_MODES.EDIT;
 	}
 

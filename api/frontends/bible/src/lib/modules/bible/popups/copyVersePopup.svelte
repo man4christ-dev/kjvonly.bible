@@ -47,7 +47,7 @@
 	let allChecked = $state(false);
 	let checked: boolean[] = $state([]);
 	let verseNumbers: string[] = $state([]);
-	let verses: Map<string, Verse> = $state(new Map());
+	let verses: { [verseNumber: string]: Verse } = $state({});
 	let title = $state('');
 	let selectedVerseRangeText = $state('');
 
@@ -77,16 +77,13 @@
 	}
 
 	function setSortedAscVersesKeys() {
-		verseNumbers = verses
-			.keys()
-			.toArray()
-			.sort((a, b) => {
-				return parseInt(a) - parseInt(b);
-			});
+		verseNumbers = Object.keys(verses).sort((a, b) => {
+			return parseInt(a) - parseInt(b);
+		});
 	}
 
 	function initializeCheckedVersesByIdMap() {
-		checked = Array<boolean>(verses.size);
+		checked = Array<boolean>(Object.keys(verses).length);
 	}
 
 	function setTitle() {
@@ -129,7 +126,8 @@
 		);
 
 		versesToCopy.forEach((verseNumber: number) => {
-			verseRangeText += `${verses.get(String(verseNumber))?.text}\n`;
+			let vn = `${verseNumber}`;
+			verseRangeText += `${verses[vn]?.text}\n`;
 		});
 
 		return verseRangeText;
@@ -199,7 +197,7 @@
 	}
 
 	function toggleSelects() {
-		checked = Array(verses.size).fill(allChecked);
+		checked = Array(Object.keys(verses).length).fill(allChecked);
 	}
 
 	function areAllVersesChecked() {
@@ -357,7 +355,7 @@
 			</div>
 			<div class="flex flex-col px-4">
 				<span class="whitespace-normal">
-					{verses.get(verseNumber)?.text}
+					{verses[verseNumber]?.text}
 				</span>
 				<span class="flex-fill flex"></span>
 				{@render actions(parseInt(verseNumber))}
