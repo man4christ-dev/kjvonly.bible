@@ -11,6 +11,8 @@
 		PLANS_VIEWS,
 		SUBS_MAX_VIEW_ID
 	} from '$lib/models/plans.model';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -38,21 +40,12 @@
 	});
 </script>
 
-<div class="kjvonly-noselect overflow-hidden">
-	<div {id} style="{containerHeight} {containerWidth}">
-		<div bind:clientHeight style={containerHeight} class="overflow-hidden">
-			<div class="flex flex-col items-center">
-				{#if plansDisplay < PLANS_MAX_VIEW_ID}
-					<Discover bind:plansDisplay bind:pane bind:paneID bind:clientHeight
-					></Discover>
-				{:else if plansDisplay < SUBS_MAX_VIEW_ID}
-					<SubsView bind:plansDisplay bind:pane bind:paneID bind:clientHeight
-					></SubsView>
-				{:else if plansDisplay < NEXT_MAX_VIEW_ID}
-					<NextReadings bind:plansDisplay bind:pane bind:clientHeight
-					></NextReadings>
-				{/if}
-			</div>
-		</div>
-	</div>
-</div>
+{#if plansDisplay < PLANS_MAX_VIEW_ID}
+	<Discover bind:plansDisplay bind:pane bind:paneID bind:clientHeight
+	></Discover>
+{:else if plansDisplay < SUBS_MAX_VIEW_ID}
+	<SubsView bind:plansDisplay bind:pane bind:paneID bind:clientHeight
+	></SubsView>
+{:else if plansDisplay < NEXT_MAX_VIEW_ID}
+	<NextReadings bind:plansDisplay bind:pane bind:clientHeight></NextReadings>
+{/if}

@@ -15,6 +15,9 @@
 		PLAN_PUBSUB_SUBSCRIPTIONS
 	} from '../../../models/plans.model';
 	import { Modules } from '$lib/models/modules.model';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -173,24 +176,20 @@
 	</button>
 {/snippet}
 
-<Header
-	bind:headerHeight
-	title="Next Readings"
-	onClose={onCloseNextReadings}
-	bind:plansDisplay
-	menuDropdownToggleViews={undefined}
-></Header>
-<div class="flex w-full max-w-lg">
-	<div
-		id="{nextReadingViewID}-scroll-container"
-		style="max-height: {clientHeight -
-			headerHeight}px; min-height: {clientHeight - headerHeight}px"
-		class="flex w-full max-w-lg flex-col overflow-x-hidden overflow-y-scroll bg-neutral-50"
-	>
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		<Header
+			title="Next Readings"
+			onClose={onCloseNextReadings}
+			bind:plansDisplay
+			menuDropdownToggleViews={undefined}
+		></Header>
+	</BufferHeader>
+	<BufferBody bind:clientHeight bind:headerHeight>
 		{#if nextReadings.length > 0}
 			{#each nextReadings as n, idx}
 				{@render nextReading(n, idx)}
 			{/each}
 		{/if}
-	</div>
-</div>
+	</BufferBody>
+</BufferContainer>

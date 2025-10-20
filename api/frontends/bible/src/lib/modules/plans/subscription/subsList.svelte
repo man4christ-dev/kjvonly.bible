@@ -2,6 +2,9 @@
 	import Header from '../components/header.svelte';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import { PLANS_VIEWS, type Sub } from '$lib/models/plans.model';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -49,19 +52,19 @@
 	{/each}
 {/snippet}
 
-<Header
-	bind:headerHeight
-	title="My Plans"
-	onClose={onClosePlansList}
-	bind:plansDisplay
-	menuDropdownToggleViews={[PLANS_VIEWS.SUBS_ACTIONS, PLANS_VIEWS.SUBS_LIST]}
-></Header>
-
-<div class="w-full max-w-lg">
-	<div
-		style="height: {clientHeight - headerHeight}px"
-		class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-	>
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		<Header
+			title="My Plans"
+			onClose={onClosePlansList}
+			bind:plansDisplay
+			menuDropdownToggleViews={[
+				PLANS_VIEWS.SUBS_ACTIONS,
+				PLANS_VIEWS.SUBS_LIST
+			]}
+		></Header>
+	</BufferHeader>
+	<BufferBody bind:clientHeight bind:headerHeight>
 		{@render subsListView()}
-	</div>
-</div>
+	</BufferBody>
+</BufferContainer>
