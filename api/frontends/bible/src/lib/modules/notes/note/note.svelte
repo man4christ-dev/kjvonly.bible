@@ -30,6 +30,8 @@
 	// OTHER
 	import Quill from 'quill';
 	import uuid4 from 'uuid4';
+	import NewTag from '$lib/components/svgs/newTag.svelte';
+	import { findElement } from '$lib/utils/eventHandlers';
 
 	// =============================== BINDINGS ================================
 
@@ -46,6 +48,7 @@
 	let showTags: boolean = $state(false);
 	let tagContainerHeight = $state(0);
 	let tagInput: string = $state('');
+	let tagID: string = uuid4();
 
 	/** editor*/
 	let editor = uuid4().replaceAll('-', '');
@@ -136,7 +139,7 @@
 		}
 	}
 
-	function onAddTag() {
+	async function onAddTag() {
 		if (tagInput && tagInput.length < 1) {
 			return;
 		}
@@ -152,10 +155,12 @@
 				id: tagId,
 				created: now,
 				modified: now,
-				tag: t
+				tag: t.trim()
 			});
 		});
 		tagInput = '';
+		let el = await findElement(`${tagID}-tags`);
+		el?.focus();
 	}
 
 	function onDeleteTag(tagID: string) {
@@ -256,46 +261,23 @@
 
 {#snippet noteTagInputSnippet()}
 	{#if showTags}
-		<div class="flex justify-center px-2">
+		<div class="flex-fill flex w-full px-2">
 			<label
 				for="tags"
-				class="focus-within:border-support-a-600 relative block overflow-hidden border-b border-neutral-200 bg-transparent pt-3"
+				class="focus-within:border-support-a-600 relative block w-full overflow-hidden border-b border-neutral-200 bg-transparent pt-3"
 			>
 				<div class="flex items-center">
 					<input
 						type="tags"
-						id="tags"
-						placeholder="add tags..."
+						id="{tagID}-tags"
+						placeholder="tag 1, tag 2, tag 3, ..."
 						bind:value={tagInput}
 						class="focus:ring-none peer h-8 w-full border-none bg-transparent p-0 outline-none focus:border-transparent focus:outline-hidden"
 					/>
 
-					<button
-						onclick={() => {
-							onAddTag();
-						}}
-						class="float-end h-8 w-8 p-0.5"
-						aria-label="add tag button"
-					>
-						<svg
-							version="1.1"
-							id="svg2"
-							width="100%"
-							height="100%"
-							viewBox="0 0 105.50072 106.78786"
-							xmlns="http://www.w3.org/2000/svg"
-						>
-							<defs id="defs6" />
-							<g id="g8" transform="translate(-11.214067,-10.602166)">
-								<path
-									id="path478"
-									class="fill-neutral-400"
-									style="stroke-width:4.20363;stroke-linejoin:round"
-									d="M 63.952348,10.627557 A 52.737736,53.368481 0 0 0 11.214067,63.996697 52.737736,53.368481 0 0 0 63.952348,117.36388 52.737736,53.368481 0 0 0 116.68868,63.996697 52.737736,53.368481 0 0 0 63.952348,10.627557 Z m -4.40625,34.925781 h 8.884766 v 14.335937 h 12.917969 v 8.138672 H 68.430864 V 82.438103 H 59.546098 V 68.027947 H 46.553911 v -8.138672 h 12.992187 z"
-								/>
-							</g>
-						</svg>
-					</button>
+					<KJVButton classes="" onClick={onAddTag}>
+						<NewTag></NewTag>
+					</KJVButton>
 				</div>
 			</label>
 		</div>
