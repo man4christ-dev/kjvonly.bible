@@ -181,7 +181,7 @@
 		note = notes[noteId];
 	}
 
-	function onBibleClicked(e: Event): void {
+	function onBibleClicked(e: Event, note: any): void {
 		e.stopPropagation();
 		paneService.onSplitPane(mode.paneID, 'h', Modules.BIBLE, {
 			bibleLocationRef: note.bibleLocationRef
@@ -295,7 +295,7 @@
 	<div class="flex w-full flex-row justify-end space-x-4">
 		<!-- bible -->
 		{#if !note?.bibleLocationRef?.startsWith('0')}
-			<KJVButton classes="" onClick={onBibleClicked}>
+			<KJVButton classes="" onClick={(e: Event) => onBibleClicked(e, note)}>
 				<Bible></Bible>
 			</KJVButton>
 		{/if}
