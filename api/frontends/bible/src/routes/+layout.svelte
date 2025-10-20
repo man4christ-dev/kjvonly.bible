@@ -7,6 +7,7 @@
 	import { authService } from '$lib/services/auth.service';
 	import { subsApi } from '$lib/api/subs.api';
 	import j from '../lib/modules/plans/data/subscriptions.json';
+	import { plansApi } from '$lib/api/plans.api';
 
 	function register() {
 		// Listen for connection coming online
@@ -48,8 +49,15 @@
 			}, 5000);
 		}
 
-		//let plan = localStorage.getItem('tmp')
-		//await subsApi.put(JSON.parse(plan))
+		// let subs = localStorage.getItem('subs') || '[]';
+		// for (let s of JSON.parse(subs)) {
+		// 	await subsApi.put(s);
+		// }
+
+		// let plans = localStorage.getItem('plans') || '[]';
+		// for (let p of JSON.parse(plans)) {
+		// 	await plansApi.put(p);
+		// }
 	});
 
 	let { children } = $props();

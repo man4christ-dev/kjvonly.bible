@@ -20,3 +20,5 @@ note needed with h-full on the bufferContainer
 ◊ remove Map type back to dict for all bound objects
 ◊ Create a strongs module allowing users to search for strongs words. this will
 launch the existing strongs module when strongs word is selected.
+◊ it seems the plans worker did not register on its own? console.log inside the
+worker registered it? Investigate.
