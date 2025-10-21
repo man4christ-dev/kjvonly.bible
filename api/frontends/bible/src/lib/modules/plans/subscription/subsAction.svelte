@@ -1,4 +1,9 @@
 <script lang="ts">
+	import BufferBody from '$lib/components/bufferBody.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
 	import { type Pane } from '$lib/models/pane.model';
 	import { PLANS_VIEWS } from '$lib/models/plans.model';
 	import ActionItemsList from '../components/actionItemsList.svelte';
@@ -27,19 +32,30 @@
 	};
 </script>
 
-<Header
-	bind:headerHeight
-	title="My Plans"
-	onClose={undefined}
-	bind:plansDisplay
-	menuDropdownToggleViews={[PLANS_VIEWS.SUBS_LIST, PLANS_VIEWS.SUBS_ACTIONS]}
-></Header>
-<div class="flex w-full max-w-lg">
-	<div
-		style="max-height: {clientHeight -
-			headerHeight}px; min-height: {clientHeight - headerHeight}px"
-		class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-	>
-		<ActionItemsList actionItems={subsActionItems}></ActionItemsList>
+{#snippet header()}
+	<div class="grid w-full grid-cols-5 place-items-center">
+		<span class="flex w-full">
+			<KJVButton
+				classes=""
+				onClick={() => {
+					plansDisplay = PLANS_VIEWS.SUBS_LIST;
+				}}
+			>
+				<ArrowBack></ArrowBack>
+			</KJVButton>
+			<span class="flex-1"></span>
+		</span>
 	</div>
-</div>
+{/snippet}
+{#snippet body()}
+	<ActionItemsList actionItems={subsActionItems}></ActionItemsList>
+{/snippet}
+
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		{@render header()}
+	</BufferHeader>
+	<BufferBody bind:clientHeight bind:headerHeight>
+		{@render body()}
+	</BufferBody>
+</BufferContainer>

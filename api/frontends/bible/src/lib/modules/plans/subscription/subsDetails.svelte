@@ -11,21 +11,34 @@
 		type Sub
 	} from '$lib/models/plans.model';
 	import type { BCV } from '$lib/models/bible.model';
-	import Pane from '$lib/components/pane.svelte';
 	import { Modules } from '$lib/models/modules.model';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
+	import Close from '$lib/components/svgs/close.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import Pending from '$lib/components/svgs/pending.svelte';
+	import CheckCircle from '$lib/components/svgs/checkCircle.svelte';
+	import type { Pane } from '$lib/models/pane.model';
 
 	// =============================== BINDINGS ================================
 
 	let {
-		plansDisplay = $bindable<string>(),
+		plansDisplay = $bindable<PLANS_VIEWS>(),
 		pane = $bindable<Pane>(),
 		paneID = $bindable<string>(),
 		clientHeight = $bindable(),
 		selectedSub = $bindable<Sub>()
+	}: {
+		plansDisplay: PLANS_VIEWS;
+		pane: Pane;
+		paneID: string;
+		clientHeight: number;
+		selectedSub: Sub;
 	} = $props();
 
 	// ================================== VARS =================================
-
+	let hasCompletedReading = $state(false);
 	let headerHeight = $state(0);
 	let showCompletedReadings: boolean = $state(false);
 	let subListReadingsToShow: number = $state(0);
@@ -35,6 +48,7 @@
 
 	onMount(() => {
 		loadMoreSubReadings();
+		setHasCompletedReadings();
 		setTimeout(async () => {
 			let el = document.getElementById(`${subListViewID}-scroll-container`);
 			let retriesMax = 10;
@@ -71,8 +85,9 @@
 			toShow !== BATCH_SIZE_TO_SHOW &&
 			count + subListReadingsToShow < selectedSub.nestedReadings.length
 		) {
-			let hasCompletedReading =
-				selectedSub.completedReadings[subListReadingsToShow + count];
+			let hasCompletedReading = selectedSub.completedReadings.get(
+				subListReadingsToShow + count
+			);
 			count++;
 			if (hasCompletedReading && !showCompletedReadings) {
 				continue;
@@ -98,12 +113,16 @@
 		}
 	}
 
+	function setHasCompletedReadings(): void {
+		hasCompletedReading = selectedSub.completedReadings.size > 0;
+	}
+
 	// ============================== CLICK FUNCS ==============================
 
 	function onSelectedSubReading(
 		subNestedReadingsIndex: number,
 		returnView: PLANS_VIEWS
-	) {
+	): void {
 		let readings: Readings = selectedSub.nestedReadings[subNestedReadingsIndex];
 		readings.bcvs = readings.bcvs.map((r: any) => {
 			r.bibleLocationRef = `${r.bookID}_${r.chapter}_${r.verses}`;
@@ -124,8 +143,12 @@
 		pane.updateBuffer(Modules.BIBLE);
 	}
 
-	function onCloseSubDetails() {
+	function onCloseSubDetails(): void {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
+	}
+
+	function onToggleCompletedReadings(): void {
+		showCompletedReadings = !showCompletedReadings;
 	}
 </script>
 
@@ -188,21 +211,44 @@
 	</div>
 {/snippet}
 
-<Header
-	bind:headerHeight
-	title="My Plans"
-	onClose={onCloseSubDetails}
-	bind:plansDisplay
-	menuDropdownToggleViews={undefined}
-></Header>
+{#snippet header()}
+	<div class="grid w-full grid-cols-5 place-items-center">
+		<span></span>
+		<span></span>
+		<span class="text-center">My plans</span>
+		<KJVButton
+			classes=""
+			disabled={!hasCompletedReading}
+			onClick={onToggleCompletedReadings}
+		>
+			{#if showCompletedReadings}
+				<Pending></Pending>
+			{:else}
+				<CheckCircle></CheckCircle>
+			{/if}
+		</KJVButton>
+		<KJVButton classes="" onClick={onCloseSubDetails}>
+			<Close></Close>
+		</KJVButton>
+	</div>
+{/snippet}
+{#snippet body()}
+	{@render subListView(selectedSub)}
+{/snippet}
 
+<BufferContainer bind:clientHeight>
+	<BufferHeader bind:headerHeight>
+		{@render header()}
+	</BufferHeader>
+	<BufferBody bind:clientHeight bind:headerHeight>
+		{@render body()}
+	</BufferBody>
+</BufferContainer>
 <div class="flex w-full max-w-lg">
 	<div
 		id="{subListViewID}-scroll-container"
 		style="max-height: {clientHeight -
 			headerHeight}px; min-height: {clientHeight - headerHeight}px"
 		class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-	>
-		{@render subListView(selectedSub)}
-	</div>
+	></div>
 </div>

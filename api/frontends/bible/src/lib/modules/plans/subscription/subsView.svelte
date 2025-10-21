@@ -102,7 +102,7 @@
 	<SubsAction bind:plansDisplay bind:pane bind:clientHeight paneID></SubsAction>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_DETAILS}
 	<SubsDetails
-		paneID
+		{paneID}
 		bind:clientHeight
 		bind:pane
 		bind:plansDisplay

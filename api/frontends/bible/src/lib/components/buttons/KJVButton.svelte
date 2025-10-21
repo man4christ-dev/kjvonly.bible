@@ -5,14 +5,26 @@
 	let {
 		onClick,
 		classes = 'h-12 w-12 rounded-full bg-neutral-100 text-neutral-700 ring-2 ring-neutral-300',
+		disabled = false,
 		children
 	}: {
 		onClick: MouseEventHandler<HTMLButtonElement>;
 		classes?: string;
+		disabled?: boolean;
 		children: Snippet;
 	} = $props();
 </script>
 
-<button onclick={onClick} class={classes}>
-	{@render children?.()}
-</button>
+{#if disabled}
+	<button
+		disabled
+		onclick={onClick}
+		class="{classes} disabled disabled:pointer-events-none disabled:opacity-50"
+	>
+		{@render children?.()}
+	</button>
+{:else}
+	<button onclick={onClick} class={classes}>
+		{@render children?.()}
+	</button>
+{/if}

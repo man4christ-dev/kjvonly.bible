@@ -69,6 +69,7 @@
 		>
 			<Menu></Menu>
 		</KJVButton>
+
 		<KJVButton classes="" onClick={onClosePlansList}>
 			<Close></Close>
 		</KJVButton>
