@@ -39,8 +39,7 @@
 	{#each subsList as s}
 		<button
 			onclick={() => onSubClicked(s)}
-			class="col-2 flex w-full flex-col overflow-hidden p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
-			style="height: 100px"
+			class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
 		>
 			<div class="flex w-full">
 				<span class="pb-2 text-2xl">{s.name}</span>

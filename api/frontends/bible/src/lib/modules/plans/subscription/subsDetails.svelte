@@ -20,6 +20,8 @@
 	import Pending from '$lib/components/svgs/pending.svelte';
 	import CheckCircle from '$lib/components/svgs/checkCircle.svelte';
 	import type { Pane } from '$lib/models/pane.model';
+	import { toastService } from '$lib/services/toast.service';
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -149,87 +151,78 @@
 
 	function onToggleCompletedReadings(): void {
 		showCompletedReadings = !showCompletedReadings;
+		let toastMsg = '';
+		if (showCompletedReadings) {
+			toastMsg = 'Showing Completed Readings';
+		} else {
+			toastMsg = 'Hiding CompletedReadings';
+		}
+		toastService.showToast('Toggled Completed Readings');
 	}
 </script>
 
 {#snippet subListView(sub: any)}
-	<div class="flex w-full flex-col">
-		<div class="flex p-2">
-			<span class="pb-2 text-2xl">{sub.name}</span>
-			<span class="flex-grow"></span>
+	<span
+		class=" sticky top-0 border-t border-neutral-400 bg-neutral-50 pb-2 text-2xl"
+		>{sub.name}</span
+	>
 
-			<label
-				for="showCompleted"
-				class="has-checked:bg-support-a-500 relative block h-8 w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent]"
+	{#each Array(subListReadingsToShow) as _, idx}
+		{#if !sub.completedReadings.get(idx) || (sub.completedReadings.get(idx) && showCompletedReadings)}
+			<button
+				onclick={() => onSelectedSubReading(idx, PLANS_VIEWS.SUBS_DETAILS)}
+				class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
 			>
-				<input
-					bind:checked={showCompletedReadings}
-					type="checkbox"
-					id="showCompleted"
-					class="peer sr-only"
-				/>
+				<div class="flex w-full min-w-50">
+					<ReadingsComponent bind:readings={sub.nestedReadings[idx].bcvs}
+					></ReadingsComponent>
+				</div>
 
-				<span
-					class="absolute inset-y-0 start-0 m-1 size-6 rounded-full bg-neutral-100 transition-[inset-inline-start] peer-checked:start-6"
-				></span>
-			</label>
-		</div>
-
-		<div class="flex w-full flex-col text-base">
-			{#each Array(subListReadingsToShow) as _, idx}
-				{#if !sub.completedReadings.get(idx) || (sub.completedReadings.get(idx) && showCompletedReadings)}
-					<button
-						onclick={() => onSelectedSubReading(idx, PLANS_VIEWS.SUBS_DETAILS)}
-						class="flex w-full flex-row px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
-					>
-						<div class="flex w-full min-w-50">
-							<ReadingsComponent bind:readings={sub.nestedReadings[idx].bcvs}
-							></ReadingsComponent>
+				<div class="flex w-full min-w-50 flex-col">
+					<div class="flex w-full">
+						<span class="flex flex-grow"></span>
+						<div
+							class="text-lg {sub.completedReadings.get(idx)?.index === idx
+								? 'text-support-a-500'
+								: ''}"
+						>
+							{idx + 1} of {sub.nestedReadings.length}
 						</div>
-
-						<div class="flex w-full min-w-50 flex-col">
-							<div class="flex w-full">
-								<span class="flex flex-grow"></span>
-								<div
-									class="text-lg {sub.completedReadings.get(idx)?.index === idx
-										? 'text-support-a-500'
-										: ''}"
-								>
-									{idx + 1} of {sub.nestedReadings.length}
-								</div>
-							</div>
-							<div class="flex w-full justify-end">
-								<div class="text-base text-nowrap">
-									Verses: {sub.nestedReadings[idx].totalVerses}
-								</div>
-							</div>
+					</div>
+					<div class="flex w-full justify-end">
+						<div class="text-base text-nowrap">
+							Verses: {sub.nestedReadings[idx].totalVerses}
 						</div>
-					</button>
-				{/if}
-			{/each}
-		</div>
-	</div>
+					</div>
+				</div>
+			</button>
+		{/if}
+	{/each}
 {/snippet}
 
 {#snippet header()}
-	<div class="grid w-full grid-cols-5 place-items-center">
-		<span></span>
-		<span></span>
-		<span class="text-center">My plans</span>
-		<KJVButton
-			classes=""
-			disabled={!hasCompletedReading}
-			onClick={onToggleCompletedReadings}
-		>
-			{#if showCompletedReadings}
-				<Pending></Pending>
-			{:else}
-				<CheckCircle></CheckCircle>
-			{/if}
-		</KJVButton>
-		<KJVButton classes="" onClick={onCloseSubDetails}>
-			<Close></Close>
-		</KJVButton>
+	<div class="grid w-full grid-cols-3 place-items-center">
+		<div class="flex w-full">
+			<KJVButton classes="" onClick={onCloseSubDetails}>
+				<ArrowBack></ArrowBack>
+			</KJVButton>
+			<span class="flex-1"></span>
+		</div>
+		<span class="flex text-center">My plans</span>
+		<div class="flex w-full">
+			<span class="flex-1"></span>
+			<KJVButton
+				classes=""
+				disabled={!hasCompletedReading}
+				onClick={onToggleCompletedReadings}
+			>
+				{#if showCompletedReadings}
+					<Pending></Pending>
+				{:else}
+					<CheckCircle></CheckCircle>
+				{/if}
+			</KJVButton>
+		</div>
 	</div>
 {/snippet}
 {#snippet body()}
@@ -244,11 +237,3 @@
 		{@render body()}
 	</BufferBody>
 </BufferContainer>
-<div class="flex w-full max-w-lg">
-	<div
-		id="{subListViewID}-scroll-container"
-		style="max-height: {clientHeight -
-			headerHeight}px; min-height: {clientHeight - headerHeight}px"
-		class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-	></div>
-</div>
