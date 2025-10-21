@@ -5,6 +5,9 @@
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import Close from '$lib/components/svgs/close.svelte';
+	import Menu from '$lib/components/svgs/menu.svelte';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -52,17 +55,29 @@
 	{/each}
 {/snippet}
 
+{#snippet header()}
+	<div class="grid w-full grid-cols-5 place-items-center">
+		<snap class=""></snap>
+		<span></span>
+		<span>My Plans</span>
+
+		<KJVButton
+			classes=""
+			onClick={() => {
+				plansDisplay = PLANS_VIEWS.SUBS_ACTIONS;
+			}}
+		>
+			<Menu></Menu>
+		</KJVButton>
+		<KJVButton classes="" onClick={onClosePlansList}>
+			<Close></Close>
+		</KJVButton>
+	</div>
+{/snippet}
+
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
-		<Header
-			title="My Plans"
-			onClose={onClosePlansList}
-			bind:plansDisplay
-			menuDropdownToggleViews={[
-				PLANS_VIEWS.SUBS_ACTIONS,
-				PLANS_VIEWS.SUBS_LIST
-			]}
-		></Header>
+		{@render header()}
 	</BufferHeader>
 	<BufferBody bind:clientHeight bind:headerHeight>
 		{@render subsListView()}
