@@ -1,36 +1,49 @@
 <script lang="ts">
-	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onDestroy, onMount } from 'svelte';
-	import ReadingsComponent from '../components/readings.svelte';
-	import uuid4 from 'uuid4';
-	import Header from '../components/header.svelte';
 
-	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
+	// COMPONENTS
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+	import BufferBody from '$lib/components/bufferBody.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	import ReadingsComponent from '../components/readings.svelte';
+
+	// MODELS
+	import { Modules } from '$lib/models/modules.model';
+	import type { Pane } from '$lib/models/pane.model';
 	import {
+		PLANS_VIEWS,
+		PLAN_PUBSUB_SUBSCRIPTIONS,
 		type Sub,
 		type NextReadings,
 		type Readings,
-		type NavReadings,
-		PLANS_VIEWS,
-		PLAN_PUBSUB_SUBSCRIPTIONS
+		type NavReadings
 	} from '../../../models/plans.model';
-	import { Modules } from '$lib/models/modules.model';
-	import BufferContainer from '$lib/components/bufferContainer.svelte';
-	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import BufferBody from '$lib/components/bufferBody.svelte';
+
+	// SERVICES
+	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
+
+	// OTHER
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
 
 	let {
-		pane = $bindable(),
-		plansDisplay = $bindable(),
-		clientHeight = $bindable()
+		pane = $bindable<Pane>(),
+		plansDisplay = $bindable<PLANS_VIEWS>()
+	}: {
+		pane: Pane;
+		plansDisplay: PLANS_VIEWS;
 	} = $props();
 
 	// ================================== VARS =================================
 
-	let nextReadingViewID = uuid4();
-	let headerHeight = $state(0);
+	let clientHeight: number = $state(0);
+	let headerHeight: number = $state(0);
 
 	let SUBSCRIBER_ID: string = uuid4();
 
@@ -147,7 +160,7 @@
 {#snippet nextReading(n: any, idx: any)}
 	<button
 		onclick={() => onSelectedNextReading(idx, PLANS_VIEWS.NEXT_LIST)}
-		class=" flex w-full flex-col px-2 py-4 text-base hover:cursor-pointer hover:bg-neutral-100"
+		class=" flex w-full flex-col px-2 py-4 text-base hover:bg-neutral-100"
 	>
 		<div class="flex">
 			<span class="pb-2 text-2xl">{n.name}</span>
@@ -176,20 +189,36 @@
 	</button>
 {/snippet}
 
+<!-- ================================ HEADER =============================== -->
+
+{#snippet header()}
+	<span class="flex-1">
+		<KJVButton classes="" onClick={onCloseNextReadings}>
+			<ArrowBack></ArrowBack>
+		</KJVButton>
+	</span>
+	<span class="text-center">Next Readings</span>
+
+	<span class="flex-1"></span>
+{/snippet}
+
+<!-- ================================= BODY ================================ -->
+
+{#snippet body()}
+	{#if nextReadings.length > 0}
+		{#each nextReadings as n, idx}
+			{@render nextReading(n, idx)}
+		{/each}
+	{/if}
+{/snippet}
+
+<!-- ============================== CONTAINER ============================== -->
+
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
-		<Header
-			title="Next Readings"
-			onClose={onCloseNextReadings}
-			bind:plansDisplay
-			menuDropdownToggleViews={undefined}
-		></Header>
+		{@render header()}
 	</BufferHeader>
 	<BufferBody bind:clientHeight bind:headerHeight>
-		{#if nextReadings.length > 0}
-			{#each nextReadings as n, idx}
-				{@render nextReading(n, idx)}
-			{/each}
-		{/if}
+		{@render body()}
 	</BufferBody>
 </BufferContainer>

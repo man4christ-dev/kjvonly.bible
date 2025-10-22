@@ -32,10 +32,9 @@
 </script>
 
 {#if plansDisplay < PLANS_MAX_VIEW_ID}
-	<Discover bind:plansDisplay bind:pane bind:paneID bind:clientHeight
-	></Discover>
+	<Discover bind:plansDisplay bind:pane bind:paneID></Discover>
 {:else if plansDisplay < SUBS_MAX_VIEW_ID}
 	<SubsView bind:plansDisplay bind:pane bind:paneID></SubsView>
 {:else if plansDisplay < NEXT_MAX_VIEW_ID}
-	<NextReadings bind:plansDisplay bind:pane bind:clientHeight></NextReadings>
+	<NextReadings bind:plansDisplay bind:pane></NextReadings>
 {/if}
