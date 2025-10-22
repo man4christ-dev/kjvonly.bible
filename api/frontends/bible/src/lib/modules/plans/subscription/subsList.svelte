@@ -1,26 +1,38 @@
 <script lang="ts">
-	import Header from '../components/header.svelte';
-	import { paneService } from '$lib/services/pane.service.svelte';
-	import { PLANS_VIEWS, type Sub } from '$lib/models/plans.model';
+	// ================================ IMPORTS ================================
+	// COMPONENTS
+	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import BufferBody from '$lib/components/bufferBody.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
+	// // SVGS
 	import Close from '$lib/components/svgs/close.svelte';
 	import Menu from '$lib/components/svgs/menu.svelte';
+	import type { Pane } from '$lib/models/pane.model';
+
+	// MODELS
+	import { PLANS_VIEWS, type Sub } from '$lib/models/plans.model';
+
+	// SERVICES
+	import { paneService } from '$lib/services/pane.service.svelte';
 
 	// =============================== BINDINGS ================================
 	let {
-		plansDisplay = $bindable<string>(),
-		pane = $bindable(),
-		paneID = $bindable(),
-		clientHeight = $bindable(),
+		plansDisplay = $bindable<PLANS_VIEWS>(),
+		pane = $bindable<Pane>(),
+		paneID = $bindable<string>(),
 		selectedSub = $bindable<Sub>(),
 		subsList = $bindable<Sub[]>()
+	}: {
+		plansDisplay: PLANS_VIEWS;
+		pane: Pane;
+		paneID: string;
+		selectedSub: Sub;
+		subsList: Sub[];
 	} = $props();
 
 	// ================================== VARS =================================
-
+	let clientHeight: number = $state(0);
 	let headerHeight = $state(0);
 
 	// ============================== CLICK FUNCS ==============================
@@ -30,10 +42,34 @@
 		plansDisplay = PLANS_VIEWS.SUBS_DETAILS;
 	}
 
-	function onClosePlansList() {
+	function onClosePlansList(): void {
 		paneService.onDeletePane(paneService.rootPane, paneID);
 	}
+
+	function onMenuClicked(): void {
+		plansDisplay = PLANS_VIEWS.SUBS_ACTIONS;
+	}
 </script>
+
+<!-- ================================ HEADER =============================== -->
+
+{#snippet header()}
+	<div class="grid w-full grid-cols-5 place-items-center">
+		<snap></snap>
+		<span></span>
+		<span>My Plans</span>
+
+		<KJVButton classes="" onClick={onMenuClicked}>
+			<Menu></Menu>
+		</KJVButton>
+
+		<KJVButton classes="" onClick={onClosePlansList}>
+			<Close></Close>
+		</KJVButton>
+	</div>
+{/snippet}
+
+<!-- ================================= BODY ================================ -->
 
 {#snippet subsListView()}
 	{#each subsList as s}
@@ -54,26 +90,7 @@
 	{/each}
 {/snippet}
 
-{#snippet header()}
-	<div class="grid w-full grid-cols-5 place-items-center">
-		<snap class=""></snap>
-		<span></span>
-		<span>My Plans</span>
-
-		<KJVButton
-			classes=""
-			onClick={() => {
-				plansDisplay = PLANS_VIEWS.SUBS_ACTIONS;
-			}}
-		>
-			<Menu></Menu>
-		</KJVButton>
-
-		<KJVButton classes="" onClick={onClosePlansList}>
-			<Close></Close>
-		</KJVButton>
-	</div>
-{/snippet}
+<!-- ============================== CONTAINER ============================== -->
 
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>

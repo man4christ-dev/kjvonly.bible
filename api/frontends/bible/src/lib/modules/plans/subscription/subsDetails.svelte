@@ -1,47 +1,56 @@
 <script lang="ts">
-	import { sleep } from '$lib/utils/sleep';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onMount, untrack } from 'svelte';
-	import Header from '../components/header.svelte';
+
+	// COMPONENTS
+	import BufferBody from '$lib/components/bufferBody.svelte';
+	import BufferContainer from '$lib/components/bufferContainer.svelte';
+	import BufferHeader from '$lib/components/bufferHeader.svelte';
+	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
 	import ReadingsComponent from '../components/readings.svelte';
-	import uuid4 from 'uuid4';
+	// // SVGS
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+	import CheckCircle from '$lib/components/svgs/checkCircle.svelte';
+	import Pending from '$lib/components/svgs/pending.svelte';
+
+	// MODELS
+	import type { BCV } from '$lib/models/bible.model';
+	import { Modules } from '$lib/models/modules.model';
+	import type { Pane } from '$lib/models/pane.model';
 	import {
 		PLANS_VIEWS,
 		type NavReadings,
 		type Readings,
 		type Sub
 	} from '$lib/models/plans.model';
-	import type { BCV } from '$lib/models/bible.model';
-	import { Modules } from '$lib/models/modules.model';
-	import BufferContainer from '$lib/components/bufferContainer.svelte';
-	import BufferHeader from '$lib/components/bufferHeader.svelte';
-	import BufferBody from '$lib/components/bufferBody.svelte';
-	import Close from '$lib/components/svgs/close.svelte';
-	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import Pending from '$lib/components/svgs/pending.svelte';
-	import CheckCircle from '$lib/components/svgs/checkCircle.svelte';
-	import type { Pane } from '$lib/models/pane.model';
+
+	// SERVICES
 	import { toastService } from '$lib/services/toast.service';
-	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+
+	// OTHER
+	import { sleep } from '$lib/utils/sleep';
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
-
 	let {
 		plansDisplay = $bindable<PLANS_VIEWS>(),
 		pane = $bindable<Pane>(),
 		paneID = $bindable<string>(),
-		clientHeight = $bindable(),
 		selectedSub = $bindable<Sub>()
 	}: {
 		plansDisplay: PLANS_VIEWS;
 		pane: Pane;
 		paneID: string;
-		clientHeight: number;
 		selectedSub: Sub;
 	} = $props();
 
 	// ================================== VARS =================================
-	let hasCompletedReading = $state(false);
+
+	let clientHeight: number = $state(0);
 	let headerHeight = $state(0);
+
+	let hasCompletedReading = $state(false);
 	let showCompletedReadings: boolean = $state(false);
 	let subListReadingsToShow: number = $state(0);
 	let subListViewID = uuid4();
@@ -73,6 +82,7 @@
 		selectedSub;
 		untrack(() => {
 			loadMoreSubReadings();
+			setHasCompletedReadings();
 		});
 	});
 
@@ -161,6 +171,40 @@
 	}
 </script>
 
+<!-- ================================ HEADER =============================== -->
+
+{#snippet header()}
+	<div class="grid w-full grid-cols-3 place-items-center">
+		<div class="flex w-full">
+			<KJVButton classes="" onClick={onCloseSubDetails}>
+				<ArrowBack></ArrowBack>
+			</KJVButton>
+			<span class="flex-1"></span>
+		</div>
+		<span class="flex text-center">My plans</span>
+		<div class="flex w-full">
+			<span class="flex-1"></span>
+			<KJVButton
+				classes=""
+				disabled={!hasCompletedReading}
+				onClick={onToggleCompletedReadings}
+			>
+				{#if showCompletedReadings}
+					<Pending></Pending>
+				{:else}
+					<CheckCircle></CheckCircle>
+				{/if}
+			</KJVButton>
+		</div>
+	</div>
+{/snippet}
+
+<!-- ================================= BODY ================================ -->
+
+{#snippet body()}
+	{@render subListView(selectedSub)}
+{/snippet}
+
 {#snippet subListView(sub: any)}
 	<span
 		class=" sticky top-0 border-t border-neutral-400 bg-neutral-50 pb-2 text-2xl"
@@ -200,34 +244,7 @@
 	{/each}
 {/snippet}
 
-{#snippet header()}
-	<div class="grid w-full grid-cols-3 place-items-center">
-		<div class="flex w-full">
-			<KJVButton classes="" onClick={onCloseSubDetails}>
-				<ArrowBack></ArrowBack>
-			</KJVButton>
-			<span class="flex-1"></span>
-		</div>
-		<span class="flex text-center">My plans</span>
-		<div class="flex w-full">
-			<span class="flex-1"></span>
-			<KJVButton
-				classes=""
-				disabled={!hasCompletedReading}
-				onClick={onToggleCompletedReadings}
-			>
-				{#if showCompletedReadings}
-					<Pending></Pending>
-				{:else}
-					<CheckCircle></CheckCircle>
-				{/if}
-			</KJVButton>
-		</div>
-	</div>
-{/snippet}
-{#snippet body()}
-	{@render subListView(selectedSub)}
-{/snippet}
+<!-- ============================== CONTAINER ============================== -->
 
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>

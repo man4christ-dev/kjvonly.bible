@@ -1,11 +1,13 @@
 <script lang="ts">
-	import { completedReadingsApi } from '$lib/api/completedReadings';
-	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
+	// ================================ IMPORTS ================================
+	// SVELTE
 	import { onDestroy, onMount } from 'svelte';
+	// COMPONENTS
 	import SubsAction from './subsAction.svelte';
 	import SubsDetails from './subsDetails.svelte';
 	import SubsList from './subsList.svelte';
-	import uuid4 from 'uuid4';
+
+	// MODELS
 	import {
 		NullSub,
 		type Sub,
@@ -14,15 +16,20 @@
 		PLAN_PUBSUB_SUBSCRIPTIONS
 	} from '$lib/models/plans.model';
 	import type { Pane } from '$lib/models/pane.model';
+
+	// SERVICES
 	import { completedReadingsService } from '$lib/services/plans/completedReadings.service';
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
+
+	// OTHER
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
 
 	let {
 		plansDisplay = $bindable<string>(),
 		pane = $bindable<Pane>(),
-		paneID = $bindable<string>(),
-		clientHeight = $bindable<string>()
+		paneID = $bindable<string>()
 	} = $props();
 
 	// ================================== VARS =================================
@@ -89,23 +96,19 @@
 	}
 </script>
 
+<!-- ============================== CONTAINER ============================== -->
+
 {#if plansDisplay === PLANS_VIEWS.SUBS_LIST}
 	<SubsList
 		bind:paneID
-		bind:clientHeight
 		bind:pane
 		bind:plansDisplay
 		bind:selectedSub
 		bind:subsList={subs}
 	></SubsList>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_ACTIONS}
-	<SubsAction bind:plansDisplay bind:pane bind:clientHeight paneID></SubsAction>
+	<SubsAction bind:plansDisplay bind:pane {paneID}></SubsAction>
 {:else if plansDisplay === PLANS_VIEWS.SUBS_DETAILS}
-	<SubsDetails
-		{paneID}
-		bind:clientHeight
-		bind:pane
-		bind:plansDisplay
-		bind:selectedSub
+	<SubsDetails {paneID} bind:pane bind:plansDisplay bind:selectedSub
 	></SubsDetails>
 {/if}

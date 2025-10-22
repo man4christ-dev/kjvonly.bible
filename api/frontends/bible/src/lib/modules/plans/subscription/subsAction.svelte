@@ -1,26 +1,32 @@
 <script lang="ts">
+	// ================================ IMPORTS ================================
+	// COMPONENTS
+	import ActionItemsList from '../components/actionItemsList.svelte';
+	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
 	import BufferBody from '$lib/components/bufferBody.svelte';
 	import BufferContainer from '$lib/components/bufferContainer.svelte';
 	import BufferHeader from '$lib/components/bufferHeader.svelte';
 	import KJVButton from '$lib/components/buttons/KJVButton.svelte';
-	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
+
+	// MODELS
 	import { type Pane } from '$lib/models/pane.model';
 	import { PLANS_VIEWS } from '$lib/models/plans.model';
-	import ActionItemsList from '../components/actionItemsList.svelte';
-	import Header from '../components/header.svelte';
 
 	// =============================== BINDINGS ================================
 
 	let {
-		plansDisplay = $bindable<string>(),
+		plansDisplay = $bindable<PLANS_VIEWS>(),
 		pane = $bindable<Pane>(),
-		paneID = $bindable<string>(),
-		clientHeight = $bindable<string>()
+		paneID = $bindable<string>()
+	}: {
+		plansDisplay: PLANS_VIEWS;
+		pane: Pane;
+		paneID: string;
 	} = $props();
 
 	// ================================== VARS =================================
-
-	let headerHeight = $state(0);
+	let clientHeight: number = $state(0);
+	let headerHeight: number = $state(0);
 
 	let subsActionItems: any = {
 		plans: () => {
@@ -32,6 +38,7 @@
 	};
 </script>
 
+<!-- ================================ HEADER =============================== -->
 {#snippet header()}
 	<div class="grid w-full grid-cols-5 place-items-center">
 		<span class="flex w-full">
@@ -47,10 +54,13 @@
 		</span>
 	</div>
 {/snippet}
+
+<!-- ================================= BODY ================================ -->
 {#snippet body()}
 	<ActionItemsList actionItems={subsActionItems}></ActionItemsList>
 {/snippet}
 
+<!-- ============================== CONTAINER ============================== -->
 <BufferContainer bind:clientHeight>
 	<BufferHeader bind:headerHeight>
 		{@render header()}
