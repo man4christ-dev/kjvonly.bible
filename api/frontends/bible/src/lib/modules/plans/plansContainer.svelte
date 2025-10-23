@@ -17,7 +17,6 @@
 	// ================================== VARS =================================
 
 	let plansDisplay: PLANS_VIEWS = $state(PLANS_VIEWS.SUBS_LIST);
-	let clientHeight = $state(0);
 
 	// =============================== LIFECYCLE ===============================
 

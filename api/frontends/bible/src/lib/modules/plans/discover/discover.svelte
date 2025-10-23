@@ -1,15 +1,23 @@
 <script lang="ts">
-	import { paneService } from '$lib/services/pane.service.svelte';
+	// ================================ IMPORTS ================================
+	// SVELTE
+	// COMPONENTS
+	// MODELS
+	// SERVICES
+	// =============================== BINDINGS ================================
+	// ================================== VARS =================================
+	// =============================== LIFECYCLE ===============================
+	// ================================ FUNCS ==================================
+	// ============================== CLICK FUNCS ==============================
 	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
-	import Header from '../components/header.svelte';
-	import ActionItemsList from '../components/actionItemsList.svelte';
 	import {
 		PLAN_PUBSUB_SUBSCRIPTIONS,
 		PLANS_VIEWS,
 		type Plan
 	} from '$lib/models/plans.model';
+	import DiscoverList from './discoverList.svelte';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -50,10 +58,6 @@
 
 	// ============================== CLICK FUNCS ==============================
 
-	function onClosePlansList() {
-		paneService.onDeletePane(paneService.rootPane, paneID);
-	}
-
 	function onGetAllPlans(data: any) {
 		if (data) {
 			plansMap = data.plans;
@@ -65,73 +69,6 @@
 	}
 </script>
 
-{#snippet plansListView()}
-	{#each planList as p}
-		<button
-			class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
-			style="height: 100px"
-		>
-			<div class="flex w-full">
-				<span class="pb-2 text-2xl">{p.name}</span>
-			</div>
-
-			<div class="text-md truncate text-start">
-				<p class="truncate text-start">{p.description}</p>
-			</div>
-		</button>
-	{/each}
-{/snippet}
-
 {#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
-	<Header
-		bind:headerHeight
-		title="Discover Plans"
-		onClose={onClosePlansList}
-		bind:plansDisplay
-		menuDropdownToggleViews={[
-			PLANS_VIEWS.PLANS_ACTIONS,
-			PLANS_VIEWS.PLANS_LIST
-		]}
-	></Header>
-
-	<div class="relative w-full max-w-lg">
-		<div
-			style="height: {clientHeight - headerHeight}px"
-			class="w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-		>
-			<!-- {@render today()} -->
-			{@render plansListView()}
-		</div>
-
-		<!-- Your parent container content -->
-		<div class="absolute right-0 bottom-0 p-4">
-			<button
-				class="bg-primary-200 z-10 flex h-12 w-12 items-center justify-center rounded-full text-neutral-200 hover:cursor-pointer"
-			>
-				+
-			</button>
-		</div>
-	</div>
-{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}
-	<Header
-		bind:headerHeight
-		title="Discover Plans"
-		onClose={undefined}
-		bind:plansDisplay
-		menuDropdownToggleViews={[
-			PLANS_VIEWS.PLANS_LIST,
-			PLANS_VIEWS.PLANS_ACTIONS
-		]}
-	></Header>
-	<div class="flex w-full max-w-lg">
-		<div
-			style="max-height: {clientHeight -
-				headerHeight}px; min-height: {clientHeight - headerHeight}px"
-			class="flex w-full max-w-lg overflow-x-hidden overflow-y-scroll bg-neutral-50"
-		>
-			<!-- {@render today()} -->
-
-			<ActionItemsList actionItems={planActionItems}></ActionItemsList>
-		</div>
-	</div>
-{/if}
+	<DiscoverList bind:planList bind:plansDisplay {paneID}></DiscoverList>
+{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}{/if}

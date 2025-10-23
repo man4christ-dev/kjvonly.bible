@@ -75,7 +75,7 @@
 	{#each subsList as s}
 		<button
 			onclick={() => onSubClicked(s)}
-			class="col-2 flex w-full flex-col p-2 text-base hover:cursor-pointer hover:bg-neutral-100"
+			class="col-2 flex w-full flex-col p-2 text-base hover:bg-neutral-100"
 		>
 			<div class="flex w-full">
 				<span class="pb-2 text-2xl">{s.name}</span>
@@ -84,7 +84,12 @@
 			</div>
 
 			<div class="text-md">
-				<p class="truncate text-left">{s.description}</p>
+				<p class="line-clamp-3 text-left">
+					{s.description}
+					{#each { length: 2000 } as _}
+						&nbsp;
+					{/each}
+				</p>
 			</div>
 		</button>
 	{/each}

@@ -4,9 +4,7 @@
 		"id": "00000000-0000-0000-0000-000000000000",
 		"planID": "00000000-0000-0000-0000-000000000000",
 		"name": "M'Cheyne Reading Plan",
-		"description": [
-			"The M'Cheyne Reading Plan is a daily Bible reading schedule developed by 19th-century Scottish minister Robert Murray M’Cheyne, designed to guide readers through the entire Bible in one year.\nThe plan involves reading approximately four passages per day, with the goal of completing the Old Testament once, the New Testament twice, and the Psalms twice within the year.\nThis structure ensures a comprehensive and balanced exposure to Scripture.\n"
-		],
+		"description": "The M'Cheyne Reading Plan is a daily Bible reading schedule developed by 19th-century Scottish minister Robert Murray M’Cheyne, designed to guide readers through the entire Bible in one year.\nThe plan involves reading approximately four passages per day, with the goal of completing the Old Testament once, the New Testament twice, and the Psalms twice within the year.\nThis structure ensures a comprehensive and balanced exposure to Scripture.\n",
 		"encodedReadings": [
 			"1/1/1-31;47/1/1-25;15/1/1-11;51/1/1-26",
 			"1/2/1-25;47/2/1-23;15/2/1-70;51/2/1-47",

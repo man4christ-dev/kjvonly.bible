@@ -7,7 +7,7 @@ export interface Plan {
 	id: string;
 	userID: string;
 	name: string;
-	description: string[];
+	description: string;
 	nestedReadings: Readings[];
 	dateCreated: number;
 	version: number;
@@ -18,7 +18,7 @@ export function NullPlan(): Plan {
 		id: '',
 		userID: '',
 		name: '',
-		description: [],
+		description: '',
 		nestedReadings: [],
 		dateCreated: 0,
 		version: 0
@@ -29,7 +29,7 @@ export interface CachedPlan {
 	id: string;
 	userID: string;
 	name: string;
-	description: string[];
+	description: string;
 	encodedReadings: string[];
 	dateCreated: number;
 	version: number;
