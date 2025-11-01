@@ -351,7 +351,7 @@
 {#snippet noteListActionsSnippet()}
 	{#each Object.keys(noteListActions) as na}
 		<button
-			class="hover:bg-primary-50 w-full py-4 ps-2 text-left capitalize"
+			class="w-full py-4 ps-2 text-left capitalize hover:bg-neutral-100"
 			aria-label="note action button"
 			onclick={() => noteListActions[na]()}
 		>

@@ -102,7 +102,7 @@
 			<div class="w-full">
 				<button
 					onclick={() => actions[a]()}
-					class="hover:bg-primary-100 w-full bg-neutral-50 p-4 text-start capitalize"
+					class="w-full bg-neutral-50 p-4 text-start capitalize hover:bg-neutral-100"
 					>{a}</button
 				>
 			</div>

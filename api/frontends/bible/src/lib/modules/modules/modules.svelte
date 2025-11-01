@@ -61,7 +61,7 @@
 		<div class="w-full">
 			<button
 				onclick={(event) => pane.updateBuffer(components[c])}
-				class="hover:bg-primary-50 w-full bg-neutral-50 p-4 text-start capitalize"
+				class="w-full bg-neutral-50 p-4 text-start capitalize hover:bg-neutral-100"
 				>{c}</button
 			>
 		</div>
