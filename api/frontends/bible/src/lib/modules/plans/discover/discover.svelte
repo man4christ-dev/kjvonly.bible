@@ -13,11 +13,13 @@
 	import { onDestroy, onMount } from 'svelte';
 	import uuid4 from 'uuid4';
 	import {
+		NullPlan,
 		PLAN_PUBSUB_SUBSCRIPTIONS,
 		PLANS_VIEWS,
 		type Plan
 	} from '$lib/models/plans.model';
 	import DiscoverList from './discoverList.svelte';
+	import DiscoverDetails from './discoverDetails.svelte';
 
 	// =============================== BINDINGS ================================
 	let {
@@ -31,15 +33,7 @@
 	let SUBSCRIBER_ID: string = uuid4();
 	let plansMap: Map<string, Plan> = $state(new Map());
 	let planList: Plan[] = $state([]);
-	let headerHeight = $state(0);
-	let planActionItems: any = {
-		'my plans': () => {
-			plansDisplay = PLANS_VIEWS.SUBS_LIST;
-		},
-		'next readings': () => {
-			plansDisplay = PLANS_VIEWS.NEXT_LIST;
-		}
-	};
+	let selectedPlan: Plan = $state(NullPlan());
 
 	// =============================== LIFECYCLE ===============================
 
@@ -70,5 +64,8 @@
 </script>
 
 {#if plansDisplay === PLANS_VIEWS.PLANS_LIST}
-	<DiscoverList bind:planList bind:plansDisplay {paneID}></DiscoverList>
-{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}{/if}
+	<DiscoverList bind:selectedPlan bind:planList bind:plansDisplay {paneID}
+	></DiscoverList>
+{:else if plansDisplay === PLANS_VIEWS.PLANS_ACTIONS}{:else if plansDisplay === PLANS_VIEWS.PLANS_DETAILS}
+	<DiscoverDetails bind:plansDisplay bind:selectedPlan></DiscoverDetails>
+{/if}

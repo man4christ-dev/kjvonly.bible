@@ -250,7 +250,7 @@
 	<BufferHeader bind:headerHeight>
 		{@render header()}
 	</BufferHeader>
-	<BufferBody bind:clientHeight bind:headerHeight>
+	<BufferBody ID={subListViewID} bind:clientHeight bind:headerHeight>
 		{@render body()}
 	</BufferBody>
 </BufferContainer>

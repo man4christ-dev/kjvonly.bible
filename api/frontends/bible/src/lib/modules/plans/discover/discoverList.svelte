@@ -10,12 +10,22 @@
 	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
 
 	// MODELS
-	import { PLANS_VIEWS } from '$lib/models/plans.model';
+	import { PLANS_VIEWS, type Plan } from '$lib/models/plans.model';
 	import { paneService } from '$lib/services/pane.service.svelte';
 	import Header from '../components/header.svelte';
 	// SERVICES
 	// =============================== BINDINGS ================================
-	let { planList = $bindable(), plansDisplay = $bindable(), paneID } = $props();
+	let {
+		planList = $bindable(),
+		plansDisplay = $bindable(),
+		selectedPlan = $bindable<Plan | undefined>(),
+		paneID
+	}: {
+		planList: Plan[];
+		plansDisplay: PLANS_VIEWS;
+		selectedPlan: Plan | undefined;
+		paneID: string;
+	} = $props();
 	// ================================== VARS =================================
 	let clientHeight: number = $state(0);
 	let headerHeight: number = $state(0);
@@ -24,6 +34,11 @@
 	// ============================== CLICK FUNCS ==============================
 	function onBackClicked() {
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
+	}
+
+	function onPlanClicked(e: Event, p: Plan) {
+		selectedPlan = p;
+		plansDisplay = PLANS_VIEWS.PLANS_DETAILS;
 	}
 </script>
 
@@ -50,6 +65,9 @@
 {#snippet plansListView()}
 	{#each planList as p}
 		<button
+			onclick={(e: Event) => {
+				onPlanClicked(e, p);
+			}}
 			class="col-2 flex w-full flex-col p-2 text-base hover:bg-neutral-100"
 		>
 			<div class="flex w-full">
