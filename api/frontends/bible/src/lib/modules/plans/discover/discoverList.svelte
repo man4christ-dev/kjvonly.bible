@@ -11,8 +11,7 @@
 
 	// MODELS
 	import { PLANS_VIEWS, type Plan } from '$lib/models/plans.model';
-	import { paneService } from '$lib/services/pane.service.svelte';
-	import Header from '../components/header.svelte';
+
 	// SERVICES
 	// =============================== BINDINGS ================================
 	let {

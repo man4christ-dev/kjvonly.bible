@@ -25,7 +25,7 @@
 		if (plan) {
 			plansDisplay = plan.returnView;
 		} else {
-			plansDisplay = PLANS_VIEWS.SUBS_LIST;
+			plansDisplay = PLANS_VIEWS.PLANS_LIST;
 		}
 	});
 </script>

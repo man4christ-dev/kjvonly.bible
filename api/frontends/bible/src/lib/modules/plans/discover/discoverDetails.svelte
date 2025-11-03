@@ -10,12 +10,19 @@
 	import ArrowBack from '$lib/components/svgs/arrowBack.svelte';
 	import ReadingsComponent from '../components/readings.svelte';
 	// MODELS
-	import { PLANS_VIEWS, type Plan } from '$lib/models/plans.model';
+	import {
+		CachedPlanToCachedSub,
+		PLANS_VIEWS,
+		type Plan
+	} from '$lib/models/plans.model';
 	// SERVICES
 	import { toastService } from '$lib/services/toast.service';
 	import uuid4 from 'uuid4';
 	import { sleep } from '$lib/utils/sleep';
 	import { onMount } from 'svelte';
+	import { subsApi } from '$lib/api/subs.api';
+	import { plansApi } from '$lib/api/plans.api';
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	// =============================== BINDINGS ================================
 	let {
 		plansDisplay = $bindable<PLANS_VIEWS>(),
@@ -67,7 +74,6 @@
 		}
 
 		readingsToShow += count;
-		console.log('loaded');
 	}
 
 	function handleScroll() {
@@ -90,9 +96,13 @@
 		plansDisplay = PLANS_VIEWS.PLANS_LIST;
 	}
 
-	function onAddPlanClicked() {
+	async function onAddPlanClicked() {
 		toastService.showToast('Plan added to My Plans');
 		plansDisplay = PLANS_VIEWS.SUBS_LIST;
+		let p = await plansApi.get(selectedPlan.id);
+		let s = CachedPlanToCachedSub(p);
+		await subsApi.put(s);
+		// TODO publish subscription
 	}
 </script>
 

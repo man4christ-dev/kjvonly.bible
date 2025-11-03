@@ -9,6 +9,10 @@ export class PlansApi {
 		return offlineApi.put(data, PATH, UNSYNCED_PLANS, PLANS);
 	}
 
+	async get(key: string): Promise<any> {
+		return offlineApi.cacheHit(key, UNSYNCED_PLANS, PLANS);
+	}
+
 	async gets(): Promise<any> {
 		let data: any = undefined;
 		try {

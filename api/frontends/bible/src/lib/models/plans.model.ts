@@ -1,4 +1,5 @@
 import { encodedReadingsDecoderService } from '$lib/services/plans/encodedReadingsDecoder.service';
+import uuid4 from 'uuid4';
 import type { BCV } from './bible.model';
 
 // =================================== PLAN ====================================
@@ -81,11 +82,24 @@ export function NullSub(): Sub {
 	};
 }
 
+export function CachedPlanToCachedSub(p: CachedPlan): CachedSub {
+	return {
+		id: uuid4(),
+		planID: p.id,
+		userID: '00000000-0000-0000-0000-000000000000',
+		name: p.name,
+		description: p.description,
+		encodedReadings: p.encodedReadings,
+		dateSubscribed: Date.now(),
+		version: 0
+	};
+}
+
 export interface CachedSub {
 	id: string;
 	planID: string;
 	userID: string;
-	name: '';
+	name: string;
 	description: string;
 	encodedReadings: string[];
 	dateSubscribed: number;
