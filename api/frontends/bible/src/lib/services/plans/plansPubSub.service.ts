@@ -1,4 +1,8 @@
-import { PLAN_PUBSUB_SUBSCRIPTIONS } from '$lib/models/plans.model';
+import {
+	PLAN_PUBSUB_SUBSCRIPTIONS,
+	type CachedSub,
+	type Sub
+} from '$lib/models/plans.model';
 
 const isBrowser = typeof window !== 'undefined';
 let plansWorker: any;
@@ -68,6 +72,14 @@ export class PlansPubSubService {
 			id: PLAN_PUBSUB_SUBSCRIPTIONS.PUT_READING,
 			data: data,
 			subID: subID
+		});
+	}
+
+	putSub(cachedSub: CachedSub) {
+		// TODO type post messages
+		plansWorker.postMessage({
+			action: PLAN_PUBSUB_SUBSCRIPTIONS.PUT_SUB,
+			data: cachedSub
 		});
 	}
 }

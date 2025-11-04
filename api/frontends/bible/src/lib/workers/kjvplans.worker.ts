@@ -212,6 +212,15 @@ function publishSubs() {
 	}
 }
 
+async function putSub(cs: CachedSub) {
+	let s = cachedSubToSub(cs);
+	subs.set(s.id, s);
+	if (s) {
+		await enrichSub(s);
+		publishSubs();
+	}
+}
+
 // ================================= ONMESSAGE =================================
 
 onmessage = async (e) => {
@@ -221,6 +230,9 @@ onmessage = async (e) => {
 			break;
 		case PLAN_PUBSUB_SUBSCRIPTIONS.GET_ALL_SUBS:
 			publishSubs();
+			break;
+		case PLAN_PUBSUB_SUBSCRIPTIONS.PUT_SUB:
+			putSub(e.data.data);
 			break;
 		case PLAN_PUBSUB_SUBSCRIPTIONS.PUT_READING:
 			putReading(e.data.data, e.data.subID);

@@ -102,7 +102,7 @@
 		let p = await plansApi.get(selectedPlan.id);
 		let s = CachedPlanToCachedSub(p);
 		await subsApi.put(s);
-		// TODO publish subscription
+		plansPubSubService.putSub(s);
 	}
 </script>
 
