@@ -1,25 +1,25 @@
 <script lang="ts">
 	// ================================ IMPORTS ================================
 	// SVELTE
-	// COMPONENTS
-	// MODELS
-	// SERVICES
-	// =============================== BINDINGS ================================
-	// ================================== VARS =================================
-	// =============================== LIFECYCLE ===============================
-	// ================================ FUNCS ==================================
-	// ============================== CLICK FUNCS ==============================
-	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
 	import { onDestroy, onMount } from 'svelte';
-	import uuid4 from 'uuid4';
+
+	// COMPONENTS
+	import DiscoverList from './discoverList.svelte';
+	import DiscoverDetails from './discoverDetails.svelte';
+
+	// MODELS
 	import {
 		NullPlan,
 		PLAN_PUBSUB_SUBSCRIPTIONS,
 		PLANS_VIEWS,
 		type Plan
 	} from '$lib/models/plans.model';
-	import DiscoverList from './discoverList.svelte';
-	import DiscoverDetails from './discoverDetails.svelte';
+
+	// SERVICES
+	import { plansPubSubService } from '$lib/services/plans/plansPubSub.service';
+
+	// OTHER
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
 	let {
