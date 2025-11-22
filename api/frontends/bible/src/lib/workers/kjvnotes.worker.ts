@@ -1,6 +1,6 @@
 import { notesApi } from '$lib/api/notes.api';
+import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 import { bibleDB, SEARCH } from '$lib/storer/bible.db';
-import { extractBookChapter } from '$lib/utils/chapter';
 import { sleep } from '$lib/utils/sleep';
 import FlexSearch, { type Id } from 'flexsearch';
 
@@ -18,20 +18,21 @@ async function waitForSearchIndex(): Promise<boolean> {
 let notesDocument = new FlexSearch.Document({
 	document: {
 		id: 'id',
-		index: ['title', 'text', 'tags[]:tag', 'bookChapter', 'chapterKey']
+		index: ['title', 'text', 'tags[]:tag', 'bookChapter', 'bibleLocationRef']
 	}
 });
 
 let notes: any = {};
 
 async function init() {
-	let cahcedNotes = await notesApi.getAllNotes();
+	let cachedNotes = await notesApi.gets();
 	notes = {};
-	for (let i = 0; i < cahcedNotes.length; i++) {
-		let nn = cahcedNotes[i];
-		if (nn?.chapterKey) {
-			let ck = nn.chapterKey.split('_');
-			nn.bookChapter = `${ck[0]}_${ck[1]}`;
+	for (let i = 0; i < cachedNotes.length; i++) {
+		let nn = cachedNotes[i];
+		if (nn?.bibleLocationRef) {
+			nn.bookChapter = bibleLocationReferenceService.extractBookIDChapter(
+				nn.bibleLocationRef
+			);
 			await notesDocument.addAsync(nn.id, nn);
 			notes[nn.id] = nn;
 		}
@@ -41,7 +42,9 @@ async function init() {
 }
 
 function addNote(noteID: string, note: any) {
-	note.bookChapter = extractBookChapter(note.chapterKey);
+	note.bookChapter = bibleLocationReferenceService.extractBookIDChapter(
+		note.bibleLocationRef
+	);
 	notes[noteID] = note;
 	notesDocument.add(noteID, note);
 	getAllNotes('*');

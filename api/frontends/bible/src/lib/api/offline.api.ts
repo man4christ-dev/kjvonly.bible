@@ -2,7 +2,10 @@ import { api } from './api';
 import { bibleStorer as storer } from '../storer/bible.storer';
 import { toastService } from '$lib/services/toast.service';
 import { authService } from '$lib/services/auth.service';
+import uuid4 from 'uuid4';
 
+// CORE NOTE: We do soft deletes server side so we can sync the delete
+// across devices. Periodically, the server will remove the soft deletes.
 export class OfflineApi {
 	async sync(path: string, unsyncedDB: string, syncedDB: string) {
 		let lastDateUpdated = 0;
@@ -40,11 +43,15 @@ export class OfflineApi {
 					}
 				} else {
 					shouldContinue = false;
-					console.log(`error syncing annotations from server: ${await resp.json()}`);
+					console.log(
+						`error syncing annotations from server: ${await resp.json()}`
+					);
 				}
 			}
 		} catch (error) {
-			console.log(`error getting ${path} from ${lastDateUpdated} from server: ${error}`);
+			console.log(
+				`error getting ${path} from ${lastDateUpdated} from server: ${error}`
+			);
 		}
 
 		if (dateUpdatedSynced) {
@@ -93,7 +100,11 @@ export class OfflineApi {
 		return data;
 	}
 
-	async cacheHit(key: string, unsyncedDB: string, syncedDB: string): Promise<any> {
+	async cacheHit(
+		key: string,
+		unsyncedDB: string,
+		syncedDB: string
+	): Promise<any> {
 		let data;
 		try {
 			data = await storer.getValue(unsyncedDB, key);
@@ -108,7 +119,12 @@ export class OfflineApi {
 		return data;
 	}
 
-	async put(data: any, path: string, unsyncedDB: string, syncedDB: string): Promise<any> {
+	async put(
+		data: any,
+		path: string,
+		unsyncedDB: string,
+		syncedDB: string
+	): Promise<any> {
 		try {
 			data.version = data.version + 1;
 			var result: Response;
@@ -127,7 +143,9 @@ export class OfflineApi {
 						storer.deleteValue(unsyncedDB, data.id);
 						storer.putValue(syncedDB, annots);
 					}
-					toastService.showToast('Discarded stale versions. Please update lastest version.');
+					toastService.showToast(
+						'Discarded stale versions. Please update lastest version.'
+					);
 					return annots;
 				} else {
 					return await this.onFailurePut(
@@ -157,10 +175,17 @@ export class OfflineApi {
 		unsyncedDB: string,
 		error: any
 	): Promise<any> {
-		console.log(`error putting  ${data?.id}: storing to unsynced cache:  ${error}: `);
+		if (!data?.id) {
+			data.id = uuid4();
+			data.dateCreated;
+		}
+		console.log(
+			`error putting  ${data?.id}: storing to unsynced cache:  ${error}: `
+		);
 		data.version = data.version - 1;
 
-		let toastMessage = 'Offline Mode: sync will occur when service is reachable.';
+		let toastMessage =
+			'Offline Mode: sync will occur when service is reachable.';
 		if (statusCode === 401) {
 			if (authService.hasLoggedIn()) {
 				toastMessage = 'Offline Mode: sign in again to save changes.';
@@ -173,20 +198,33 @@ export class OfflineApi {
 		return data;
 	}
 
-	async delete(data: any, path: string, unsyncedDB: string, syncedDB: string): Promise<any> {
+	async delete(
+		id: string,
+		path: string,
+		unsyncedDB: string,
+		syncedDB: string
+	): Promise<any> {
 		try {
-			let result = await api.delete(`${path}/${data.id}`);
+			let result = await api.delete(`${path}/${id}`);
 
 			if (result.ok) {
-				await storer.deleteValue(unsyncedDB, data.id);
-				await storer.deleteValue(syncedDB, data.id);
+				await storer.deleteValue(unsyncedDB, id);
+				await storer.deleteValue(syncedDB, id);
 			} else {
+				let data = {
+					id: id,
+					// dateDelete is so we can filtered out deletes that are not
+					// synced yet. The server will stamp the accurate dateDelete
+					// once synced.
+					dateDeleted: Date.now()
+				};
+
 				await storer.putValue(unsyncedDB, data);
-				await storer.deleteValue(syncedDB, data.id);
-				console.log(`Failed to delete ${path}/${data.id}`);
+				await storer.deleteValue(syncedDB, id);
+				console.log(`Failed to delete ${path}/${id}`);
 			}
 		} catch (error) {
-			console.log(`Failed to delete ${path}/${data.id}: ${error}`);
+			console.log(`Failed to delete ${path}/${id}: ${error}`);
 		}
 	}
 }

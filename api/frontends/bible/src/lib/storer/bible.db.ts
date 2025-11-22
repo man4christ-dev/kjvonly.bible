@@ -1,43 +1,77 @@
 import IndexedDB from './idb.db';
 
+const DB_VERSION = 11;
+
 export const enum STORES {
 	CHAPTERS,
 	BOOKNAMES,
 	STRONGS,
-	ANNOTATIONS,
-	NOTES,
 	SEARCH,
+	ANNOTATIONS,
 	UNSYNCED_ANNOTATIONS,
-	UNSYNCED_NOTES
+	NOTES,
+	UNSYNCED_NOTES,
+	PLANS,
+	UNSYNCED_PLANS,
+	SUBSCRIPTIONS,
+	UNSYNCED_SUBSCRIPTIONS,
+	READINGS,
+	UNSYNCED_READINGS
 }
 
 export const DB_NAME = 'bible';
+
 export const CHAPTERS = 'chapters';
 export const BOOKNAMES = 'booknames';
 export const STRONGS = 'strongs';
-export const ANNOTATIONS = 'annotations';
-export const NOTES = 'notes';
 export const SEARCH = 'search';
+
+export const ANNOTATIONS = 'annotations';
 export const UNSYNCED_ANNOTATIONS = 'unsynced_annotations';
+
+export const NOTES = 'notes';
 export const UNSYNCED_NOTES = 'unsynced_notes';
+
+export const PLANS = 'plans';
+export const UNSYNCED_PLANS = 'unsynced_plans';
+
+export const SUBSCRIPTIONS = 'subscriptions';
+export const UNSYNCED_SUBSCRIPTIONS = 'unsynced_subscriptions';
+
+export const COMPLETED_READINGS = 'completed_readings';
+export const UNSYNCED_COMPLETED_READINGS = 'unsynced_completed_readings';
 
 export class BibleDB extends IndexedDB {
 	constructor() {
 		super(DB_NAME);
 	}
 
-	static instance = new BibleDB();
+	static instance: BibleDB = new BibleDB();
 	public static async CreateAsync(): Promise<BibleDB> {
-		await this.instance.createAndOrOpenObjectStores([
-			CHAPTERS,
-			BOOKNAMES,
-			STRONGS,
-			ANNOTATIONS,
-			NOTES,
-			SEARCH,
-			UNSYNCED_ANNOTATIONS,
-			UNSYNCED_NOTES
-		]);
+		await this.instance.createAndOrOpenObjectStores(
+			[
+				CHAPTERS,
+				BOOKNAMES,
+				STRONGS,
+				SEARCH,
+
+				ANNOTATIONS,
+				UNSYNCED_ANNOTATIONS,
+
+				NOTES,
+				UNSYNCED_NOTES,
+
+				PLANS,
+				UNSYNCED_PLANS,
+
+				SUBSCRIPTIONS,
+				UNSYNCED_SUBSCRIPTIONS,
+
+				COMPLETED_READINGS,
+				UNSYNCED_COMPLETED_READINGS
+			],
+			DB_VERSION
+		);
 		return this.instance;
 	}
 }

@@ -1,0 +1,18 @@
+{
+	"version": "0.2.0",
+	"configurations": [
+		{
+			"name": "Launch Brave with Profile",
+			"type": "chrome",
+			"request": "launch",
+			"runtimeExecutable": "/Applications/Brave Browser.app/Contents/MacOS/Brave Browser",
+			"url": "http://localhost:5173",
+			"webRoot": "${workspaceFolder}",
+			"userDataDir": false,
+			"runtimeArgs": [
+				"--profile-directory='Your Brave'",
+				"--remote-debugging-port=9222"
+			]
+		}
+	]
+}

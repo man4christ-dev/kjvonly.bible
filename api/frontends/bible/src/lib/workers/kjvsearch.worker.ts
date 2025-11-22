@@ -1,6 +1,11 @@
+import type { SearchResultResponse } from '$lib/models/search.model';
 import { bibleDB, SEARCH } from '$lib/storer/bible.db';
 import { sleep } from '$lib/utils/sleep';
 import FlexSearch, { type Id } from 'flexsearch';
+
+/**
+ * Index ID is <BookID>_<Chapter>_<Verse>
+ */
 
 let index = new FlexSearch.Index();
 
@@ -70,14 +75,16 @@ function onlyUnique(value: any, index: number, array: any[]) {
 async function search(id: string, text: string) {
 	let startTime: any = new Date();
 
-	let indexes = [];
+	let indexes: FlexSearch.IndexSearchResult = [];
 	let terms = text.split('OR');
 	for (let i = 0; i < terms.length; i++) {
 		let matches = await index.searchAsync(terms[i], 1000000);
 		indexes.push(...matches);
 	}
 
-	let unique = indexes.filter(onlyUnique);
+	let unique: string[] = indexes
+		.filter(onlyUnique)
+		.map((value: FlexSearch.Id) => value as string);
 
 	unique = unique.sort((a: Id, b: Id) => {
 		let asplit = a
@@ -100,13 +107,19 @@ async function search(id: string, text: string) {
 	});
 
 	let endTime: any = new Date();
-	var timeDiff = endTime - startTime; //in ms
+	var timeDiffInMilliseconds = endTime - startTime;
 
 	let stats = {
 		count: unique.length,
-		time: `${timeDiff} ms`
+		time: `${timeDiffInMilliseconds} ms`
 	};
-	postMessage({ id: id, indexes: unique, stats: stats });
+
+	let srr: SearchResultResponse = {
+		id: id,
+		bibleLocationRefs: unique,
+		stats: stats
+	};
+	postMessage(srr);
 }
 
 onmessage = async (e) => {

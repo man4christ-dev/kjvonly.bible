@@ -14,7 +14,7 @@ export function timeout(prom: Promise<any>, time: number) {
 	 * Not much incentive to decrease the seed time since it only happens once on app load and with new data versions.
 	 *
 	 *
-	 * example: chapter = await this.timeout(bibleDB.getValue('chapters', chapterKey), 1000)
+	 * example: chapter = await this.timeout(bibleDB.getValue('chapters', bibleLocationRef), 1000)
 	 *   */
 	const timeoutError = new Error(
 		`execution time has exceeded the allowed time frame of ${time} ms`

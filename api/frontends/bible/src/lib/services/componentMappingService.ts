@@ -1,9 +1,12 @@
-import ChapterContainer from '$lib/modules/chapter/chapterContainer.svelte';
+import { Modules as modules } from '$lib/models/modules.model';
+import BibleContainer from '$lib/modules/bible/bibleContainer.svelte';
 import UserGuide from '$lib/modules/guide/userGuide.svelte';
 import Login from '$lib/modules/login/login.svelte';
 import Modules from '$lib/modules/modules/modules.svelte';
-import Notes from '$lib/modules/notes/notes.svelte';
-import StrongsVersesRefs from '$lib/modules/refs/strongs-verses-refs/strongsVersesRefs.svelte';
+import NotesContainer from '$lib/modules/notes/notesContainer.svelte';
+import PlansContainer from '$lib/modules/plans/plansContainer.svelte';
+import RefsContainer from '$lib/modules/refs/refsContainer.svelte';
+import SettingsContainer from '$lib/modules/settings/settingsContainer.svelte';
 import Search from '../modules/search/search.svelte';
 
 /**
@@ -14,28 +17,32 @@ import Search from '../modules/search/search.svelte';
 export class ComponentMapping {
 	/**
 	 *
-	 * @param componentName string of class to be returned
+	 * @param module string of class to be returned
 	 * @returns component class
 	 */
-	getComponent(componentName: string): any {
-		switch (componentName) {
-			case 'ChapterContainer':
-				return ChapterContainer;
-			case 'StrongsVersesRefs':
-				return StrongsVersesRefs;
-			case 'Search':
+	getComponent(module: modules): any {
+		switch (module) {
+			case modules.BIBLE:
+				return BibleContainer;
+			case modules.STRONGS:
+				return RefsContainer;
+			case modules.SEARCH:
 				return Search;
-			case 'Modules':
+			case modules.MODULES:
 				return Modules;
-			case 'Notes':
-				return Notes;
-			case 'UserGuide':
+			case modules.NOTES:
+				return NotesContainer;
+			case modules.USER_GUIDE:
 				return UserGuide;
-			case 'Login':
-				return Login;				
+			case modules.LOGIN:
+				return Login;
+			case modules.SETTINGS:
+				return SettingsContainer;
+			case modules.PLANS:
+				return PlansContainer;
 		}
 
-		return ChapterContainer;
+		return BibleContainer;
 	}
 }
 

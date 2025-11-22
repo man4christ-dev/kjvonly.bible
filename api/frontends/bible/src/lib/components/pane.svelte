@@ -1,16 +1,14 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { onDestroy, onMount } from 'svelte';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import { newSettings, type Settings } from '../models/settings.model';
 	import { componentMapping } from '$lib/services/componentMappingService';
 	import { settingsService } from '$lib/services/settings.service';
 	import type { Pane } from '$lib/models/pane.model';
 
 	let containerHeight: string = $state('');
 	let containerWidth: string = $state('');
-	let chapterSettings: Settings | null = $state(null);
 
-	let { paneId = $bindable<string>() } = $props();
+	let { paneID = $bindable<string>() } = $props();
 
 	let pane: Pane | any = $state();
 
@@ -21,7 +19,7 @@
 		 * the idea is that the existing pane becomes a branch pane so we would
 		 * assign the pane vars to a new object and unset the pane id var.
 		 * eventually, svelte would update and the pane.id, which would be
-		 * undefined. The paneId was still correct. I'm thinking
+		 * undefined. The paneID was still correct. I'm thinking
 		 * on update this would be the place to reassign the pane.
 		 *
 		 * So what made this a very difficult bug to detect was when we assign
@@ -33,39 +31,29 @@
 		 * looking at the split code in +page.svelte it's obvious that we are creating
 		 * an new object and the references of the original pane object would not change.
 		 *
-		 * If paneId was bound with pane.id then when the pane.id was reset to undefined
-		 * then every child paneId bound with pane.id would be undefined causing w/e
+		 * If paneID was bound with pane.id then when the pane.id was reset to undefined
+		 * then every child paneID bound with pane.id would be undefined causing w/e
 		 * issue.
 		 *
-		 * I don't think a paneId ever changes. So we should make it a convention
-		 * to use paneId instead of pane.id. There's a few moments when id is unset
-		 * and the paneId would be undefined.
+		 * I don't think a paneID ever changes. So we should make it a convention
+		 * to use paneID instead of pane.id. There's a few moments when id is unset
+		 * and the paneID would be undefined.
 		 *
 		 * Also the vars except id are objects so those would have the same reference if bound
 		 * to a child component.
 		 */
-		pane = paneService.findNode(paneService.rootPane, paneId);
-		if (hw[paneId]) {
-			containerHeight = `height: ${hw[paneId].height * 100}vh;`;
-			containerWidth = `width: ${hw[paneId].width * 100}vw;`;
+		pane = paneService.findNode(paneService.rootPane, paneID);
+		if (hw[paneID]) {
+			containerHeight = `height: ${hw[paneID].height * 100}vh;`;
+			containerWidth = `width: ${hw[paneID].width * 100}vw;`;
 		} else {
 			console.log('error should have update height and width');
 		}
 	}
 
 	onMount(() => {
-		let cs = localStorage.getItem('settings');
-		if (cs !== null) {
-			chapterSettings = JSON.parse(cs);
-
-			if (chapterSettings && chapterSettings.colorTheme) {
-				settingsService.setTheme(chapterSettings?.colorTheme);
-			}
-		} else {
-			chapterSettings = newSettings();
-		}
-
-		let p = paneService.findNode(paneService.rootPane, paneId);
+		settingsService.applySettings();
+		let p = paneService.findNode(paneService.rootPane, paneID);
 
 		/**
 		 * Pane buffer history:
@@ -85,25 +73,35 @@
 		}
 
 		pane = p;
-		paneService.subscribe(paneId, updateHeightWidth);
+		paneService.subscribe(paneID, updateHeightWidth);
 		updateHeightWidth(paneService.heightWidth);
+	});
+
+	onDestroy(() => {
+		//unsubscribe from paneService
 	});
 </script>
 
 <div style="{containerWidth} {containerHeight}">
-	<!-- Since component is a Const we need a way to rerender this when the component changes. 
-			     We accomplish this with the toggle. -->
+	<!--
+		Since component is a @const we need a way to rerender this when the 
+		component changes. We accomplish this with the toggle. 
+	 -->
 	{#if pane?.toggle}
 		{#if pane?.buffer?.componentName}
-			{@const Component = componentMapping.getComponent(pane?.buffer?.componentName)}
-			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}></Component>
+			{@const Component = componentMapping.getComponent(
+				pane?.buffer?.componentName
+			)}
+			<Component bind:pane {paneID}></Component>
 		{/if}
 	{/if}
 
 	{#if pane && !pane.toggle}
 		{#if pane?.buffer?.componentName}
-			{@const Component = componentMapping.getComponent(pane?.buffer?.componentName)}
-			<Component bind:containerHeight bind:containerWidth bind:pane {paneId}></Component>
+			{@const Component = componentMapping.getComponent(
+				pane?.buffer?.componentName
+			)}
+			<Component bind:pane {paneID}></Component>
 		{/if}
 	{/if}
 </div>

@@ -1,32 +1,40 @@
 import { NOTES, UNSYNCED_NOTES } from '$lib/storer/bible.db';
 import { bibleStorer } from '$lib/storer/bible.storer';
+import { deepMerge } from '$lib/utils/deepmerge';
 import { offlineApi } from './offline.api';
 
+const PATH = 'notes';
 export class NotesApi {
-	async putNote(data: any): Promise<any> {
-		let path = '/notes';
+	async put(data: any): Promise<any> {
 		let unsyncedDB = UNSYNCED_NOTES;
 		let syncedDB = NOTES;
-		return offlineApi.put(data, path, unsyncedDB, syncedDB);
+		return offlineApi.put(data, PATH, unsyncedDB, syncedDB);
 	}
 
-	async getAllNotes(): Promise<any> {
+	async gets(): Promise<any> {
 		let data: any = undefined;
 		try {
-			data = await bibleStorer.getAllValue(NOTES);
+			let unsyncedNotes = await bibleStorer.getAllValue(UNSYNCED_NOTES);
+			let syncedNotes = await bibleStorer.getAllValue(NOTES);
+
+			let concatNotes: any = new Map();
+			syncedNotes.forEach((p: any) => {
+				concatNotes.set(p.id, p);
+			});
+
+			unsyncedNotes.forEach((p: any) => {
+				concatNotes.set(p.id, p);
+			});
+
+			data = Array.from(concatNotes.values());
 		} catch (error) {
-			console.log(`error getting all annotations from indexedDB: ${error}`);
+			console.log(`error getting all notes from indexedDB: ${error}`);
 		}
 		return data;
 	}
 
-	async deleteNote(noteID: string): Promise<any> {
-		let path: string = `/notes`;
-		let delNte = {
-			id: noteID,
-			dateDeleted: Date.now()
-		};
-		await offlineApi.delete(delNte, path, UNSYNCED_NOTES, NOTES);
+	async delete(id: string): Promise<any> {
+		await offlineApi.delete(id, PATH, UNSYNCED_NOTES, NOTES);
 	}
 }
 

@@ -8,7 +8,7 @@ export class ToastService {
 		return this._instance || (this._instance = new this());
 	}
 
-	public showToast: Function = () => {};
+	public showToast: (message: string) => void = (message: string) => {};
 }
 
 export let toastService = ToastService.Instance;

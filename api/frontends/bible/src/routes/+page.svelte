@@ -11,6 +11,7 @@
 	import PaneContainer from '$lib/components/pane.svelte';
 	import { type Pane } from '$lib/models/pane.model';
 	import { toastService } from '$lib/services/toast.service';
+	import { Modules } from '$lib/models/modules.model';
 
 	let template = $state();
 	let paneIds: string[] = $state([]);
@@ -74,14 +75,14 @@
 		paneService.publishHw(heightWidth);
 	}
 
-	function findPane(p: Pane, paneId: string): Pane | undefined {
-		if (p.id === paneId) {
+	function findPane(p: Pane, paneID: string): Pane | undefined {
+		if (p.id === paneID) {
 			return p;
 		}
 		let found;
 
 		if (p.left) {
-			found = findPane(p.left, paneId);
+			found = findPane(p.left, paneID);
 		}
 
 		if (found) {
@@ -89,14 +90,19 @@
 		}
 
 		if (p.right) {
-			found = findPane(p.right, paneId);
+			found = findPane(p.right, paneID);
 		}
 
 		return found;
 	}
 
-	function splitPane(paneId: string, split: string, componentName: string, bag: any) {
-		let p = findPane(paneService.rootPane, paneId);
+	function splitPane(
+		paneID: string,
+		split: string,
+		componentName: Modules,
+		bag: any
+	) {
+		let p = findPane(paneService.rootPane, paneID);
 
 		/** p should never be undefined */
 		if (!p) {
@@ -117,7 +123,7 @@
 
 		let buffer = new Buffer();
 		buffer.componentName = componentName;
-		buffer.name = componentName;
+		buffer.name = `${componentName}`;
 		buffer.bag = bag;
 
 		p.right = {
@@ -136,10 +142,14 @@
 	}
 
 	function deletePane(n: Pane, key: string) {
-		if (n.id === paneService.rootPane.id && n.left === undefined && n.right === undefined) {
-			n.buffer.componentName = 'Modules';
+		if (
+			n.id === paneService.rootPane.id &&
+			n.left === undefined &&
+			n.right === undefined
+		) {
+			n.buffer.componentName = Modules.MODULES;
 			n.buffer.bag = {};
-			n.updateBuffer('Modules');
+			n.updateBuffer(Modules.MODULES);
 		}
 
 		if (n.id === key) {
@@ -207,12 +217,18 @@
 		document.getElementById('kjvonly-head')?.appendChild(link);
 
 		paneService.rootPane.buffer = new Buffer();
-		paneService.rootPane.buffer.componentName = 'ChapterContainer';
-		paneService.rootPane.buffer.name = 'ChapterContainer';
+
+		/**
+		 * DEV NOTE: Update the component to w/e you are working on
+		 * Save you a few clicks on reload.
+		 */
+		paneService.rootPane.buffer.componentName = Modules.PLANS;
+
 		paneService.onDeletePane = deletePane;
 		paneService.onSplitPane = splitPane;
 		onGridUpdate();
 
+		trySetDataPersistence();
 		toastService.showToast = showToast;
 	});
 
@@ -224,14 +240,31 @@
 			toasts.shift();
 		}, 2500 * toasts.length);
 	}
+
+	function trySetDataPersistence() {
+		(async () => {
+			if (navigator.storage && navigator.storage.persist) {
+				const persisted = await navigator.storage.persisted();
+				if (!persisted) {
+					const granted = await navigator.storage.persist();
+
+					if (granted) {
+						console.log('Persistent storage granted');
+					} else {
+						console.log('Persistent storage NOT granted');
+					}
+				}
+			}
+		})();
+	}
 </script>
 
 <div class="flex h-[100vh] w-full flex-col">
 	<div style="max-height: 100vh; min-width: 1px; {template};" class="w-full">
-		{#each paneIds as paneId}
-			{#if !deletedPaneIds[paneId]}
-				<div class="outline" style="grid-area: {paneId};">
-					<PaneContainer {paneId}></PaneContainer>
+		{#each paneIds as paneID}
+			{#if !deletedPaneIds[paneID]}
+				<div class="outline outline-neutral-400" style="grid-area: {paneID};">
+					<PaneContainer {paneID}></PaneContainer>
 				</div>
 			{/if}
 		{/each}
@@ -242,7 +275,7 @@
 	<div class="fixed end-4 bottom-4 z-[10000] flex flex-col">
 		{#each [...toasts].reverse() as t}
 			<aside
-				class="my-2 flex items-center justify-center gap-4 rounded-lg border bg-neutral-100 px-5 py-3"
+				class="my-2 flex items-center justify-center gap-4 rounded-lg border bg-neutral-400 px-5 py-3"
 			>
 				{t}
 			</aside>
