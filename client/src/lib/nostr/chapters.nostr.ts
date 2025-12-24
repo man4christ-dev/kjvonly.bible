@@ -10,7 +10,7 @@ import {
 import { offlineApi } from './offline.nostr';
 import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 import { KJVONLY_PUBKEY } from '$lib/utils/nostr';
-import { CHAPTER_KIND } from './kinds';
+import { relayService } from '$lib/services/relay.service';
 
 export class ChapterApi {
   async getChapter(bibleLocationRef: string): Promise<any> {
@@ -19,9 +19,12 @@ export class ChapterApi {
 
     let filter = {
       "authors": [KJVONLY_PUBKEY],
-      "kinds": [CHAPTER_KIND],
       "#d": [`kjvonly/bible/kjvs/${bibleLocationRef}`]
     }
+
+    // TODO remove this to actually hit cache
+    let content = await relayService.getContent(filter)
+    return JSON.parse(content)
 
     return offlineApi.cacheHitThenFetch(
       filter,
@@ -45,6 +48,32 @@ export class ChapterApi {
     );
   }
 
+  async getSearchIndex(): Promise<any> {
+    // return offlineApi.cacheHitThenFetch(
+    //   `/data/json.gz/bibleindex.json`,
+    //   'v1',
+    //   SEARCH,
+    //   SEARCH
+    // );
+  }
+
+  async getStrongs(key: string): Promise<any> {
+    let filter = {
+      "authors": [KJVONLY_PUBKEY],
+      "#d": [`kjvonly/bible/strongs/{key}`]
+    }
+
+    let content = await relayService.getContent(filter)
+    return JSON.parse(content)
+
+
+    return offlineApi.cacheHitThenFetch(
+      filter,
+      key,
+      STRONGS,
+      STRONGS
+    );
+  }
 }
 
 export let chapterApi = new ChapterApi();

@@ -1,27 +1,28 @@
 import IndexedDB from './idb.db';
 
-const DB_VERSION = 11;
+const DB_VERSION = 12;
 
 export const enum STORES {
-	CHAPTERS,
-	BOOKNAMES,
-	STRONGS,
-	SEARCH,
-	ANNOTATIONS,
-	UNSYNCED_ANNOTATIONS,
-	NOTES,
-	UNSYNCED_NOTES,
-	PLANS,
-	UNSYNCED_PLANS,
-	SUBSCRIPTIONS,
-	UNSYNCED_SUBSCRIPTIONS,
-	READINGS,
-	UNSYNCED_READINGS
+  CHAPTERS,
+  BOOKNAMES,
+  STRONGS,
+  SEARCH,
+  ANNOTATIONS,
+  UNSYNCED_ANNOTATIONS,
+  NOTES,
+  UNSYNCED_NOTES,
+  PLANS,
+  UNSYNCED_PLANS,
+  SUBSCRIPTIONS,
+  UNSYNCED_SUBSCRIPTIONS,
+  READINGS,
+  UNSYNCED_READINGS
 }
 
 export const DB_NAME = 'bible';
 
 export const CHAPTERS = 'chapters';
+export const PARAGRAPHS = 'paragraphs'
 export const BOOKNAMES = 'booknames';
 export const STRONGS = 'strongs';
 export const SEARCH = 'search';
@@ -42,38 +43,39 @@ export const COMPLETED_READINGS = 'completed_readings';
 export const UNSYNCED_COMPLETED_READINGS = 'unsynced_completed_readings';
 
 export class BibleDB extends IndexedDB {
-	constructor() {
-		super(DB_NAME);
-	}
+  constructor() {
+    super(DB_NAME);
+  }
 
-	static instance: BibleDB = new BibleDB();
-	public static async CreateAsync(): Promise<BibleDB> {
-		await this.instance.createAndOrOpenObjectStores(
-			[
-				CHAPTERS,
-				BOOKNAMES,
-				STRONGS,
-				SEARCH,
+  static instance: BibleDB = new BibleDB();
+  public static async CreateAsync(): Promise<BibleDB> {
+    await this.instance.createAndOrOpenObjectStores(
+      [
+        CHAPTERS,
+        PARAGRAPHS,
+        BOOKNAMES,
+        STRONGS,
+        SEARCH,
 
-				ANNOTATIONS,
-				UNSYNCED_ANNOTATIONS,
+        ANNOTATIONS,
+        UNSYNCED_ANNOTATIONS,
 
-				NOTES,
-				UNSYNCED_NOTES,
+        NOTES,
+        UNSYNCED_NOTES,
 
-				PLANS,
-				UNSYNCED_PLANS,
+        PLANS,
+        UNSYNCED_PLANS,
 
-				SUBSCRIPTIONS,
-				UNSYNCED_SUBSCRIPTIONS,
+        SUBSCRIPTIONS,
+        UNSYNCED_SUBSCRIPTIONS,
 
-				COMPLETED_READINGS,
-				UNSYNCED_COMPLETED_READINGS
-			],
-			DB_VERSION
-		);
-		return this.instance;
-	}
+        COMPLETED_READINGS,
+        UNSYNCED_COMPLETED_READINGS
+      ],
+      DB_VERSION
+    );
+    return this.instance;
+  }
 }
 
 export const bibleDB = await BibleDB.CreateAsync();

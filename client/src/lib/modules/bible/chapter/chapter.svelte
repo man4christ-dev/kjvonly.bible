@@ -10,8 +10,10 @@
 	import {
 		BIBLE_MODES,
 		newAnnotation,
+		newParagraphs,
 		type Annotations,
 		type BibleMode,
+		type Paragraphs,
 		type Verse as VerseModel
 	} from '../../../models/bible.model';
 	import { type Chapter } from '../../../models/bible.model';
@@ -28,6 +30,7 @@
 	import uuid4 from 'uuid4';
 	import { scrollTo, scrollToTop } from '$lib/utils/eventHandlers';
 	import type { Pane } from '$lib/models/pane.model';
+	import { paragraphsService } from '$lib/services/bible/paragraphs.service';
 
 	// =============================== BINDINGS ================================
 
@@ -60,6 +63,8 @@
 	let verseRangeEndIndex: number = 0;
 
 	let chapter: Chapter | undefined = $state();
+	let paragraphs: Paragraphs = $state({});
+
 	/**
 	 * svelte isn't updating annotations on chapter change. Need to toggle
 	 * to update annotations
@@ -85,10 +90,12 @@
 		untrack(() => {
 			resetMode();
 			resetAnnotations();
+			resetParagraphs();
 			toggleVersesViewFn();
 			setVerseRanges();
 			scrollToVerse();
 			loadAnnotations();
+			loadParagraphs();
 			loadNotes();
 			loadChapter();
 		});
@@ -105,6 +112,10 @@
 
 	function resetAnnotations() {
 		annotations = newAnnotation();
+	}
+
+	function resetParagraphs() {
+		paragraphs = newParagraphs();
 	}
 
 	function setVerseRanges() {
@@ -144,6 +155,10 @@
 
 	async function loadAnnotations() {
 		annotations = await annotsService.get(bibleLocationRef);
+	}
+
+	async function loadParagraphs() {
+		paragraphs = await paragraphsService.get(bibleLocationRef);
 	}
 
 	function subscribeToNotes() {
@@ -199,6 +214,7 @@
 			<Verse
 				bind:pane
 				bind:annotations
+				bind:paragraphs
 				bind:notes
 				bind:mode
 				{footnotes}
