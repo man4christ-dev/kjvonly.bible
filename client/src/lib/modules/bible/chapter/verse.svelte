@@ -8,6 +8,7 @@
 		type Verse
 	} from '$lib/models/bible.model';
 	import type { Pane } from '$lib/models/pane.model';
+	import Paragraph from './paragraph.svelte';
 
 	// Components
 	import Word from './word.svelte';
@@ -38,17 +39,16 @@
 </script>
 
 {#if verse}
-	{#if paragraphs && paragraphs[`${bibleLocationRef}_${verse.number}_0`] && verse.number !== 1}
-		<br />
-		<br />
-	{/if}
+	<Paragraph
+		bind:verseNumber={verse.number}
+		bind:bibleLocationRef
+		bind:paragraphs
+	></Paragraph>
 
 	<!-- Group verse number and first word so the verse number is never at the 
 	 	 end of a line -->
 	<span class="inline-block">
-		{#each verse.words.slice(0, 2) as word, idx}{#if paragraphs && paragraphs[`${bibleLocationRef}_${verse.number}_0`] && idx === 0}
-				¶
-			{/if}<Word
+		{#each verse.words.slice(0, 2) as word, idx}<Word
 				bind:pane
 				bind:annotations
 				bind:notes
