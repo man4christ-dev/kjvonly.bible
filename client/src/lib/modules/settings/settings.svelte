@@ -19,6 +19,7 @@
 	// SERVICES
 	import { settingsService } from '$lib/services/settings.service';
 	import Close from '$lib/components/svgs/close.svelte';
+	import Paragraphs from './paragraphs.svelte';
 
 	// =============================== BINDINGS ================================
 
@@ -86,6 +87,8 @@
 	<FontFamilies bind:settings></FontFamilies>
 
 	<FontWeights bind:settings></FontWeights>
+
+	<Paragraphs bind:settings></Paragraphs>
 {/snippet}
 
 <!-- ============================== CONTAINER ============================== -->

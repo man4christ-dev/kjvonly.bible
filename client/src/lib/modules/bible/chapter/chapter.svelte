@@ -31,6 +31,8 @@
 	import { scrollTo, scrollToTop } from '$lib/utils/eventHandlers';
 	import type { Pane } from '$lib/models/pane.model';
 	import { paragraphsService } from '$lib/services/bible/paragraphs.service';
+	import { settingsService } from '$lib/services/settings.service';
+	import type { Settings } from '$lib/models/settings.model';
 
 	// =============================== BINDINGS ================================
 
@@ -78,11 +80,13 @@
 	onMount(async () => {
 		subscribeToAnnotations();
 		subscribeToNotes();
+		subscribeToSettings();
 	});
 
 	onDestroy(() => {
 		unsubscribeToAnnotations();
 		unsubscribeToNotes();
+		unsubscribeToSettings();
 	});
 
 	$effect(() => {
@@ -158,7 +162,12 @@
 	}
 
 	async function loadParagraphs() {
-		paragraphs = await paragraphsService.get(bibleLocationRef);
+		let settings = settingsService.getSettings();
+		if (!settings.showParagraphs) {
+			resetParagraphs();
+		} else {
+			paragraphs = await paragraphsService.get(bibleLocationRef);
+		}
 	}
 
 	function subscribeToNotes() {
@@ -176,6 +185,18 @@
 			bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef),
 			['bookChapter']
 		);
+	}
+
+	function subscribeToSettings() {
+		settingsService.subscribe(id, onSettingsChange);
+	}
+
+	function onSettingsChange() {
+		loadParagraphs();
+	}
+
+	function unsubscribeToSettings() {
+		settingsService.unsubscribe(id);
 	}
 
 	async function loadChapter() {

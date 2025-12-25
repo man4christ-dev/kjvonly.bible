@@ -1,17 +1,19 @@
 export interface Settings {
-	fontSize: string;
-	fontWeight: number;
-	fontFamily: string;
-	colorTheme?: string;
-	isDarkTheme?: boolean;
+  fontSize: string;
+  fontWeight: number;
+  fontFamily: string;
+  colorTheme?: string;
+  isDarkTheme?: boolean;
+  showParagraphs?: boolean;
 }
 
 export function newSettings(): Settings {
-	return {
-		fontSize: 'text-base',
-		fontWeight: 400,
-		fontFamily: 'sans',
-		colorTheme: 'red',
-		isDarkTheme: false
-	};
+  return {
+    fontSize: 'text-base',
+    fontWeight: 400,
+    fontFamily: 'sans',
+    colorTheme: 'red',
+    isDarkTheme: false,
+    showParagraphs: false,
+  };
 }
