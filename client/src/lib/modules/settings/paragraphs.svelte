@@ -1,15 +1,14 @@
 <script lang="ts">
 	import type { Settings } from '$lib/models/settings.model';
-	import { onMount } from 'svelte';
 
 	let { settings = $bindable<Settings>() } = $props();
 
 	let showParagraphs = $state(settings?.showParagraphs);
 
-	onMount(() => {
+	$effect(() => {
+		settings;
 		showParagraphs = settings?.showParagraphs;
 	});
-
 	function toggleShowParagraphs() {
 		settings.showParagraphs = showParagraphs;
 	}
