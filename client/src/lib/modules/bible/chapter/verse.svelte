@@ -43,14 +43,14 @@
 </script>
 
 {#if verse}
-	<Pericope bind:verseNumber={verse.number} bind:bibleLocationRef bind:pericopes
-	></Pericope>
-
 	<Paragraph
 		bind:verseNumber={verse.number}
 		bind:bibleLocationRef
 		bind:paragraphs
 	></Paragraph>
+
+	<Pericope bind:verseNumber={verse.number} bind:bibleLocationRef bind:pericopes
+	></Pericope>
 
 	<!-- Group verse number and first word so the verse number is never at the 
 	 	 end of a line -->

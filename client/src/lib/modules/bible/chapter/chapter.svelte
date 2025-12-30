@@ -96,6 +96,7 @@
 	$effect(() => {
 		bibleLocationRef;
 		untrack(() => {
+			resetChapter();
 			resetMode();
 			resetAnnotations();
 			resetParagraphs();
@@ -116,6 +117,15 @@
 	function toggleVersesViewFn() {
 		toggleVersesView = !toggleVersesView;
 	}
+	function resetChapter() {
+		chapter = undefined;
+		verses = {};
+		footnotes = {};
+		versesNumbersToShow = [];
+		verseRangeEndIndex = 0;
+		verseRangeStartIndex = 0;
+	}
+
 	function resetMode() {
 		mode.value = BIBLE_MODES.READING;
 	}
@@ -212,6 +222,7 @@
 
 	function onSettingsChange() {
 		loadParagraphs();
+		loadPericopes();
 	}
 
 	function unsubscribeToSettings() {
