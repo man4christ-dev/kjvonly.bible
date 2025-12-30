@@ -9,7 +9,8 @@ import {
   BOOKNAMES,
   SEARCH,
   STRONGS,
-  PARAGRAPHS
+  PARAGRAPHS,
+  PERICOPES
 } from '$lib/storer/bible.db';
 import { authService } from '$lib/services/auth.service';
 import { offlineApi } from '$lib/nostr/offline.nostr';
@@ -28,6 +29,9 @@ onmessage = async (e) => {
       break;
     case 'paragraphs':
       fetchAndStoreAllParagraphs(e.data.urls);
+      break;
+    case 'pericopes':
+      fetchAndStoreAllPericopes(e.data.urls);
       break;
     case 'booknames':
       fetchAndStoreBooknames(e.data.urls);
@@ -92,6 +96,30 @@ async function fetchAndStoreAllParagraphs(urls: string[]) {
         }
         chapter['id'] = bibleLocationRef;
         db.putValue(PARAGRAPHS, chapter);
+      });
+      return
+    } catch (err) {
+      console.log(`error: ${err}`);
+    }
+  }
+}
+
+async function fetchAndStoreAllPericopes(urls: string[]) {
+  for (let u of urls) {
+    try {
+      let json = ''
+      if (u.endsWith('.gz')) {
+        json = await downloadAndDecompressGzip(u)
+      } else {
+        throw new Error(`can only process gzip for pericopes but got ${u}`)
+      }
+      let chapters = new Map<string, any>(Object.entries(JSON.parse(json)));
+      chapters.forEach((chapter: any, bibleLocationRef: string) => {
+        if (chapter === null) {
+          chapter = {}
+        }
+        chapter['id'] = bibleLocationRef;
+        db.putValue(PERICOPES, chapter);
       });
       return
     } catch (err) {

@@ -1,9 +1,11 @@
 import IndexedDB from './idb.db';
 
-const DB_VERSION = 12;
+const DB_VERSION = 14;
 
 export const enum STORES {
   CHAPTERS,
+  PARAGRAPHS,
+  PERICOPES,
   BOOKNAMES,
   STRONGS,
   SEARCH,
@@ -23,6 +25,7 @@ export const DB_NAME = 'bible';
 
 export const CHAPTERS = 'chapters';
 export const PARAGRAPHS = 'paragraphs'
+export const PERICOPES = 'pericopes'
 export const BOOKNAMES = 'booknames';
 export const STRONGS = 'strongs';
 export const SEARCH = 'search';
@@ -53,6 +56,7 @@ export class BibleDB extends IndexedDB {
       [
         CHAPTERS,
         PARAGRAPHS,
+        PERICOPES,
         BOOKNAMES,
         STRONGS,
         SEARCH,

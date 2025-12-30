@@ -1,4 +1,4 @@
-import { CHAPTERS, BOOKNAMES, STRONGS, SEARCH, PARAGRAPHS } from '$lib/storer/bible.db';
+import { CHAPTERS, BOOKNAMES, STRONGS, SEARCH, PARAGRAPHS, PERICOPES } from '$lib/storer/bible.db';
 import { sleep } from '$lib/utils/sleep';
 import { bibleDB } from '$lib/storer/bible.db';
 import { relayService } from './relay.service';
@@ -66,6 +66,7 @@ export class SyncService {
     await this.syncStrongs();
     await this.syncSearchIndex();
     await this.syncParagraphs();
+    await this.syncPericopes();
   }
 
   // TODO update syncs to be generic.
@@ -128,6 +129,34 @@ export class SyncService {
     return true;
   }
 
+  async syncPericopes() {
+    let keys = await bibleDB.getAllKeys(PERICOPES);
+    if (keys.length < TOTAL_CHAPTERS_KEYS) {
+      let filter = {
+        "#d": [`kjvonly/bible/kjvs/pericopes`],
+        kinds: [BLOSSOM_KIND]
+      }
+
+      let event = await relayService.getEvent(filter)
+      let urls = getTags(event, 'url')
+      syncWorker.postMessage({ action: PERICOPES, urls: urls });
+
+      let retries = 0;
+      let retryMax = 10;
+
+      while (keys.length < TOTAL_CHAPTERS_KEYS || retries == retryMax) {
+        await sleep(3000);
+        keys = await bibleDB.getAllKeys(PERICOPES);
+        retries = retries + 1;
+      }
+
+      if (retries === retryMax) {
+        return false;
+      }
+    }
+
+    return true;
+  }
 
   async syncBooknames() {
     let keys = await bibleDB.getAllKeys(BOOKNAMES);
