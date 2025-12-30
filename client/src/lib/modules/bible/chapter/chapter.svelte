@@ -11,9 +11,11 @@
 		BIBLE_MODES,
 		newAnnotation,
 		newParagraphs,
+		newPericopes,
 		type Annotations,
 		type BibleMode,
 		type Paragraphs,
+		type Pericopes,
 		type Verse as VerseModel
 	} from '../../../models/bible.model';
 	import { type Chapter } from '../../../models/bible.model';
@@ -33,6 +35,7 @@
 	import { paragraphsService } from '$lib/services/bible/paragraphs.service';
 	import { settingsService } from '$lib/services/settings.service';
 	import type { Settings } from '$lib/models/settings.model';
+	import { pericopesService } from '$lib/services/bible/pericopes.service';
 
 	// =============================== BINDINGS ================================
 
@@ -66,6 +69,7 @@
 
 	let chapter: Chapter | undefined = $state();
 	let paragraphs: Paragraphs = $state({});
+	let pericopes: Pericopes = $state({});
 
 	/**
 	 * svelte isn't updating annotations on chapter change. Need to toggle
@@ -95,11 +99,13 @@
 			resetMode();
 			resetAnnotations();
 			resetParagraphs();
+			resetPericopes();
 			toggleVersesViewFn();
 			setVerseRanges();
 			scrollToVerse();
 			loadAnnotations();
 			loadParagraphs();
+			loadPericopes();
 			loadNotes();
 			loadChapter();
 		});
@@ -120,6 +126,10 @@
 
 	function resetParagraphs() {
 		paragraphs = newParagraphs();
+	}
+
+	function resetPericopes() {
+		pericopes = newPericopes();
 	}
 
 	function setVerseRanges() {
@@ -167,6 +177,15 @@
 			resetParagraphs();
 		} else {
 			paragraphs = await paragraphsService.get(bibleLocationRef);
+		}
+	}
+
+	async function loadPericopes() {
+		let settings = settingsService.getSettings();
+		if (!settings.showPericopes) {
+			resetPericopes();
+		} else {
+			pericopes = await pericopesService.get(bibleLocationRef);
 		}
 	}
 
@@ -236,6 +255,7 @@
 				bind:pane
 				bind:annotations
 				bind:paragraphs
+				bind:pericopes
 				bind:notes
 				bind:mode
 				{footnotes}

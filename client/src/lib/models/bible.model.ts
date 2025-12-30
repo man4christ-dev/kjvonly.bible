@@ -177,6 +177,12 @@ export function newCrossRef(): CrossRef {
 
 export type Paragraphs = {}
 
-export function newParagraphs(): {} {
+export function newParagraphs(): Paragraphs {
+  return {}
+}
+
+export type Pericopes = {}
+
+export function newPericopes(): Pericopes {
   return {}
 }

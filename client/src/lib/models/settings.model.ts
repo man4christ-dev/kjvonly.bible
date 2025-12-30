@@ -5,6 +5,7 @@ export interface Settings {
   colorTheme?: string;
   isDarkTheme?: boolean;
   showParagraphs?: boolean;
+  showPericopes?: boolean;
 }
 
 export function newSettings(): Settings {
@@ -15,5 +16,6 @@ export function newSettings(): Settings {
     colorTheme: 'red',
     isDarkTheme: false,
     showParagraphs: false,
+    showPericopes: false
   };
 }

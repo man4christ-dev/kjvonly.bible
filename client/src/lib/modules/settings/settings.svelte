@@ -12,6 +12,8 @@
 	import FontSize from './fontSize.svelte';
 	import FontWeights from './fontWeights.svelte';
 	import LightDarkMode from './lightDarkMode.svelte';
+	import Paragraphs from './paragraphs.svelte';
+	import Pericopes from './pericopes.svelte';
 
 	// MODELS
 	import { newSettings, type Settings } from '$lib/models/settings.model';
@@ -19,8 +21,6 @@
 	// SERVICES
 	import { settingsService } from '$lib/services/settings.service';
 	import Close from '$lib/components/svgs/close.svelte';
-	import Paragraphs from './paragraphs.svelte';
-
 	// =============================== BINDINGS ================================
 
 	let { onClose } = $props();
@@ -89,6 +89,8 @@
 	<FontWeights bind:settings></FontWeights>
 
 	<Paragraphs bind:settings></Paragraphs>
+
+	<Pericopes bind:settings></Pericopes>
 {/snippet}
 
 <!-- ============================== CONTAINER ============================== -->
