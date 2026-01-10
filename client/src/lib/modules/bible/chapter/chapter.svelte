@@ -41,6 +41,7 @@
 
 	let {
 		bibleLocationRef = $bindable<string>(),
+		bibleVersion = $bindable<string>(),
 		id = $bindable<string>(),
 		pane = $bindable<Pane>(),
 		mode = $bindable<BibleMode>(),
@@ -48,6 +49,7 @@
 		lastKnownScrollPosition
 	}: {
 		bibleLocationRef: string;
+		bibleVersion: string;
 		id: string;
 		pane: Pane;
 		mode: BibleMode;
@@ -93,8 +95,15 @@
 		unsubscribeToSettings();
 	});
 
+	/**
+	 * CORE NOTE: on new bibleLocationRef we must reset the chapter prior to
+	 * loading new content. Otehrwise, the rendering will render previous chapter
+	 * annotations, paragraphs, and pericopes on the new chapter.
+	 */
+
 	$effect(() => {
 		bibleLocationRef;
+		bibleVersion;
 		untrack(() => {
 			resetChapter();
 			resetMode();
@@ -117,6 +126,7 @@
 	function toggleVersesViewFn() {
 		toggleVersesView = !toggleVersesView;
 	}
+
 	function resetChapter() {
 		chapter = undefined;
 		verses = {};
@@ -230,7 +240,7 @@
 	}
 
 	async function loadChapter() {
-		chapter = await chapterService.get(bibleLocationRef);
+		chapter = await chapterService.get(`${bibleVersion}/${bibleLocationRef}`);
 		verses = chapter.verses;
 		footnotes = chapter.footnotes;
 		setChapterVersesToShow();

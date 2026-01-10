@@ -39,16 +39,26 @@
 	let strongsRefs: string[] = $state([]);
 	let text = $state('');
 	let crossRefs: string[] = $state([]);
+	let bibleVersion: string = $state('');
 
 	// =============================== LIFECYCLE ===============================
 
 	onMount(() => {
+		setBibleVersion();
 		setRefs();
 		setCurrentVerseRef();
 		setWordText();
 	});
 
 	// ================================ FUNCS ==================================
+
+	function setBibleVersion() {
+		if (pane?.buffer?.bag?.bibleVersion) {
+			bibleVersion = pane?.buffer?.bag?.bibleVersion;
+		} else {
+			bibleVersion = 'kjvs';
+		}
+	}
 
 	function setRefs(): void {
 		let refs: string[] = getRefs();
@@ -155,7 +165,10 @@
 
 	{#if crossRefs.length > 0}
 		<div class=" pt-4"></div>
-		<CrossRefsContainer paneID={pane?.id} boundCrossRefs={crossRefs}
+		<CrossRefsContainer
+			paneID={pane?.id}
+			boundCrossRefs={crossRefs}
+			{bibleVersion}
 		></CrossRefsContainer>
 	{/if}
 {/snippet}

@@ -17,7 +17,7 @@
 <div class="my-auto flex flex-row p-2">
 	<label
 		for="showParagraphs"
-		class="has-checked:bg-support-a-600 relative block h-8 min-w-14 max-w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent] hover:cursor-pointer"
+		class="has-checked:bg-primary-500 relative block h-8 max-w-14 min-w-14 rounded-full bg-neutral-300 transition-colors [-webkit-tap-highlight-color:_transparent] hover:cursor-pointer"
 	>
 		<input
 			bind:checked={showParagraphs}

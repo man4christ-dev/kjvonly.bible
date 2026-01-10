@@ -42,6 +42,7 @@
 	// component vars
 	let searchID: string = uuid4();
 	let searchText = $state('');
+	let bibleVersion = $state('kjvs');
 
 	// =============================== LIFECYCLE ===============================
 
@@ -79,10 +80,19 @@
 
 {#snippet body()}
 	{#if showInput}
-		<SearchInput bind:searchText ID={searchID} {onFilterBibleLocationRef}
+		<SearchInput
+			bind:bibleVersion
+			bind:searchText
+			ID={searchID}
+			{onFilterBibleLocationRef}
 		></SearchInput>
 	{/if}
-	<SearchResults {paneID} bind:searchText {searchID} {onFilterBibleLocationRef}
+	<SearchResults
+		{paneID}
+		bind:bibleVersion
+		bind:searchText
+		{searchID}
+		{onFilterBibleLocationRef}
 	></SearchResults>
 
 	<div class="h-6"></div>

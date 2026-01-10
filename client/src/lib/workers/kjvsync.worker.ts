@@ -10,7 +10,10 @@ import {
   SEARCH,
   STRONGS,
   PARAGRAPHS,
-  PERICOPES
+  PERICOPES,
+  BIBLE_VERSIONS,
+  ACTION_DELETE_VERSION,
+  bibleDB
 } from '$lib/storer/bible.db';
 import { authService } from '$lib/services/auth.service';
 import { offlineApi } from '$lib/nostr/offline.nostr';
@@ -41,6 +44,9 @@ onmessage = async (e) => {
       break;
     case 'search':
       fetchAndStoreSearchBibleIndex(e.data.urls);
+    case ACTION_DELETE_VERSION:
+      deleteVersion(e.data.version)
+      break;
   }
 };
 
@@ -59,6 +65,7 @@ async function syncAnnotsAndNotesFromServer(data: any) {
 }
 
 // --------------------- SYNC STATIC DATA -------------------------------------
+
 async function fetchAndStoreAllBibleChapters(urls: string[]) {
   for (let u of urls) {
     try {
@@ -73,10 +80,26 @@ async function fetchAndStoreAllBibleChapters(urls: string[]) {
         chapter['id'] = bibleLocationRef;
         db.putValue(CHAPTERS, chapter);
       });
+      let key = chapters.keys().next().value
+      let bibleVersion = key?.split('/')[0]
+      await db.putValue(BIBLE_VERSIONS, { id: bibleVersion })
       return
     } catch (err) {
       console.log(`error: ${err}`);
     }
+  }
+}
+
+async function deleteVersion(version: string): Promise<void> {
+  await bibleDB.deleteValue(BIBLE_VERSIONS, version)
+  await deleteVersionChapters(version)
+}
+
+async function deleteVersionChapters(version: string): Promise<void> {
+  let keys = await bibleDB.getAllKeys(CHAPTERS)
+  let versionKeys = keys.map(key => key as string).filter((key: string) => key.startsWith(`${version}/`))
+  for (const key of versionKeys) {
+    await bibleDB.deleteValue(CHAPTERS, key)
   }
 }
 

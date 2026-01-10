@@ -22,10 +22,12 @@
 	let {
 		showMenuPopup = $bindable<boolean>(),
 		showCopyVersesPopup = $bindable<boolean>(),
+		showBibleVersionPopup = $bindable<boolean>(),
 		paneID
 	}: {
 		showMenuPopup: boolean;
 		showCopyVersesPopup: boolean;
+		showBibleVersionPopup: boolean;
 		paneID: string;
 	} = $props();
 
@@ -38,6 +40,10 @@
 		'copy verses': () => {
 			showMenuPopup = false;
 			showCopyVersesPopup = true;
+		},
+		'bible version': () => {
+			showMenuPopup = false;
+			showBibleVersionPopup = true;
 		},
 		search: () => {
 			let p = paneService.findNode(paneService.rootPane, paneID);

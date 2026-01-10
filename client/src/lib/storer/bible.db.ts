@@ -1,9 +1,10 @@
 import IndexedDB from './idb.db';
 
-const DB_VERSION = 14;
+const DB_VERSION = 15;
 
 export const enum STORES {
   CHAPTERS,
+  BIBLE_VERSIONS,
   PARAGRAPHS,
   PERICOPES,
   BOOKNAMES,
@@ -23,7 +24,9 @@ export const enum STORES {
 
 export const DB_NAME = 'bible';
 
+// indexes 
 export const CHAPTERS = 'chapters';
+export const BIBLE_VERSIONS = 'bible_versions';
 export const PARAGRAPHS = 'paragraphs'
 export const PERICOPES = 'pericopes'
 export const BOOKNAMES = 'booknames';
@@ -45,6 +48,10 @@ export const UNSYNCED_SUBSCRIPTIONS = 'unsynced_subscriptions';
 export const COMPLETED_READINGS = 'completed_readings';
 export const UNSYNCED_COMPLETED_READINGS = 'unsynced_completed_readings';
 
+// ACTIONS
+
+export const ACTION_DELETE_VERSION = 'DELETE_VERSION'
+
 export class BibleDB extends IndexedDB {
   constructor() {
     super(DB_NAME);
@@ -55,6 +62,7 @@ export class BibleDB extends IndexedDB {
     await this.instance.createAndOrOpenObjectStores(
       [
         CHAPTERS,
+        BIBLE_VERSIONS,
         PARAGRAPHS,
         PERICOPES,
         BOOKNAMES,

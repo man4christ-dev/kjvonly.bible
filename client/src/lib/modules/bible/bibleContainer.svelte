@@ -45,6 +45,7 @@
 
 	let annotations: Annotations = $state(newAnnotation());
 	let bibleLocationRef: string = $state('');
+	let bibleVersion: string = $state('kjvs');
 	let clientHeight = $state(0);
 	let headerHeight = $state(0);
 	/** since the {@link header} snippet is part of the body we don't
@@ -54,6 +55,7 @@
 	let zeroHeaderHeight = $state(0);
 	let id = $state(uuid4());
 	const LAST_BIBLE_LOCATION_REF = 'lastBibleLocationReference';
+	const LAST_BIBLE_VERSION = 'lastBibleVersion';
 	let mode: any = $state(newBibleMode());
 
 	// DOM related vars
@@ -65,6 +67,7 @@
 	onMount(() => {
 		setModePaneID();
 		setNavReadings();
+		setBibleVersion();
 		setBibleLocationRef();
 		attachScrolls();
 		overrideContextMenu();
@@ -72,6 +75,7 @@
 
 	$effect(() => {
 		bibleLocationRef;
+		bibleVersion;
 		onBibleLocationRefChanged();
 	});
 
@@ -84,6 +88,17 @@
 	function setNavReadings() {
 		if (pane?.buffer?.bag?.navReadings) {
 			mode.navReadings = pane?.buffer?.bag?.navReadings;
+		}
+	}
+
+	function setBibleVersion() {
+		if (pane?.buffer?.bag?.bibleVersion) {
+			bibleVersion = pane?.buffer?.bag?.bibleVersion;
+		} else {
+			let version = localStorage.getItem(LAST_BIBLE_VERSION);
+			if (version) {
+				bibleVersion = version;
+			}
 		}
 	}
 
@@ -133,7 +148,9 @@
 	function onBibleLocationRefChanged() {
 		if (bibleLocationRef) {
 			pane.buffer.bag.bibleLocationRef = bibleLocationRef;
+			pane.buffer.bag.bibleVersion = bibleVersion;
 			localStorage.setItem(LAST_BIBLE_LOCATION_REF, bibleLocationRef);
+			localStorage.setItem(LAST_BIBLE_VERSION, bibleVersion);
 			paneService.save();
 		}
 	}
@@ -145,6 +162,7 @@
 	<BibleHeader
 		bind:mode
 		bind:bibleLocationRef
+		bind:bibleVersion
 		bind:clientHeight
 		bind:headerHeight
 		{paneID}
@@ -159,6 +177,7 @@
 			<div id="chapter-container-{id}" class="w-full">
 				<Chapter
 					bind:bibleLocationRef
+					bind:bibleVersion
 					bind:id
 					bind:pane
 					bind:mode
@@ -180,6 +199,7 @@
 					bind:mode
 					bind:pane
 					bind:bibleLocationRef
+					bind:bibleVersion
 					bind:showNavButtons
 					ID={id}
 				></ChapterNavButtons>

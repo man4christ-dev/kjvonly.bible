@@ -25,11 +25,13 @@
 
 	let {
 		searchText = $bindable<string>(),
+		bibleVersion = $bindable<string>(),
 		paneID,
 		searchID,
 		onFilterBibleLocationRef
 	}: {
 		searchText: string;
+		bibleVersion: string;
 		paneID: string;
 		searchID: string;
 		onFilterBibleLocationRef: onFilterBibleLocationRefFunction;
@@ -124,7 +126,7 @@
 	async function searchResultIndexToSearchResult(
 		bibleLocationRef: string
 	): Promise<SearchResult | undefined> {
-		let verse = await verseService.get(bibleLocationRef);
+		let verse = await verseService.get(`${bibleVersion}/${bibleLocationRef}`);
 		if (!verse) {
 			return;
 		}
@@ -146,7 +148,8 @@
 		let pane = paneService.findNode(paneService.rootPane, paneID);
 		if (pane) {
 			pane.buffer.bag = {
-				bibleLocationRef: sr.key
+				bibleLocationRef: sr.key,
+				bibleVersion: bibleVersion
 			};
 			pane?.updateBuffer(Modules.BIBLE);
 		}

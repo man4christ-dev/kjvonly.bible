@@ -1,6 +1,6 @@
 <script lang="ts">
 	// SVELTE
-	import { onMount, untrack } from 'svelte';
+	import { onDestroy, onMount, untrack } from 'svelte';
 
 	// COMPONENTS
 	import BibleMenuPopup from './popups/bibleMenuPopup.svelte';
@@ -9,6 +9,8 @@
 	import NavReadingsList from './plans/navReadingsList.svelte';
 	import Notes from '../notes/notes.svelte';
 	import Settings from '../settings/settings.svelte';
+	import Edit from '$lib/components/svgs/edit.svelte';
+	import BibleVersionPopup from './popups/bibleVersionPopup.svelte';
 
 	// // TOOLBAR
 	import Close from '$lib/components/svgs/close.svelte';
@@ -30,20 +32,25 @@
 	// SERVICES
 	import { bibleLocationReferenceService } from '$lib/services/bible/bibleLocationReference.service';
 	import { shortBookNamesByIDService } from '$lib/services/bibleMetadata/shortBookNamesByID.service';
+	import { settingsService } from '$lib/services/settings.service';
 	import { paneService } from '$lib/services/pane.service.svelte';
-	import Edit from '$lib/components/svgs/edit.svelte';
+
+	// OTHER
+	import uuid4 from 'uuid4';
 
 	// =============================== BINDINGS ================================
 
 	let {
 		mode = $bindable(),
-		bibleLocationRef = $bindable(),
+		bibleLocationRef = $bindable<string>(),
+		bibleVersion = $bindable<string>(),
 		clientHeight = $bindable<number>(),
 		headerHeight = $bindable<number>(),
 		paneID
 	}: {
 		mode: BibleMode;
 		bibleLocationRef: string;
+		bibleVersion: string;
 		clientHeight: number;
 		headerHeight: number;
 		paneID: string;
@@ -51,16 +58,19 @@
 
 	// ================================== VARS =================================
 
+	let id = uuid4();
+	let bookName: string = $state('');
+	let bookChapter: number = $state(0);
+	let headerGridCols = $state(7);
+	let showBibleVersion = $state(false);
+	let verses: string = $state('');
+
 	let showBookChapterPopup: boolean = $state(false);
 	let showNavReadingsPopup: boolean = $state(false);
 	let showSettingsPopup: boolean = $state(false);
 	let showMenuPopup: boolean = $state(false);
 	let showCopyVersesPopup: boolean = $state(false);
-
-	let bookName: string = $state('');
-	let bookChapter: number = $state(0);
-	let verses: string = $state('');
-	let headerGridCols = $state(7);
+	let showBibleVersionPopup: boolean = $state(false);
 
 	// TODO this will become dynamic option allowing users to configure their
 	// toolbar to their liking
@@ -78,6 +88,11 @@
 
 	onMount(() => {
 		setBookNameAndChapter();
+		subscribeToSettings();
+	});
+
+	onDestroy(() => {
+		unsubscribeToSettings();
 	});
 
 	$effect(() => {
@@ -105,6 +120,19 @@
 		} else {
 			verses = '';
 		}
+	}
+
+	function subscribeToSettings() {
+		settingsService.subscribe(id, onSettingsChange);
+		onSettingsChange();
+	}
+
+	function unsubscribeToSettings() {
+		settingsService.unsubscribe(id);
+	}
+
+	function onSettingsChange() {
+		showBibleVersion = settingsService.getSettings().showBibleVersion || false;
 	}
 
 	// ============================== CLICK FUNCS ==============================
@@ -149,7 +177,9 @@
 	}
 
 	function onSearchClick() {
-		paneService.onSplitPane(paneID, 'h', Modules.SEARCH, {});
+		paneService.onSplitPane(paneID, 'h', Modules.SEARCH, {
+			bibleVersion: bibleVersion
+		});
 	}
 
 	function onCopyClick() {
@@ -161,9 +191,10 @@
 
 {#snippet bookChapterVerseButton()}
 	<button onclick={onBookChapterClick} class=" text-center text-neutral-700">
-		<span class="kjvonly-noselect flex items-center text-center">
+		<span class="kjvonly-noselect text-center whitespace-nowrap">
 			{#if bookName && bookChapter}
-				{bookName} {bookChapter}{verses}
+				{#if showBibleVersion}{bibleVersion?.toUpperCase()}/{/if}{bookName}
+				{bookChapter}{verses}
 			{/if}
 		</span>
 	</button>
@@ -278,8 +309,21 @@
 {#snippet actionsPopup()}
 	{#if showMenuPopup}
 		<PopupContainer bind:clientHeight>
-			<BibleMenuPopup {paneID} bind:showCopyVersesPopup bind:showMenuPopup
+			<BibleMenuPopup
+				{paneID}
+				bind:showCopyVersesPopup
+				bind:showMenuPopup
+				bind:showBibleVersionPopup
 			></BibleMenuPopup>
+		</PopupContainer>
+	{/if}
+{/snippet}
+
+{#snippet bibleVersionPopup()}
+	{#if showBibleVersionPopup}
+		<PopupContainer bind:clientHeight>
+			<BibleVersionPopup bind:bibleVersion bind:showBibleVersionPopup
+			></BibleVersionPopup>
 		</PopupContainer>
 	{/if}
 {/snippet}
@@ -299,6 +343,7 @@
 				{paneID}
 				bind:showCopyVersePopup={showCopyVersesPopup}
 				bind:bibleLocationRef
+				bind:bibleVersion
 			></CopyVersePopup>
 		</PopupContainer>
 	{/if}
@@ -311,6 +356,7 @@
 {@render navReadingsPopup()}
 {@render settingsPopup()}
 {@render actionsPopup()}
+{@render bibleVersionPopup()}
 {@render notePopup()}
 {@render copyVersePopup()}
 

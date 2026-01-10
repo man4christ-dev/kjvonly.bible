@@ -1,9 +1,9 @@
-import { CHAPTERS, BOOKNAMES, STRONGS, SEARCH, PARAGRAPHS, PERICOPES } from '$lib/storer/bible.db';
+import { CHAPTERS, BOOKNAMES, STRONGS, SEARCH, PARAGRAPHS, PERICOPES, ACTION_DELETE_VERSION } from '$lib/storer/bible.db';
 import { sleep } from '$lib/utils/sleep';
 import { bibleDB } from '$lib/storer/bible.db';
 import { relayService } from './relay.service';
 import { BLOSSOM_KIND } from '$lib/nostr/kinds';
-import { getTags } from '$lib/utils/nostr';
+import { getTag, getTags, KJVONLY_PUBKEY } from '$lib/utils/nostr';
 const syncWorker = new Worker(
   new URL('../workers/kjvsync.worker?worker', import.meta.url),
   {
@@ -73,15 +73,20 @@ export class SyncService {
   // implement a count call to index db to just return the count.
   async syncChapters() {
     let keys = await bibleDB.getAllKeys(CHAPTERS);
-    if (keys.length < TOTAL_CHAPTERS_KEYS) {
+    if (keys.length === 0 || keys.length % TOTAL_CHAPTERS_KEYS !== 0) {
       let filter = {
-        "#d": [`kjvonly/bible/kjvs/all`],
+        "authors": [KJVONLY_PUBKEY],
         kinds: [BLOSSOM_KIND]
       }
 
-      let event = await relayService.getEvent(filter)
-      let urls = getTags(event, 'url')
-      syncWorker.postMessage({ action: CHAPTERS, urls: urls });
+      let events = await relayService.getEvents(filter)
+      events?.forEach(event => {
+        let type = getTag(event, 'type')
+        if (type === 'chapters') {
+          let urls = getTags(event, 'url')
+          syncWorker.postMessage({ action: CHAPTERS, urls: urls });
+        }
+      })
 
       let retries = 0;
       let retryMax = 10;
@@ -100,12 +105,18 @@ export class SyncService {
     return true;
   }
 
+  async deleteVersion(version: string) {
+    syncWorker.postMessage({ action: ACTION_DELETE_VERSION, version: version })
+  }
+
   async syncParagraphs() {
     let keys = await bibleDB.getAllKeys(PARAGRAPHS);
     if (keys.length < TOTAL_CHAPTERS_KEYS) {
       let filter = {
         "#d": [`kjvonly/bible/kjvs/paragraphs`],
+        "authors": [KJVONLY_PUBKEY],
         kinds: [BLOSSOM_KIND]
+
       }
 
       let event = await relayService.getEvent(filter)
@@ -134,6 +145,7 @@ export class SyncService {
     if (keys.length < TOTAL_CHAPTERS_KEYS) {
       let filter = {
         "#d": [`kjvonly/bible/kjvs/pericopes`],
+        "authors": [KJVONLY_PUBKEY],
         kinds: [BLOSSOM_KIND]
       }
 
@@ -164,6 +176,7 @@ export class SyncService {
     if (keys.length < TOTAL_BOOKNAMES_KEYS) {
       let filter = {
         "#d": [`kjvonly/bible/kjvs/booknames`],
+        "authors": [KJVONLY_PUBKEY],
         kinds: [BLOSSOM_KIND]
       }
 
@@ -196,6 +209,7 @@ export class SyncService {
     if (!searchIndex) {
       let filter = {
         "#d": [`kjvonly/bible/kjvs/bibleindex`],
+        "authors": [KJVONLY_PUBKEY],
         kinds: [BLOSSOM_KIND]
       }
 
@@ -227,6 +241,7 @@ export class SyncService {
     if (keys.length < TOTAL_STRONGS_KEYS) {
       let filter = {
         "#d": [`kjvonly/bible/strongs/all`],
+        "authors": [KJVONLY_PUBKEY],
         kinds: [BLOSSOM_KIND]
       }
 

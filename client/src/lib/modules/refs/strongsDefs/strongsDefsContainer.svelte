@@ -24,6 +24,7 @@
 	let {
 		clientHeight = $bindable<number>(),
 		popups = $bindable<any>(),
+		bibleVersion,
 		hasCrossRef,
 		strongsRefs,
 		strongsWords,
@@ -60,7 +61,7 @@
 	}
 
 	function sanitize(w: string): string {
-		return w.replace(/[^a-zA-Z0-9 ]/g, '');
+		return w?.replace(/[^a-zA-Z0-9 ]/g, '');
 	}
 
 	// ============================== CLICK FUNCS ==============================
@@ -89,7 +90,8 @@
 		popups.searchPopup = {
 			paneID: paneID,
 			searchTerms: searchTerms,
-			onFilterBibleLocationRefByBookID: onFilterBibleLocationRefByBookID
+			onFilterBibleLocationRefByBookID: onFilterBibleLocationRefByBookID,
+			bibleVersion: bibleVersion
 		};
 	}
 
@@ -98,7 +100,8 @@
 
 		popups.searchPopup = {
 			paneID: paneID,
-			searchTerms: searchTerms
+			searchTerms: searchTerms,
+			bibleVersion: bibleVersion
 		};
 	}
 
