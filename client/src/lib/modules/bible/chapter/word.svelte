@@ -30,6 +30,7 @@
 		mode = $bindable<BibleMode>(),
 		notes = $bindable(),
 		bibleLocationRef,
+		bibleVersion,
 		footnotes,
 		lastKnownScrollPosition,
 		verse,
@@ -41,6 +42,7 @@
 		mode: BibleMode;
 		notes: any;
 		bibleLocationRef: string;
+		bibleVersion: string;
 		footnotes: { [key: string]: string };
 		lastKnownScrollPosition: number;
 		verse: Verse;
@@ -130,11 +132,9 @@
 		updateBibleLocationRef();
 
 		if (isBibleModeEdit()) {
-			console.log('is bible mode edit', isBibleModeEdit());
 			onEditClick();
 			return;
 		}
-		console.log('skipped edit click');
 
 		if (track[wordIdx] && track[wordIdx].finished) {
 			return;
@@ -171,6 +171,7 @@
 			footnotes: footnotes,
 			currentVerseRef: getBibleCrossReference(),
 			refs: refs,
+			bibleVersion: bibleVersion,
 			strongsWords: strongsWords
 		});
 	}
@@ -179,7 +180,8 @@
 		paneService.onSplitPane(pane.id, 'h', Modules.STRONGS, {
 			word: word,
 			footnotes: footnotes,
-			currentVerseRef: getBibleCrossReference()
+			currentVerseRef: getBibleCrossReference(),
+			bibleVersion: bibleVersion
 		});
 	}
 

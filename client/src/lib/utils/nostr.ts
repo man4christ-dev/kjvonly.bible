@@ -11,4 +11,18 @@ export function getTags(event: Event, tagName: string): string[] {
     .map(tag => tag[1]) || [];
 }
 
+/** 
+ * Finds first tag and returns the value */
+export function getTag(event: Event, tagName: string): string {
+  let tags = event.tags
+    .filter(tag => tag[0] === tagName)
+    .map(tag => tag[1]);
+
+  if (tags.length === 0) {
+    return ''
+  }
+
+  return tags[0]
+}
+
 

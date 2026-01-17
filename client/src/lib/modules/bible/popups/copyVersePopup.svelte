@@ -31,10 +31,12 @@
 
 	let {
 		bibleLocationRef = $bindable<string>(),
+		bibleVersion = $bindable<string>(),
 		showCopyVersePopup = $bindable<boolean>(),
 		paneID
 	}: {
 		bibleLocationRef: string;
+		bibleVersion: string;
 		showCopyVersePopup: boolean;
 		paneID: string;
 	} = $props();
@@ -72,7 +74,9 @@
 	// ================================ FUNCS ==================================
 
 	async function loadVerses() {
-		let chapter = await chapterService.get(bibleLocationRef);
+		let chapter = await chapterService.get(
+			`${bibleVersion}/${bibleLocationRef}`
+		);
 		verses = chapter.verses;
 	}
 

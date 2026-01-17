@@ -25,6 +25,7 @@
 		mode = $bindable<BibleMode>(),
 		notes = $bindable<any>(),
 		bibleLocationRef,
+		bibleVersion,
 		footnotes,
 		lastKnownScrollPosition,
 		verse
@@ -36,6 +37,7 @@
 		mode: BibleMode;
 		notes: any;
 		bibleLocationRef: string;
+		bibleVersion: string;
 		footnotes: { [key: string]: string };
 		lastKnownScrollPosition: number;
 		verse: Verse;
@@ -64,6 +66,7 @@
 				{word}
 				{footnotes}
 				{bibleLocationRef}
+				{bibleVersion}
 				{lastKnownScrollPosition}
 				wordIdx={idx}
 			></Word>
@@ -78,6 +81,7 @@
 			{word}
 			{footnotes}
 			{bibleLocationRef}
+			{bibleVersion}
 			{lastKnownScrollPosition}
 			wordIdx={idx + 2}
 		></Word>

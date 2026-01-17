@@ -13,7 +13,14 @@ import { KJVONLY_PUBKEY } from '$lib/utils/nostr';
 import { relayService } from '$lib/services/relay.service';
 
 export class ChapterApi {
-  async getChapter(bibleLocationRef: string): Promise<any> {
+  async getChapter(key: string): Promise<any> {
+
+    let bibleLocationRef = ''
+    let versionRef = key.split('/')
+    if (versionRef.length === 2) {
+      bibleLocationRef = versionRef[1]
+    }
+
     bibleLocationRef =
       bibleLocationReferenceService.extractBookIDChapter(bibleLocationRef);
 
@@ -22,13 +29,10 @@ export class ChapterApi {
       "#d": [`kjvonly/bible/kjvs/${bibleLocationRef}`]
     }
 
-    // TODO remove this to actually hit cache
-    let content = await relayService.getContent(filter)
-    return JSON.parse(content)
 
     return offlineApi.cacheHitThenFetch(
       filter,
-      bibleLocationRef,
+      key,
       CHAPTERS,
       CHAPTERS
     );

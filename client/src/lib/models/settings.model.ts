@@ -6,6 +6,8 @@ export interface Settings {
   isDarkTheme?: boolean;
   showParagraphs?: boolean;
   showPericopes?: boolean;
+  showBibleVersion?: boolean;
+  enableMaxWidth?: boolean;
 }
 
 export function newSettings(): Settings {
@@ -16,6 +18,8 @@ export function newSettings(): Settings {
     colorTheme: 'red',
     isDarkTheme: false,
     showParagraphs: false,
-    showPericopes: false
+    showPericopes: false,
+    showBibleVersion: false,
+    enableMaxWidth: true
   };
 }

@@ -1,27 +1,23 @@
+import uuid4 from 'uuid4';
 import { type Settings, newSettings } from '../models/settings.model';
+
+
 
 /**
  * Settings apply users settings to DOM. On update the settings module will
  * call this service to update the DOM with desired settings e.g. color, font
  */
 class SettingsService {
-  subscribers: any[] = [];
-  constructor() {
-  }
+  myid = uuid4()
+  subscribers: any = {}
 
 
-  subscribe(id: any, fn: any) {
-    this.subscribers.push({ id: id, fn: fn });
+  subscribe(subID: any, fn: any) {
+    this.subscribers[subID] = fn;
   }
 
   unsubscribe(subID: any) {
-    let tmpSubscribers: any = [];
-    this.subscribers.forEach((s) => {
-      if (s.subID !== subID) {
-        tmpSubscribers.push();
-      }
-    });
-    this.subscribers = tmpSubscribers;
+    delete this.subscribers[subID]
   }
 
 
@@ -41,8 +37,9 @@ class SettingsService {
       `font-size: ${cs.fontSize}px; font-weight: ${cs.fontWeight};`
     );
 
-    this.subscribers.forEach((s) => {
-      s.fn(cs);
+    Object.keys(this.subscribers).forEach((k: string) => {
+      let fn = this.subscribers[k];
+      fn(cs)
     });
 
   }
